@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sheep Gates</title>
+<style>
+  :root {
+    --bg-page: #f5f1e8;
+    --bg-card: #ffffff;
+    --bg-soft: #efeadd;
+    --text-primary: #2c2c2a;
+    --text-secondary: #6b6961;
+    --text-muted: #94918a;
+    --border: rgba(0, 0, 0, 0.1);
+    --info: #185fa5;
+    --info-soft: #e6f1fb;
+    --success: #0f6e56;
+    --danger: #a32d2d;
+    --gate-wood: #8b6f47;
+    --gate-wood-dark: #5d4a30;
+    --grass: #c8e6a0;
+    --grass-dark: #a8cf7a;
+    --sky: #b8dcf0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg-page);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 16px;
+  }
+  .app {
+    width: 100%;
+    max-width: 720px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 28px;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+  .tagline {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin: 0 0 24px;
+  }
+  #game-container {
+    background: var(--bg-soft);
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .sheep-icon { font-size: 28px; }
+  .stat {
+    background: var(--bg-card);
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 0.5px solid var(--border);
+  }
+  .stat-label { font-size: 11px; color: var(--text-secondary); }
+  .stat-value { font-size: 14px; font-weight: 500; }
+  .level-bar-wrap {
+    background: var(--bg-card);
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 16px;
+  }
+  .level-bar-text {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+  .level-bar-track {
+    height: 8px;
+    background: var(--bg-soft);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .level-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: #639922;
+    transition: width 0.4s;
+  }
+  #field {
+    background: linear-gradient(to bottom, var(--sky) 0%, var(--sky) 25%, var(--grass) 25%, var(--grass) 100%);
+    border-radius: 8px;
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+  }
+  #world {
+    position: absolute;
+    inset: 0;
+    transition: transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 1;
+    will-change: transform;
+  }
+  #sheep {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    font-size: 44px;
+    transition: left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                transform 0.3s, opacity 0.3s;
+    z-index: 3;
+    line-height: 1;
+  }
+  #grass-front {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 18px;
+    background: var(--grass-dark);
+    z-index: 2;
+  }
+  #message {
+    position: absolute;
+    bottom: 28px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    min-height: 20px;
+    z-index: 4;
+    pointer-events: none;
+  }
+  #level-up-banner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    background: rgba(15, 110, 86, 0.95);
+    color: #fff;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    z-index: 5;
+    pointer-events: none;
+    transition: transform 0.4s, opacity 0.4s;
+    text-align: center;
+  }
+  button {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background 0.15s, transform 0.1s;
+  }
+  button:hover { background: var(--bg-soft); }
+  button:active { transform: scale(0.98); }
+  input[type="text"] {
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 8px;
+    font-family: inherit;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: var(--info);
+    box-shadow: 0 0 0 2px var(--info-soft);
+  }
+  #hiscore-entry, #leaderboard {
+    background: var(--bg-card);
+    border: 0.5px solid var(--border);
+    border-radius: 8px;
+    padding: 14px;
+  }
+  #hiscore-entry { margin-top: 16px; text-align: center; }
+  #leaderboard { margin-top: 16px; font-size: 13px; }
+  .leaderboard-title {
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .leaderboard-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4px 0;
+  }
+  .lb-name {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    letter-spacing: 2px;
+    font-weight: 500;
+  }
+  .lb-rank {
+    color: var(--text-muted);
+    margin-right: 8px;
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  }
+  details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
+  details summary { cursor: pointer; }
+  details p { margin: 8px 0 0; line-height: 1.6; }
+  .footer {
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 20px;
+  }
+  .footer a { color: var(--text-secondary); }
+  .sync-indicator {
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+  .sync-indicator.syncing { color: var(--info); }
+  .sync-indicator.error { color: var(--danger); }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🐑 Sheep Gates</h1>
+  <p class="tagline">Bet on the open gate. Survive as long as you can.</p>
+
+  <div id="game-container">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="sheep-icon" aria-hidden="true">🐑</span>
+        <div>
+          <div style="font-size: 16px; font-weight: 500;" id="round-label">Gate 1 · Level 1</div>
+          <div style="font-size: 13px; color: var(--text-secondary);" id="status-label">Pick the open gate</div>
+        </div>
+      </div>
+      <div style="display: flex; gap: 8px;">
+        <div class="stat">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">World best</div>
+          <div class="stat-value" id="best-display">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="level-bar-wrap">
+      <div class="level-bar-text">
+        <span id="level-label">Level 1 · 6 of 7 open</span>
+        <span id="level-progress-text">0 / 7</span>
+      </div>
+      <div class="level-bar-track">
+        <div class="level-bar-fill" id="level-progress-bar"></div>
+      </div>
+    </div>
+
+    <div id="field">
+      <div id="world"></div>
+      <div id="sheep" aria-hidden="true">🐑</div>
+      <div id="grass-front"></div>
+      <div id="message"></div>
+      <div id="level-up-banner">Level up!</div>
+    </div>
+
+    <div id="hiscore-entry" style="display: none;">
+      <div style="font-size: 14px; font-weight: 500; margin-bottom: 6px;">🏅 New world best!</div>
+      <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 10px;">Enter your initials (up to 4 letters)</div>
+      <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+        <input id="hiscore-name" type="text" maxlength="4" autocomplete="off"
+               style="width: 90px; text-align: center; text-transform: uppercase; font-size: 18px; letter-spacing: 4px; font-weight: 500;" />
+        <button id="hiscore-save" style="font-weight: 500;">Save</button>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px; margin-top: 16px; justify-content: center; min-height: 36px;">
+      <button id="restart-btn" style="display: none;">Try again</button>
+    </div>
+
+    <div id="leaderboard" style="display: none;">
+      <div class="leaderboard-title">
+        <span>Top 10 of all time</span>
+        <span class="sync-indicator" id="sync-indicator"></span>
+      </div>
+      <div id="leaderboard-list"></div>
+    </div>
+
+    <details>
+      <summary>How to play</summary>
+      <p>7 gates per row, but only some are open. Pick an open gate to keep walking. Every 7 gates you survive, one more gate becomes blocked — the field gets meaner.<br/>Level 1: 6 of 7 open · Level 2: 5 of 7 · Level 3: 4 of 7 · all the way down to 1 open gate.</p>
+    </details>
+  </div>
+
+  <div class="footer">
+    Built for fun · scores stored on JSONBin · share the URL with friends
+  </div>
+</div>
+
+<script>
+(function() {
+  // =========================================================================
+  // ⚙️ CONFIG — set these two values to enable shared scores
+  // =========================================================================
+  // 1. Create a free account at https://jsonbin.io
+  // 2. Create a new bin with initial content:  {"scores": []}
+  // 3. Paste the Bin ID here (looks like "65f1234abcd5678ef9012345")
+  const JSONBIN_BIN_ID = "6a02208b250b1311c3361731";
+  // 4. Create an Access Key (Master Key works, but a scoped Access Key is safer)
+  //    Settings → API Keys → Create Access Key with Read + Update permissions
+  const JSONBIN_ACCESS_KEY = "$2a$10$m0sl3AucAJxSvyN.dVOoVOH0JgtuRubH.lGUcAOXxh1xl6A7tMMt.";
+  // =========================================================================
+
+  const SHARED_SCORES_ENABLED =
+    JSONBIN_BIN_ID && JSONBIN_BIN_ID !== "6a02208b250b1311c3361731" &&
+    JSONBIN_ACCESS_KEY && JSONBIN_ACCESS_KEY !== "$2a$10$m0sl3AucAJxSvyN.dVOoVOH0JgtuRubH.lGUcAOXxh1xl6A7tMMt.";
+
+  const GATES_PER_ROUND = 7;
+  const ROUNDS_PER_LEVEL = 7;
+  const FIELD_HEIGHT = 320;
+  const MAX_LEADERBOARD = 10;
+  const LOCAL_FALLBACK_KEY = "sheepgate:local-leaderboard";
+
+  let state = {
+    score: 0,
+    blockedGates: [],
+    revealed: false,
+    animating: false,
+    gameOver: false,
+    won: false,
+    currentSetEl: null,
+    worldOffset: 0
+  };
+
+  let leaderboard = []; // [{name, score, date}]
+
+  const $ = id => document.getElementById(id);
+  const worldEl = $('world');
+  const messageEl = $('message');
+  const sheepEl = $('sheep');
+  const roundLabel = $('round-label');
+  const statusLabel = $('status-label');
+  const scoreEl = $('score');
+  const bestDisplay = $('best-display');
+  const levelLabel = $('level-label');
+  const levelProgressText = $('level-progress-text');
+  const levelProgressBar = $('level-progress-bar');
+  const restartBtn = $('restart-btn');
+  const hiscoreEntry = $('hiscore-entry');
+  const hiscoreName = $('hiscore-name');
+  const hiscoreSave = $('hiscore-save');
+  const leaderboardEl = $('leaderboard');
+  const leaderboardList = $('leaderboard-list');
+  const fieldEl = $('field');
+  const levelBanner = $('level-up-banner');
+  const syncIndicator = $('sync-indicator');
+
+  function getLevel() { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
+  function getBlockedCount() { return Math.min(getLevel(), GATES_PER_ROUND - 1); }
+  function getOpenCount() { return GATES_PER_ROUND - getBlockedCount(); }
+  function getRoundInLevel() { return (state.score % ROUNDS_PER_LEVEL) + 1; }
+
+  // ---- Leaderboard storage ----------------------------------------------
+  function setSyncStatus(text, kind) {
+    syncIndicator.textContent = text || '';
+    syncIndicator.className = 'sync-indicator' + (kind ? ' ' + kind : '');
+  }
+
+  async function loadLeaderboard() {
+    if (!SHARED_SCORES_ENABLED) {
+      // Fall back to local storage if JSONBin isn't configured
+      try {
+        const raw = localStorage.getItem(LOCAL_FALLBACK_KEY);
+        leaderboard = raw ? JSON.parse(raw) : [];
+      } catch (e) { leaderboard = []; }
+      setSyncStatus('Local only', '');
+      renderLeaderboard();
+      return;
+    }
+    setSyncStatus('Syncing...', 'syncing');
+    try {
+      const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+        headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      leaderboard = (data.record && Array.isArray(data.record.scores)) ? data.record.scores : [];
+      setSyncStatus('Synced', '');
+    } catch (e) {
+      console.error('Failed to load leaderboard', e);
+      setSyncStatus('Offline', 'error');
+      try {
+        const raw = localStorage.getItem(LOCAL_FALLBACK_KEY);
+        leaderboard = raw ? JSON.parse(raw) : [];
+      } catch (_) { leaderboard = []; }
+    }
+    renderLeaderboard();
+  }
+
+  async function saveLeaderboard() {
+    // Cache locally as a fallback
+    try {
+      localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard));
+    } catch (_) {}
+
+    if (!SHARED_SCORES_ENABLED) return true;
+
+    setSyncStatus('Saving...', 'syncing');
+    try {
+      // Re-fetch latest to minimize race-condition score loss
+      const latestRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+        headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
+      });
+      let serverScores = [];
+      if (latestRes.ok) {
+        const latest = await latestRes.json();
+        if (latest.record && Array.isArray(latest.record.scores)) {
+          serverScores = latest.record.scores;
+        }
+      }
+      // Merge: combine server scores + our local additions, dedupe-ish & keep top N
+      const combined = [...serverScores, ...leaderboard];
+      const seen = new Set();
+      const merged = [];
+      for (const entry of combined) {
+        const key = entry.name + '|' + entry.score + '|' + (entry.date || '');
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      merged.sort((a, b) => b.score - a.score);
+      const trimmed = merged.slice(0, MAX_LEADERBOARD);
+
+      const putRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Access-Key': JSONBIN_ACCESS_KEY
+        },
+        body: JSON.stringify({ scores: trimmed })
+      });
+      if (!putRes.ok) throw new Error('HTTP ' + putRes.status);
+      leaderboard = trimmed;
+      setSyncStatus('Synced', '');
+      return true;
+    } catch (e) {
+      console.error('Failed to save leaderboard', e);
+      setSyncStatus('Save failed', 'error');
+      return false;
+    }
+  }
+
+  function getTopScore() {
+    if (!leaderboard.length) return null;
+    return leaderboard[0];
+  }
+
+  function isNewBest(score) {
+    if (leaderboard.length < MAX_LEADERBOARD) return score > 0;
+    return score > leaderboard[leaderboard.length - 1].score;
+  }
+
+  function renderLeaderboard() {
+    if (!leaderboard.length) {
+      bestDisplay.textContent = '—';
+      leaderboardEl.style.display = SHARED_SCORES_ENABLED ? 'block' : 'none';
+      leaderboardList.innerHTML = '<div style="color: var(--text-muted); font-size: 12px; padding: 4px 0;">No scores yet — be the first!</div>';
+      return;
+    }
+    const top = leaderboard[0];
+    bestDisplay.textContent = top.score + ' (' + top.name + ')';
+    leaderboardEl.style.display = 'block';
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach((entry, idx) => {
+      const row = document.createElement('div');
+      row.className = 'leaderboard-row';
+      row.innerHTML =
+        '<div><span class="lb-rank">' + String(idx + 1).padStart(2, '0') + '</span>' +
+        '<span class="lb-name">' + entry.name + '</span></div>' +
+        '<span style="font-weight: 500;">' + entry.score + '</span>';
+      leaderboardList.appendChild(row);
+    });
+  }
+
+  // ---- Gate building ----------------------------------------------------
+  function pickBlockedIndices(count) {
+    const indices = [];
+    const pool = Array.from({ length: GATES_PER_ROUND }, (_, i) => i);
+    for (let n = 0; n < count; n++) {
+      const idx = Math.floor(Math.random() * pool.length);
+      indices.push(pool[idx]);
+      pool.splice(idx, 1);
+    }
+    return indices;
+  }
+
+  function buildGateSet(yOffset) {
+    const set = document.createElement('div');
+    set.className = 'gate-set';
+    set.style.cssText = 'position: absolute; left: 16px; right: 16px; top: ' + yOffset + 'px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 95px;';
+
+    for (let i = 0; i < GATES_PER_ROUND; i++) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position: relative; height: 95px; perspective: 400px;';
+
+      const hinge = document.createElement('div');
+      hinge.style.cssText = 'position: absolute; top: 0; bottom: 0; left: 0; width: 4px; background: #4a3a24; border-radius: 2px; z-index: 0;';
+      wrap.appendChild(hinge);
+
+      const gate = document.createElement('button');
+      gate.className = 'gate';
+      gate.dataset.idx = i;
+      gate.style.cssText = 'position: absolute; top: 0; left: 4px; right: 0; bottom: 0; background: var(--gate-wood); border: 2px solid var(--gate-wood-dark); border-radius: 0 4px 4px 0; padding: 0; cursor: pointer; transform-origin: left center; transform: rotateY(0deg); transition: transform 0.15s, background 0.4s, border-color 0.4s; display: flex; align-items: center; justify-content: center; overflow: hidden; will-change: transform;';
+      gate.innerHTML = '<div class="planks" style="width: 82%; height: 100%; display: flex; flex-direction: column; justify-content: space-around; padding: 5px 0; transition: opacity 0.3s;">' +
+        '<div style="height: 8px; background: var(--gate-wood-dark); border-radius: 2px;"></div>' +
+        '<div style="height: 8px; background: var(--gate-wood-dark); border-radius: 2px;"></div>' +
+        '<div style="height: 8px; background: var(--gate-wood-dark); border-radius: 2px;"></div>' +
+        '</div>';
+      gate.onmouseover = () => { if (!gate.disabled) gate.style.transform = 'translateY(-3px)'; };
+      gate.onmouseout = () => { if (!gate.disabled) gate.style.transform = 'translateY(0)'; };
+      gate.onclick = () => pickGate(i);
+      gate.setAttribute('aria-label', 'Gate ' + (i + 1));
+      wrap.appendChild(gate);
+      set.appendChild(wrap);
+    }
+    return set;
+  }
+
+  function newRound() {
+    state.blockedGates = pickBlockedIndices(getBlockedCount());
+    state.revealed = false;
+    state.animating = false;
+    messageEl.textContent = '';
+    messageEl.style.color = 'var(--text-primary)';
+    restartBtn.style.display = 'none';
+    statusLabel.textContent = 'Pick the open gate';
+    sheepEl.textContent = '🐑';
+    updateHud();
+    const newSet = buildGateSet(95 - state.worldOffset);
+    worldEl.appendChild(newSet);
+    state.currentSetEl = newSet;
+  }
+
+  function updateHud() {
+    const level = getLevel();
+    const round = getRoundInLevel();
+    const openCount = getOpenCount();
+    roundLabel.textContent = 'Gate ' + (state.score + 1) + ' · Level ' + level;
+    levelLabel.textContent = 'Level ' + level + ' · ' + openCount + ' of ' + GATES_PER_ROUND + ' open';
+    levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
+    levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
+    scoreEl.textContent = state.score;
+  }
+
+  function showLevelUp(newLevel) {
+    levelBanner.textContent = 'Level ' + newLevel + ' · ' + (GATES_PER_ROUND - getBlockedCount()) + ' open';
+    levelBanner.style.opacity = '1';
+    levelBanner.style.transform = 'translate(-50%, -50%) scale(1)';
+    setTimeout(() => {
+      levelBanner.style.opacity = '0';
+      levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
+    }, 1200);
+  }
+
+  function pickGate(index) {
+    if (state.revealed || state.animating) return;
+    state.animating = true;
+
+    const gates = state.currentSetEl.querySelectorAll('.gate');
+    gates.forEach(g => {
+      g.disabled = true;
+      g.onmouseover = null; g.onmouseout = null; g.onclick = null;
+      g.style.cursor = 'default';
+      g.style.transform = 'translateY(0)';
+    });
+
+    const gateEl = gates[index];
+    const gateRect = gateEl.getBoundingClientRect();
+    const fieldRect = fieldEl.getBoundingClientRect();
+    const gateCenterX = (gateRect.left - fieldRect.left) + (gateRect.width / 2);
+    const leftPct = (gateCenterX / fieldRect.width) * 100;
+
+    statusLabel.textContent = 'Trotting over...';
+    sheepEl.style.left = leftPct + '%';
+
+    let wiggleCount = 0;
+    const wiggle = setInterval(() => {
+      sheepEl.style.transform = 'translateX(-50%) rotate(' + (wiggleCount % 2 === 0 ? '-6deg' : '6deg') + ')';
+      wiggleCount++;
+    }, 120);
+
+    setTimeout(() => {
+      clearInterval(wiggle);
+      sheepEl.style.transform = 'translateX(-50%) rotate(0deg)';
+      sheepEl.style.bottom = '120px';
+      statusLabel.textContent = 'Nudging the gate...';
+      setTimeout(() => {
+        let bumpCount = 0;
+        const bump = setInterval(() => {
+          sheepEl.style.transform = 'translateX(-50%) translateY(' + (bumpCount % 2 === 0 ? '-3px' : '0') + ')';
+          bumpCount++;
+          if (bumpCount >= 2) {
+            clearInterval(bump);
+            sheepEl.style.transform = 'translateX(-50%)';
+            resolveGate(index, gateEl);
+          }
+        }, 130);
+      }, 650);
+    }, 700);
+  }
+
+  function resolveGate(index, gateEl) {
+    const isBlocked = state.blockedGates.indexOf(index) !== -1;
+    if (!isBlocked) {
+      gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      gateEl.style.transform = 'rotateY(-110deg)';
+      state.score++;
+      const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
+      updateHud();
+
+      setTimeout(() => {
+        statusLabel.textContent = 'Walking on...';
+        sheepEl.style.transition = 'bottom 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s, opacity 0.3s';
+        sheepEl.style.bottom = '180px';
+        let bobCount = 0;
+        const bob = setInterval(() => {
+          sheepEl.style.transform = 'translateX(-50%) translateY(' + (bobCount % 2 === 0 ? '-2px' : '2px') + ')';
+          bobCount++;
+        }, 180);
+
+        state.worldOffset -= FIELD_HEIGHT;
+        worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
+
+        const nextSet = buildGateSet(95 - state.worldOffset);
+        worldEl.appendChild(nextSet);
+
+        setTimeout(() => {
+          clearInterval(bob);
+          sheepEl.style.transform = 'translateX(-50%)';
+          if (state.currentSetEl && state.currentSetEl.parentNode === worldEl) {
+            worldEl.removeChild(state.currentSetEl);
+          }
+          state.currentSetEl = nextSet;
+          sheepEl.style.transition = 'left 0.5s ease, bottom 0.5s ease, transform 0.3s, opacity 0.3s';
+          sheepEl.style.left = '50%';
+          sheepEl.style.bottom = '24px';
+          setTimeout(() => {
+            sheepEl.style.transition = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
+            state.blockedGates = pickBlockedIndices(getBlockedCount());
+            state.revealed = false;
+            state.animating = false;
+            statusLabel.textContent = 'Pick the open gate';
+            if (wasLevelUp) showLevelUp(getLevel());
+          }, 550);
+        }, 1500);
+      }, 500);
+    } else {
+      gateEl.style.transformOrigin = 'left bottom';
+      gateEl.style.transition = 'transform 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53), background 0.4s, border-color 0.4s';
+      gateEl.style.background = '#a33c1d';
+      gateEl.style.borderColor = '#712b13';
+      gateEl.style.zIndex = '4';
+      gateEl.style.transform = 'rotate(-3deg)';
+      setTimeout(() => { gateEl.style.transform = 'rotate(2deg)'; }, 150);
+      setTimeout(() => { gateEl.style.transform = 'rotate(90deg)'; }, 350);
+      setTimeout(() => {
+        sheepEl.style.transition = 'all 0.4s ease-out';
+        sheepEl.style.transform = 'translateX(-50%) translateY(8px) scaleY(0.4) scaleX(1.4)';
+      }, 700);
+      setTimeout(() => {
+        sheepEl.textContent = '💀';
+        handleEndOfGame();
+      }, 1300);
+    }
+  }
+
+  function handleEndOfGame() {
+    state.revealed = true;
+    state.animating = false;
+    state.gameOver = true;
+    messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
+    messageEl.style.color = 'var(--danger)';
+    statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
+
+    if (isNewBest(state.score)) {
+      showHiscoreEntry();
+    } else {
+      restartBtn.style.display = 'inline-block';
+      restartBtn.textContent = 'Try again';
+    }
+  }
+
+  function showHiscoreEntry() {
+    hiscoreEntry.style.display = 'block';
+    hiscoreName.value = '';
+    setTimeout(() => hiscoreName.focus(), 100);
+  }
+
+  hiscoreSave.onclick = async () => {
+    let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    if (name.length === 0) name = 'ANON';
+    const entry = { name, score: state.score, date: new Date().toISOString() };
+    leaderboard.push(entry);
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
+    renderLeaderboard();
+    await saveLeaderboard();
+    hiscoreEntry.style.display = 'none';
+    restartBtn.style.display = 'inline-block';
+    restartBtn.textContent = 'Try again';
+  };
+
+  hiscoreName.addEventListener('input', (e) => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+  });
+  hiscoreName.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') hiscoreSave.click();
+  });
+
+  restartBtn.onclick = () => {
+    state = {
+      score: 0, blockedGates: [],
+      revealed: false, animating: false, gameOver: false, won: false,
+      currentSetEl: null, worldOffset: 0
+    };
+    worldEl.innerHTML = '';
+    worldEl.style.transition = 'none';
+    worldEl.style.transform = 'translateY(0)';
+    sheepEl.style.transition = 'none';
+    sheepEl.style.left = '50%';
+    sheepEl.style.bottom = '24px';
+    sheepEl.style.fontSize = '44px';
+    sheepEl.style.transform = 'translateX(-50%)';
+    sheepEl.style.opacity = '1';
+    setTimeout(() => {
+      worldEl.style.transition = 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+      sheepEl.style.transition = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
+      loadLeaderboard(); // refresh in case others have played
+      newRound();
+    }, 30);
+  };
+
+  // Boot
+  loadLeaderboard();
+  newRound();
+})();
+</script>
+</body>
+</html>
