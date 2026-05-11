@@ -233,6 +233,17 @@
   .lb-score { font-weight: 500; }
   .action-bar { display: flex; gap: 8px; margin-top: 16px; justify-content: center; min-height: 36px; }
   .gate-plank { height: 8px; background: var(--gate-wood-dark); border-radius: 2px; }
+  .horn-hint {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    line-height: 1;
+    pointer-events: none;
+    z-index: 5;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+  }
   @keyframes sheep-bob {
     0%, 100% { transform: translateX(-50%) translateY(-2px); }
     50%       { transform: translateX(-50%) translateY(2px); }
@@ -311,6 +322,7 @@
     </div>
 
     <div class="action-bar">
+      <button id="hint-btn">🐮 Hint</button>
       <button id="restart-btn" style="display: none;">Try again</button>
     </div>
 
@@ -363,6 +375,7 @@
     blockedGates: [],
     animating: false,
     gameOver: false,
+    hintUsed: false,
     currentSetEl: null,
     worldOffset: 0
   };
@@ -381,6 +394,7 @@
   const levelLabel = $('level-label');
   const levelProgressText = $('level-progress-text');
   const levelProgressBar = $('level-progress-bar');
+  const hintBtn = $('hint-btn');
   const restartBtn = $('restart-btn');
   const hiscoreEntry = $('hiscore-entry');
   const hiscoreName = $('hiscore-name');
@@ -683,7 +697,7 @@
         sheepEl.style.bottom = '180px';
         sheepEl.style.animation = 'sheep-bob 360ms linear infinite';
 
-        state.worldOffset -= FIELD_HEIGHT;
+        state.worldOffset += FIELD_HEIGHT;
         worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
 
         const nextSet = buildGateSet(95 - state.worldOffset);
@@ -728,9 +742,23 @@
     }
   }
 
+  hintBtn.onclick = () => {
+    if (state.hintUsed || state.animating || state.gameOver || !state.blockedGates.length) return;
+    state.hintUsed = true;
+    hintBtn.disabled = true;
+    hintBtn.textContent = '🐮 Hint used';
+    const blockedIdx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
+    const gateWrap = state.currentSetEl.querySelectorAll('.gate')[blockedIdx].parentNode;
+    const horn = document.createElement('div');
+    horn.className = 'horn-hint';
+    horn.textContent = '🐮';
+    gateWrap.appendChild(horn);
+  };
+
   function handleEndOfGame() {
     state.animating = false;
     state.gameOver = true;
+    hintBtn.disabled = true;
     messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
     messageEl.style.color = 'var(--danger)';
     statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
@@ -773,10 +801,12 @@
   restartBtn.onclick = () => {
     clearInterval(_wiggleId); _wiggleId = null;
     sheepEl.style.animation = '';
+    hintBtn.disabled = false;
+    hintBtn.textContent = '🐮 Hint';
     state = {
       score: 0, blockedGates: [],
       animating: false, gameOver: false,
-      currentSetEl: null, worldOffset: 0
+      hintUsed: false, currentSetEl: null, worldOffset: 0
     };
     worldEl.innerHTML = '';
     worldEl.style.transition = 'none';
