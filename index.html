@@ -180,9 +180,18 @@
     cursor: pointer;
     font-family: inherit;
     transition: background 0.15s, transform 0.1s;
+    touch-action: manipulation;
   }
   button:hover { background: var(--bg-soft); }
   button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  #hint-btn:not(:disabled) {
+    background: #e8f5e9;
+    border-color: #81c784;
+    color: #2e7d32;
+    font-weight: 500;
+  }
+  #hint-btn:not(:disabled):hover { background: #c8e6c9; }
   input[type="text"] {
     border: 0.5px solid var(--border);
     border-radius: 8px;
@@ -218,8 +227,10 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 4px 0;
+    padding: 6px 0;
+    border-bottom: 0.5px solid var(--border);
   }
+  .leaderboard-row:last-child { border-bottom: none; }
   .lb-name {
     font-family: ui-monospace, "SF Mono", Menlo, monospace;
     letter-spacing: 2px;
@@ -251,6 +262,15 @@
   details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
   details summary { cursor: pointer; }
   details p { margin: 8px 0 0; line-height: 1.6; }
+  @media (max-width: 480px) {
+    body { padding: 12px 8px; }
+    h1 { font-size: 22px; }
+    .tagline { margin-bottom: 16px; }
+    #game-container { padding: 14px; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .stat-group { align-self: flex-end; }
+    .stat { padding: 5px 10px; }
+  }
   .footer {
     text-align: center;
     font-size: 12px;
@@ -533,7 +553,7 @@
       const left = document.createElement('div');
       const rank = document.createElement('span');
       rank.className = 'lb-rank';
-      rank.textContent = String(idx + 1).padStart(2, '0');
+      rank.textContent = ['🥇', '🥈', '🥉'][idx] || String(idx + 1).padStart(2, '0');
       const name = document.createElement('span');
       name.className = 'lb-name';
       name.textContent = entry.name;
@@ -578,7 +598,7 @@
       const gate = document.createElement('button');
       gate.className = 'gate';
       gate.dataset.idx = i;
-      gate.style.cssText = 'position: absolute; top: 0; left: 4px; right: 0; bottom: 0; background: var(--gate-wood); border: 2px solid var(--gate-wood-dark); border-radius: 0 4px 4px 0; padding: 0; cursor: pointer; transform-origin: left center; transform: rotateY(0deg); transition: transform 0.15s, background 0.4s, border-color 0.4s; display: flex; align-items: center; justify-content: center; overflow: hidden; will-change: transform;';
+      gate.style.cssText = 'position: absolute; top: 0; left: 4px; right: 0; bottom: 0; background: var(--gate-wood); border: 2px solid var(--gate-wood-dark); border-radius: 0 4px 4px 0; padding: 0; cursor: pointer; transform-origin: left center; transform: rotateY(0deg); transition: transform 0.15s, background 0.4s, border-color 0.4s; display: flex; align-items: center; justify-content: center; overflow: hidden; will-change: transform; touch-action: manipulation;';
 
       const planks = document.createElement('div');
       planks.className = 'planks';
@@ -665,7 +685,7 @@
     setTimeout(() => {
       clearInterval(_wiggleId); _wiggleId = null;
       sheepEl.style.transform = 'translateX(-50%) rotate(0deg)';
-      sheepEl.style.bottom = '120px';
+      sheepEl.style.bottom = '80px';
       statusLabel.textContent = 'Nudging the gate...';
       setTimeout(() => {
         let bumpCount = 0;
@@ -693,9 +713,10 @@
 
       setTimeout(() => {
         statusLabel.textContent = 'Walking on...';
-        sheepEl.style.transition = SHEEP_TRANSITION_WALK;
-        sheepEl.style.bottom = '180px';
         sheepEl.style.animation = 'sheep-bob 360ms linear infinite';
+
+        state.currentSetEl.style.transition = 'opacity 0.5s ease-out';
+        state.currentSetEl.style.opacity = '0';
 
         state.worldOffset += FIELD_HEIGHT;
         worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
