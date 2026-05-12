@@ -492,9 +492,9 @@
   #info-close:hover { color: var(--text-primary); }
   /* leaderboard styles when inside drawer */
   #leaderboard { border: none; padding: 0; }
-  /* hamburger button — fixed top-right on all screen sizes */
+  /* hamburger button — fixed top-right, aligned with page title */
   #stats-btn {
-    position: fixed; top: 14px; right: 16px; z-index: 199;
+    position: fixed; top: 24px; right: 16px; z-index: 199;
     background: var(--bg-card); border: 0.5px solid var(--border);
     border-radius: 8px; padding: 7px 12px; font-size: 17px;
     cursor: pointer; line-height: 1; color: var(--text-primary);
@@ -518,6 +518,7 @@
     .stat-group { align-self: flex-end; }
     .stat { padding: 5px 10px; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    #stats-btn { top: 12px; right: 8px; }
   }
 </style>
 </head>
