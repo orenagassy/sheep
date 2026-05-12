@@ -1055,7 +1055,7 @@
     messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
     messageEl.style.color = 'var(--danger)';
     statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
-    if (isNewBest(state.score)) {
+    if (!TEST_MODE && isNewBest(state.score)) {
       showHiscoreEntry();
     } else {
       restartBtn.style.display = 'inline-block';
