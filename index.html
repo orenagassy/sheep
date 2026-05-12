@@ -44,11 +44,10 @@
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
   }
-  .topbar-left { display: flex; align-items: center; gap: 12px; }
-  .sheep-icon { font-size: 28px; }
+  .topbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .hud-title { font-size: 16px; font-weight: 500; }
   .hud-subtitle { font-size: 13px; color: var(--text-secondary); }
-  .stat-group { display: flex; gap: 8px; }
+  .stat-group { display: flex; gap: 8px; flex-wrap: wrap; }
   .stat {
     background: var(--bg-card); padding: 6px 12px;
     border-radius: 8px; border: 0.5px solid var(--border);
@@ -107,22 +106,13 @@
     content: ''; position: absolute;
     background: rgba(255,255,255,0.88); border-radius: 50%;
   }
-  .c1 {
-    width: 88px; height: 24px; top: 16px;
-    animation: cloud-drift 38s linear infinite;
-  }
+  .c1 { width: 88px; height: 24px; top: 16px; animation: cloud-drift 38s linear infinite; }
   .c1::before { width: 38px; height: 38px; top: -22px; left: 14px; }
   .c1::after  { width: 26px; height: 26px; top: -12px; left: 48px; }
-  .c2 {
-    width: 58px; height: 18px; top: 44px;
-    animation: cloud-drift 58s linear infinite -22s;
-  }
+  .c2 { width: 58px; height: 18px; top: 44px; animation: cloud-drift 58s linear infinite -22s; }
   .c2::before { width: 26px; height: 26px; top: -15px; left: 8px; }
   .c2::after  { width: 20px; height: 20px; top: -8px;  left: 32px; }
-  .c3 {
-    width: 110px; height: 28px; top: 8px;
-    animation: cloud-drift 48s linear infinite -36s;
-  }
+  .c3 { width: 110px; height: 28px; top: 8px; animation: cloud-drift 48s linear infinite -36s; }
   .c3::before { width: 46px; height: 46px; top: -28px; left: 16px; }
   .c3::after  { width: 32px; height: 32px; top: -16px; left: 62px; }
   @keyframes cloud-drift {
@@ -165,7 +155,6 @@
     z-index: 3;
   }
   #sheep-dead { display: none; font-size: 44px; line-height: 1; }
-  /* SVG leg animation */
   .leg { transform-box: fill-box; transform-origin: 50% 0%; }
   #sheep.walking .leg-fl { animation: leg-swing 360ms ease-in-out infinite; }
   #sheep.walking .leg-fr { animation: leg-swing 360ms ease-in-out infinite 180ms; }
@@ -237,7 +226,7 @@
   .lb-name { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 2px; font-weight: 500; }
   .lb-rank { color: var(--text-muted); margin-right: 8px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
   .lb-score { font-weight: 500; }
-  .action-bar { display: flex; gap: 8px; margin-top: 16px; justify-content: center; min-height: 36px; }
+  .action-bar { display: flex; gap: 8px; margin-top: 16px; justify-content: center; min-height: 36px; flex-wrap: wrap; }
 
   /* ---- Gates ---- */
   .gate-plank {
@@ -253,13 +242,17 @@
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 
-  /* ---- Test mode ---- */
-  #test-badge {
+  /* ---- Mode badges ---- */
+  #test-badge, #sport-badge, #daily-badge {
     display: none;
-    background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
-    padding: 3px 8px; font-size: 11px; font-weight: 600; color: #856404;
-    letter-spacing: 0.5px;
+    border-radius: 6px; padding: 3px 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
   }
+  #test-badge  { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+  #sport-badge { background: #fde8e8; border: 1px solid #ef9a9a; color: #b71c1c; }
+  #daily-badge { background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
+
+  /* ---- Test mode indicator ---- */
   .test-hint-indicator {
     position: absolute; top: -18px; left: 50%;
     transform: translateX(-50%); font-size: 14px; line-height: 1;
@@ -341,6 +334,69 @@
     50%       { transform: translateX(-50%) translateY(2px); }
   }
 
+  /* ---- Streak ---- */
+  #streak-row {
+    text-align: center; font-size: 12px; font-weight: 600;
+    color: #e65100; min-height: 16px; margin-top: 4px;
+  }
+
+  /* ---- Achievement toast ---- */
+  .achievement-toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: #1c1c1c; color: #fff; border-radius: 10px;
+    padding: 10px 16px; font-size: 13px; z-index: 1000;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none; white-space: nowrap;
+    max-width: calc(100vw - 32px);
+  }
+  .achievement-toast.show { transform: translateX(-50%) translateY(0); }
+  .ach-label { font-weight: 600; }
+  .ach-desc  { color: rgba(255,255,255,0.65); font-size: 12px; }
+
+  /* ---- Sport timer bar ---- */
+  #sport-timer {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 5px; z-index: 6; display: none;
+  }
+  #sport-timer-bar {
+    height: 100%; width: 100%;
+    background: linear-gradient(to right, #43a047, #fdd835, #e53935);
+    transform-origin: left center;
+  }
+
+  /* ---- Near-miss markers ---- */
+  .near-miss-x {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 900;
+    color: rgba(190,30,30,0.9); pointer-events: none; z-index: 3;
+    animation: miss-flash 0.75s ease-out forwards;
+  }
+  @keyframes miss-flash {
+    0%   { opacity: 0; transform: scale(0.5); }
+    20%  { opacity: 1; transform: scale(1.1); }
+    70%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1); }
+  }
+
+  /* ---- Stats panel ---- */
+  #stats-panel {
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 14px; margin-top: 16px;
+  }
+  .stats-title {
+    font-weight: 500; font-size: 12px; color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 6px;
+  }
+  .stat-item-label { font-size: 11px; color: var(--text-muted); }
+  .stat-item-value { font-weight: 500; font-size: 14px; }
+
   /* ---- Misc ---- */
   details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
   details summary { cursor: pointer; }
@@ -356,6 +412,7 @@
     .topbar { flex-direction: column; align-items: flex-start; gap: 4px; }
     .stat-group { align-self: flex-end; }
     .stat { padding: 5px 10px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
   }
 </style>
 </head>
@@ -368,7 +425,9 @@
 
     <div class="topbar">
       <div class="topbar-left">
-        <span id="test-badge">🧪 TEST MODE</span>
+        <span id="test-badge">🧪 TEST</span>
+        <span id="sport-badge">⚡ SPORT</span>
+        <span id="daily-badge">📅 DAILY</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
           <div class="hud-subtitle" id="status-label">Pick the open gate</div>
@@ -378,6 +437,10 @@
         <div class="stat">
           <div class="stat-label">Score</div>
           <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Your best</div>
+          <div class="stat-value" id="personal-best-display">—</div>
         </div>
         <div class="stat">
           <div class="stat-label">World best</div>
@@ -394,9 +457,11 @@
       <div class="level-bar-track">
         <div class="level-bar-fill" id="level-progress-bar"></div>
       </div>
+      <div id="streak-row"></div>
     </div>
 
     <div id="field">
+      <div id="sport-timer"><div id="sport-timer-bar"></div></div>
       <div id="field-overlay"></div>
       <div id="stars"></div>
       <div id="clouds">
@@ -410,26 +475,20 @@
         <span id="sheep-dead"></span>
         <svg id="sheep-svg" viewBox="0 0 70 58" width="70" height="58"
              xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;">
-          <!-- Wool body -->
           <circle cx="38" cy="26" r="17" fill="#eeeae0"/>
           <circle cx="27" cy="21" r="12" fill="#f3f1e8"/>
           <circle cx="44" cy="19" r="12" fill="#edeae2"/>
           <circle cx="51" cy="27" r="10" fill="#e9e6dc"/>
           <circle cx="28" cy="33" r="10" fill="#e9e6dc"/>
           <circle cx="41" cy="34" r="8"  fill="#e6e3d9"/>
-          <!-- Head -->
           <ellipse cx="13" cy="33" rx="10" ry="9" fill="#d5caaf"/>
-          <!-- Snout -->
           <ellipse cx="6" cy="37" rx="5" ry="4" fill="#c9bda0"/>
           <circle cx="4.5" cy="38.5" r="1.1" fill="#9c8c74"/>
           <circle cx="7.5" cy="38.5" r="1.1" fill="#9c8c74"/>
-          <!-- Eye -->
           <circle cx="11" cy="30" r="2.2" fill="#1e1810"/>
           <circle cx="10.2" cy="29.2" r="0.6" fill="white"/>
-          <!-- Ear -->
           <ellipse cx="18" cy="25" rx="3.5" ry="5.5" fill="#d5caaf" transform="rotate(15,18,25)"/>
           <ellipse cx="18" cy="25" rx="2"   ry="3.5" fill="#edc0b8" transform="rotate(15,18,25)"/>
-          <!-- Back legs (slightly darker, drawn first) -->
           <g class="leg leg-bl">
             <rect x="49" y="42" width="6" height="13" rx="3"   fill="#c2b89a"/>
             <rect x="49" y="51" width="6" height="5"  rx="2"   fill="#3a2e1e"/>
@@ -438,7 +497,6 @@
             <rect x="55" y="42" width="5" height="13" rx="2.5" fill="#b4aa8c"/>
             <rect x="55" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
           </g>
-          <!-- Front legs -->
           <g class="leg leg-fl">
             <rect x="26" y="42" width="6" height="13" rx="3"   fill="#cac0a0"/>
             <rect x="26" y="51" width="6" height="5"  rx="2"   fill="#3a2e1e"/>
@@ -477,9 +535,49 @@
       <div id="leaderboard-list"></div>
     </div>
 
+    <div id="stats-panel">
+      <div class="stats-title">Your all-time stats</div>
+      <div class="stats-grid">
+        <div>
+          <div class="stat-item-label">Gates cleared</div>
+          <div class="stat-item-value" id="stat-gates">0</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Games played</div>
+          <div class="stat-item-value" id="stat-games">0</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Average score</div>
+          <div class="stat-item-value" id="stat-avg">—</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Best level</div>
+          <div class="stat-item-value" id="stat-level">1</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Hints used</div>
+          <div class="stat-item-value" id="stat-hints-used">0</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Hints found</div>
+          <div class="stat-item-value" id="stat-hints-found">0</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Best streak</div>
+          <div class="stat-item-value" id="stat-streak">0</div>
+        </div>
+        <div>
+          <div class="stat-item-label">Personal best</div>
+          <div class="stat-item-value" id="stat-personal-best">—</div>
+        </div>
+      </div>
+    </div>
+
     <details>
       <summary>How to play</summary>
-      <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>Use 🐮 Hint to mark one bad gate — once per run. Lucky sheep sometimes find a hint hiding behind an open gate!</p>
+      <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
+      Use 🐮 Hint to mark one bad gate — once per run. Lucky sheep sometimes find a hint hiding behind an open gate!<br/>
+      Add <code>?daily</code> to the URL for today's shared challenge. Add <code>?sport</code> for sport mode — pick within 8 seconds or the sheep runs into a wall.</p>
     </details>
   </div>
 
@@ -488,55 +586,200 @@
 <script>
 (function() {
   const WORKER_URL = 'https://sheep-score.oren-agassy.workers.dev';
-  const TEST_MODE = new URLSearchParams(location.search).has('test');
+  const TEST_MODE  = new URLSearchParams(location.search).has('test');
+  const SPORT_MODE = new URLSearchParams(location.search).has('sport');
+  const DAILY_MODE = new URLSearchParams(location.search).has('daily');
 
-  const GATES_PER_ROUND = 7;
-  const ROUNDS_PER_LEVEL = 7;
-  const FIELD_HEIGHT = 320;
-  const MAX_LEADERBOARD = 10;
-  const LOCAL_FALLBACK_KEY = "sheepgate:local-leaderboard";
+  const GATES_PER_ROUND    = 7;
+  const ROUNDS_PER_LEVEL   = 7;
+  const FIELD_HEIGHT        = 320;
+  const MAX_LEADERBOARD     = 10;
+  const SPORT_TIME_MS       = 8000;
+  const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
+  const STATS_KEY           = 'sheepgate:stats';
+  const PERSONAL_BEST_KEY   = 'sheepgate:personal-best';
+  const ACHIEVEMENTS_KEY    = 'sheepgate:achievements';
+  const DAILY_KEY           = 'sheepgate:daily';
   const SHEEP_TRANSITION = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
   const WORLD_TRANSITION = 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
+  // ---- Stats persistence -------------------------------------------------
+  function loadStats() {
+    try {
+      return Object.assign(
+        { gatesCleared:0, gamesPlayed:0, totalScore:0, bestLevel:1, hintsUsed:0, hintsFound:0, streakBest:0 },
+        JSON.parse(localStorage.getItem(STATS_KEY))
+      );
+    } catch(_) {
+      return { gatesCleared:0, gamesPlayed:0, totalScore:0, bestLevel:1, hintsUsed:0, hintsFound:0, streakBest:0 };
+    }
+  }
+  function saveStats() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch(_) {}
+  }
+  let stats = loadStats();
+
+  let personalBest = parseInt(localStorage.getItem(PERSONAL_BEST_KEY)) || 0;
+
+  // ---- Achievements -------------------------------------------------------
+  const ACHIEVEMENTS = [
+    { id: 'gate1',    icon: '🚪', label: 'First Step',       desc: 'Clear your first gate',         check: (s, st) => st.gatesCleared >= 1 },
+    { id: 'level2',   icon: '📈', label: 'Leveling Up',      desc: 'Reach Level 2',                 check: (s, st) => st.bestLevel >= 2 },
+    { id: 'level3',   icon: '🏅', label: 'Getting Serious',  desc: 'Reach Level 3',                 check: (s, st) => st.bestLevel >= 3 },
+    { id: 'level5',   icon: '🌙', label: 'Night Shift',      desc: 'Reach Level 5',                 check: (s, st) => st.bestLevel >= 5 },
+    { id: 'score10',  icon: '🐑', label: 'Ten Gates',        desc: 'Clear 10 gates in one run',     check: (s, st) => s.score >= 10 },
+    { id: 'score25',  icon: '🏆', label: 'Quarter Century',  desc: 'Clear 25 gates in one run',     check: (s, st) => s.score >= 25 },
+    { id: 'hintfound',icon: '🐮', label: 'Lucky Sheep',      desc: 'Find a hint behind a gate',     check: (s, st) => st.hintsFound >= 1 },
+    { id: 'streak5',  icon: '🔥', label: 'Hot Streak',       desc: '5 gates in a row',              check: (s, st) => st.streakBest >= 5 },
+    { id: 'games10',  icon: '🎮', label: 'Dedicated',        desc: 'Play 10 games',                 check: (s, st) => st.gamesPlayed >= 10 },
+  ];
+  let unlockedAchievements = new Set(
+    JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || '[]')
+  );
+  function checkAchievements() {
+    ACHIEVEMENTS.forEach(a => {
+      if (!unlockedAchievements.has(a.id) && a.check(state, stats)) {
+        unlockedAchievements.add(a.id);
+        try { localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify([...unlockedAchievements])); } catch(_) {}
+        showAchievementToast(a);
+      }
+    });
+  }
+  let _toastQueue = [], _toastBusy = false;
+  function showAchievementToast(a) {
+    _toastQueue.push(a);
+    if (!_toastBusy) drainToastQueue();
+  }
+  function drainToastQueue() {
+    if (!_toastQueue.length) { _toastBusy = false; return; }
+    _toastBusy = true;
+    const a = _toastQueue.shift();
+    const el = document.createElement('div');
+    el.className = 'achievement-toast';
+    el.innerHTML = '<span style="font-size:20px">' + a.icon + '</span>' +
+      '<div><div class="ach-label">Achievement: ' + a.label + '</div>' +
+      '<div class="ach-desc">' + a.desc + '</div></div>';
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => { el.remove(); drainToastQueue(); }, 450);
+    }, 3000);
+  }
+
+  // ---- Daily challenge ----------------------------------------------------
+  function seededRng(seed) {
+    let s = seed >>> 0;
+    return () => {
+      s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
+      return (s >>> 0) / 0x100000000;
+    };
+  }
+  function dailySeed() {
+    const d = new Date().toISOString().slice(0, 10);
+    return d.split('').reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
+  }
+  function loadDailyState() {
+    try {
+      const d = JSON.parse(localStorage.getItem(DAILY_KEY));
+      const today = new Date().toISOString().slice(0, 10);
+      if (d && d.date === today) return d;
+    } catch(_) {}
+    return { date: new Date().toISOString().slice(0, 10), best: 0 };
+  }
+  let dailyState = loadDailyState();
+  let dailyRng = DAILY_MODE ? seededRng(dailySeed()) : null;
+
+  // ---- Sport timer --------------------------------------------------------
+  let _sportRaf = null;
+  function startSportTimer() {
+    cancelSportTimer();
+    state.roundStartTime = performance.now();
+    sportTimerEl.style.display = 'block';
+    sportTimerBarEl.style.transform = 'scaleX(1)';
+    (function tick() {
+      const p = Math.max(0, 1 - (performance.now() - state.roundStartTime) / SPORT_TIME_MS);
+      sportTimerBarEl.style.transform = 'scaleX(' + p + ')';
+      if (p <= 0) { autoKillBySport(); return; }
+      _sportRaf = requestAnimationFrame(tick);
+    })();
+  }
+  function cancelSportTimer() {
+    if (_sportRaf) { cancelAnimationFrame(_sportRaf); _sportRaf = null; }
+    sportTimerEl.style.display = 'none';
+  }
+  function autoKillBySport() {
+    if (state.gameOver || state.animating) return;
+    statusLabel.textContent = "⏱️ Time's up!";
+    const idx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
+    pickGate(idx);
+  }
+
+  // ---- State --------------------------------------------------------------
   let state = {
     score: 0, blockedGates: [], animating: false,
-    gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0, hintGateIdx: -1
+    gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0,
+    hintGateIdx: -1, streak: 0, roundStartTime: 0
   };
 
   let leaderboard = [];
   let _wiggleId = null;
 
   const $ = id => document.getElementById(id);
-  const worldEl        = $('world');
-  const messageEl      = $('message');
-  const sheepEl        = $('sheep');
-  const sheepSvgEl     = $('sheep-svg');
-  const sheepDeadEl    = $('sheep-dead');
-  const roundLabel     = $('round-label');
-  const statusLabel    = $('status-label');
-  const scoreEl        = $('score');
-  const bestDisplay    = $('best-display');
-  const levelLabel     = $('level-label');
-  const levelProgressText = $('level-progress-text');
-  const levelProgressBar  = $('level-progress-bar');
-  const hintBtn        = $('hint-btn');
-  const restartBtn     = $('restart-btn');
-  const hiscoreEntry   = $('hiscore-entry');
-  const hiscoreName    = $('hiscore-name');
-  const hiscoreSave    = $('hiscore-save');
-  const leaderboardEl  = $('leaderboard');
-  const leaderboardList = $('leaderboard-list');
-  const fieldEl        = $('field');
-  const levelBanner    = $('level-up-banner');
-  const syncIndicator  = $('sync-indicator');
-  const fieldOverlayEl = $('field-overlay');
-  const starsEl        = $('stars');
-  const grassBladesEl  = $('grass-blades');
+  const worldEl             = $('world');
+  const messageEl           = $('message');
+  const sheepEl             = $('sheep');
+  const sheepSvgEl          = $('sheep-svg');
+  const sheepDeadEl         = $('sheep-dead');
+  const roundLabel          = $('round-label');
+  const statusLabel         = $('status-label');
+  const scoreEl             = $('score');
+  const bestDisplay         = $('best-display');
+  const personalBestDisplay = $('personal-best-display');
+  const levelLabel          = $('level-label');
+  const levelProgressText   = $('level-progress-text');
+  const levelProgressBar    = $('level-progress-bar');
+  const streakRowEl         = $('streak-row');
+  const hintBtn             = $('hint-btn');
+  const restartBtn          = $('restart-btn');
+  const hiscoreEntry        = $('hiscore-entry');
+  const hiscoreName         = $('hiscore-name');
+  const hiscoreSave         = $('hiscore-save');
+  const leaderboardEl       = $('leaderboard');
+  const leaderboardList     = $('leaderboard-list');
+  const fieldEl             = $('field');
+  const levelBanner         = $('level-up-banner');
+  const syncIndicator       = $('sync-indicator');
+  const fieldOverlayEl      = $('field-overlay');
+  const starsEl             = $('stars');
+  const grassBladesEl       = $('grass-blades');
+  const sportTimerEl        = $('sport-timer');
+  const sportTimerBarEl     = $('sport-timer-bar');
+  const statGatesEl         = $('stat-gates');
+  const statGamesEl         = $('stat-games');
+  const statAvgEl           = $('stat-avg');
+  const statLevelEl         = $('stat-level');
+  const statHintsUsedEl     = $('stat-hints-used');
+  const statHintsFoundEl    = $('stat-hints-found');
+  const statStreakEl        = $('stat-streak');
+  const statPersonalBestEl  = $('stat-personal-best');
 
   function getLevel()        { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
   function getBlockedCount() { return Math.min(getLevel(), GATES_PER_ROUND - 1); }
   function getOpenCount()    { return GATES_PER_ROUND - getBlockedCount(); }
   function getRoundInLevel() { return (state.score % ROUNDS_PER_LEVEL) + 1; }
+
+  function renderStats() {
+    statGatesEl.textContent        = stats.gatesCleared;
+    statGamesEl.textContent        = stats.gamesPlayed;
+    statAvgEl.textContent          = stats.gamesPlayed ? (stats.totalScore / stats.gamesPlayed).toFixed(1) : '—';
+    statLevelEl.textContent        = stats.bestLevel;
+    statHintsUsedEl.textContent    = stats.hintsUsed;
+    statHintsFoundEl.textContent   = stats.hintsFound;
+    statStreakEl.textContent        = stats.streakBest;
+    statPersonalBestEl.textContent = personalBest || '—';
+    personalBestDisplay.textContent = personalBest || '—';
+  }
 
   // ---- Leaderboard --------------------------------------------------------
   function setSyncStatus(text, kind) {
@@ -642,10 +885,11 @@
   }
 
   // ---- Gate building ------------------------------------------------------
-  function pickBlockedIndices(count) {
+  function pickBlockedIndices(count, rng) {
+    rng = rng || Math.random;
     const indices = [], pool = Array.from({ length: GATES_PER_ROUND }, (_, i) => i);
     for (let n = 0; n < count; n++) {
-      const idx = Math.floor(Math.random() * pool.length);
+      const idx = Math.floor(rng() * pool.length);
       indices.push(pool[idx]); pool.splice(idx, 1);
     }
     return indices;
@@ -683,7 +927,7 @@
 
   // ---- HUD ----------------------------------------------------------------
   function newRound() {
-    state.blockedGates = pickBlockedIndices(getBlockedCount());
+    state.blockedGates = pickBlockedIndices(getBlockedCount(), DAILY_MODE ? dailyRng : null);
     if (TEST_MODE) {
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
@@ -707,6 +951,7 @@
       gates[state.hintGateIdx].parentNode.appendChild(ind);
     }
     state.currentSetEl = newSet;
+    if (SPORT_MODE) startSportTimer();
   }
   function showSheep() {
     sheepDeadEl.style.display = 'none';
@@ -725,6 +970,7 @@
     levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
     levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
     scoreEl.textContent = state.score;
+    streakRowEl.textContent = state.streak >= 3 ? '🔥 ' + state.streak + ' streak' : '';
     updateFieldAmbience(level);
   }
   function showLevelUp(newLevel) {
@@ -752,6 +998,17 @@
       fieldOverlayEl.style.background = 'rgba(15,18,55,' + a + ')';
     }
     starsEl.style.opacity = p > 0.55 ? Math.min(1, (p - 0.55) / 0.35) : 0;
+  }
+
+  // ---- Near-miss reveal ---------------------------------------------------
+  function showNearMiss(setEl, blockedIndices) {
+    const gates = setEl.querySelectorAll('.gate');
+    blockedIndices.forEach(idx => {
+      const m = document.createElement('div');
+      m.className = 'near-miss-x';
+      m.textContent = '✕';
+      gates[idx].parentNode.appendChild(m);
+    });
   }
 
   // ---- Particle effects --------------------------------------------------
@@ -789,11 +1046,11 @@
       setTimeout(() => p.remove(), 1600);
     }
   }
-  function spawnFloatingScore(gateEl) {
+  function spawnFloatingScore(gateEl, label) {
     const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
     const el = document.createElement('div');
     el.className = 'floating-score';
-    el.textContent = '+1';
+    el.textContent = label || '+1';
     el.style.left = (gr.left - fr.left + gr.width / 2) + 'px';
     el.style.top  = (gr.top  - fr.top) + 'px';
     fieldEl.appendChild(el);
@@ -809,7 +1066,6 @@
     fieldEl.appendChild(el);
     setTimeout(() => el.remove(), 2400);
   }
-
   function spawnFunnySkull(gateEl) {
     const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
     const cx = gr.left - fr.left + gr.width / 2;
@@ -860,7 +1116,7 @@
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.start(t); o.stop(t + dur);
   }
-  function playGateOpen()  {
+  function playGateOpen() {
     _tone(523, 'triangle', 0.15, 0,    0.3);
     _tone(659, 'triangle', 0.12, 0.09, 0.3);
     _tone(784, 'triangle', 0.10, 0.18, 0.4);
@@ -903,6 +1159,7 @@
   function tryGrantHint(gateEl, index) {
     const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < 0.05);
     if (!shouldGrant) return;
+    stats.hintsFound++;
     const pop = document.createElement('div');
     pop.textContent = '🐮';
     pop.style.cssText = 'position:absolute;top:50%;left:50%;font-size:26px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
@@ -923,6 +1180,7 @@
   // ---- Gate interaction --------------------------------------------------
   function pickGate(index) {
     if (state.gameOver || state.animating) return;
+    if (SPORT_MODE) cancelSportTimer();
     state.animating = true;
 
     const gates = state.currentSetEl.querySelectorAll('.gate');
@@ -973,12 +1231,23 @@
     if (!isBlocked) {
       gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
       gateEl.style.transform = 'rotateY(-110deg)';
+      showNearMiss(state.currentSetEl, state.blockedGates);
       playGateOpen();
+      navigator.vibrate && navigator.vibrate(25);
       tryGrantHint(gateEl, index);
       state.score++;
-      spawnFloatingScore(gateEl);
+      state.streak++;
+
+      let floatLabel = '+1';
+      if (SPORT_MODE && (performance.now() - state.roundStartTime) < 2000) {
+        state.score++;
+        floatLabel = '+2 ⚡';
+      }
+
+      spawnFloatingScore(gateEl, floatLabel);
       const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
       updateHud();
+      checkAchievements();
 
       setTimeout(() => {
         statusLabel.textContent = 'Walking on...';
@@ -1004,10 +1273,11 @@
           sheepEl.style.bottom = '24px';
           setTimeout(() => {
             sheepEl.style.transition = SHEEP_TRANSITION;
-            state.blockedGates = pickBlockedIndices(getBlockedCount());
+            state.blockedGates = pickBlockedIndices(getBlockedCount(), DAILY_MODE ? dailyRng : null);
             state.animating = false;
             statusLabel.textContent = 'Pick the open gate';
             if (wasLevelUp) showLevelUp(getLevel());
+            if (SPORT_MODE) startSportTimer();
           }, 550);
         }, 1500);
       }, 500);
@@ -1020,6 +1290,7 @@
       gateEl.style.zIndex = '4';
       gateEl.style.transform = 'rotate(-3deg)';
       playGateCrash();
+      navigator.vibrate && navigator.vibrate([70, 40, 70]);
       spawnCrashParticles(gateEl);
       fieldEl.classList.add('shaking');
       setTimeout(() => fieldEl.classList.remove('shaking'), 520);
@@ -1042,6 +1313,7 @@
   hintBtn.onclick = () => {
     if (state.hintUsed || state.animating || state.gameOver || !state.blockedGates.length) return;
     state.hintUsed = true;
+    stats.hintsUsed++;
     hintBtn.disabled = true;
     hintBtn.textContent = '🐮 Hint used';
     const blockedIdx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
@@ -1052,11 +1324,36 @@
   };
 
   function handleEndOfGame() {
+    cancelSportTimer();
     state.animating = false; state.gameOver = true; hintBtn.disabled = true;
+
+    stats.gamesPlayed++;
+    stats.totalScore += state.score;
+    stats.gatesCleared += state.score;
+    stats.bestLevel = Math.max(stats.bestLevel, getLevel());
+    stats.streakBest = Math.max(stats.streakBest, state.streak);
+    saveStats();
+
+    if (state.score > personalBest) {
+      personalBest = state.score;
+      try { localStorage.setItem(PERSONAL_BEST_KEY, personalBest); } catch(_) {}
+    }
+
+    renderStats();
+    checkAchievements();
+
     messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
     messageEl.style.color = 'var(--danger)';
     statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
-    if (!TEST_MODE && isNewBest(state.score)) {
+
+    if (DAILY_MODE) {
+      if (state.score > dailyState.best) {
+        dailyState.best = state.score;
+        try { localStorage.setItem(DAILY_KEY, JSON.stringify(dailyState)); } catch(_) {}
+      }
+      restartBtn.style.display = 'inline-block';
+      restartBtn.textContent = 'Try again · Daily best: ' + dailyState.best;
+    } else if (!TEST_MODE && isNewBest(state.score)) {
       showHiscoreEntry();
     } else {
       restartBtn.style.display = 'inline-block';
@@ -1086,15 +1383,18 @@
   hiscoreName.addEventListener('keydown', e => { if (e.key === 'Enter') hiscoreSave.click(); });
 
   restartBtn.onclick = () => {
+    cancelSportTimer();
     clearInterval(_wiggleId); _wiggleId = null;
     sheepEl.style.animation = '';
     sheepEl.classList.remove('walking');
     showSheep();
     hintBtn.disabled = false;
     hintBtn.textContent = '🐮 Hint';
+    if (DAILY_MODE) dailyRng = seededRng(dailySeed());
     state = {
       score: 0, blockedGates: [], animating: false,
-      gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0, hintGateIdx: -1
+      gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0,
+      hintGateIdx: -1, streak: 0, roundStartTime: 0
     };
     worldEl.innerHTML = '';
     fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
@@ -1140,12 +1440,15 @@
     }
   }
 
-  if (TEST_MODE) document.getElementById('test-badge').style.display = 'inline-block';
-
   // ---- Boot --------------------------------------------------------------
+  if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
+  if (SPORT_MODE) $('sport-badge').style.display = 'inline-block';
+  if (DAILY_MODE) $('daily-badge').style.display = 'inline-block';
+
   generateGrassBlades();
   generateStars();
   updateFieldAmbience(1);
+  renderStats();
   loadLeaderboard();
   newRound();
 })();
