@@ -35,169 +35,172 @@
     align-items: flex-start;
     padding: 24px 16px;
   }
-  .app {
-    width: 100%;
-    max-width: 720px;
-  }
-  h1 {
-    text-align: center;
-    font-size: 28px;
-    font-weight: 500;
-    margin: 0 0 4px;
-  }
-  .tagline {
-    text-align: center;
-    font-size: 14px;
-    color: var(--text-secondary);
-    margin: 0 0 24px;
-  }
-  #game-container {
-    background: var(--bg-soft);
-    border-radius: 12px;
-    padding: 20px;
-  }
+  .app { width: 100%; max-width: 720px; }
+  h1 { text-align: center; font-size: 28px; font-weight: 500; margin: 0 0 4px; }
+  .tagline { text-align: center; font-size: 14px; color: var(--text-secondary); margin: 0 0 24px; }
+  #game-container { background: var(--bg-soft); border-radius: 12px; padding: 20px; }
   .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-    flex-wrap: wrap;
-    gap: 8px;
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
   }
-  .topbar-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .topbar-left { display: flex; align-items: center; gap: 12px; }
   .sheep-icon { font-size: 28px; }
   .hud-title { font-size: 16px; font-weight: 500; }
   .hud-subtitle { font-size: 13px; color: var(--text-secondary); }
   .stat-group { display: flex; gap: 8px; }
   .stat {
-    background: var(--bg-card);
-    padding: 6px 12px;
-    border-radius: 8px;
-    border: 0.5px solid var(--border);
+    background: var(--bg-card); padding: 6px 12px;
+    border-radius: 8px; border: 0.5px solid var(--border);
   }
   .stat-label { font-size: 11px; color: var(--text-secondary); }
   .stat-value { font-size: 14px; font-weight: 500; }
-  .level-bar-wrap {
-    background: var(--bg-card);
-    border-radius: 8px;
-    padding: 8px;
-    margin-bottom: 16px;
-  }
+  .level-bar-wrap { background: var(--bg-card); border-radius: 8px; padding: 8px; margin-bottom: 16px; }
   .level-bar-text {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 12px;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;
   }
-  .level-bar-track {
-    height: 8px;
-    background: var(--bg-soft);
-    border-radius: 4px;
-    overflow: hidden;
-  }
-  .level-bar-fill {
-    height: 100%;
-    width: 0%;
-    background: #639922;
-    transition: width 0.4s;
-  }
+  .level-bar-track { height: 8px; background: var(--bg-soft); border-radius: 4px; overflow: hidden; }
+  .level-bar-fill { height: 100%; width: 0%; background: #639922; transition: width 0.4s; }
+
+  /* ---- Field ---- */
   #field {
-    background: linear-gradient(to bottom, var(--sky) 0%, var(--sky) 25%, var(--grass) 25%, var(--grass) 100%);
+    background: linear-gradient(to bottom,
+      #8ec8e8 0%, var(--sky) 20%, var(--sky) 25%,
+      #b0d870 25%, var(--grass) 35%, var(--grass) 100%);
     border-radius: 8px;
     height: 320px;
     position: relative;
     overflow: hidden;
   }
-  #world {
-    position: absolute;
-    inset: 0;
-    transition: transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-    z-index: 1;
-    will-change: transform;
+  #field-overlay {
+    position: absolute; inset: 0; z-index: 0;
+    pointer-events: none;
+    transition: background 3s ease;
   }
+  /* Stars */
+  #stars {
+    position: absolute; left: 0; right: 0; top: 0; height: 80px;
+    z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 3s ease;
+  }
+  .star {
+    position: absolute; width: 2px; height: 2px;
+    background: white; border-radius: 50%;
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+  /* Clouds */
+  #clouds {
+    position: absolute; left: 0; right: 0; top: 0; height: 80px;
+    z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .cloud {
+    position: absolute;
+    background: rgba(255,255,255,0.88);
+    border-radius: 30px;
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute;
+    background: rgba(255,255,255,0.88); border-radius: 50%;
+  }
+  .c1 {
+    width: 88px; height: 24px; top: 16px;
+    animation: cloud-drift 38s linear infinite;
+  }
+  .c1::before { width: 38px; height: 38px; top: -22px; left: 14px; }
+  .c1::after  { width: 26px; height: 26px; top: -12px; left: 48px; }
+  .c2 {
+    width: 58px; height: 18px; top: 44px;
+    animation: cloud-drift 58s linear infinite -22s;
+  }
+  .c2::before { width: 26px; height: 26px; top: -15px; left: 8px; }
+  .c2::after  { width: 20px; height: 20px; top: -8px;  left: 32px; }
+  .c3 {
+    width: 110px; height: 28px; top: 8px;
+    animation: cloud-drift 48s linear infinite -36s;
+  }
+  .c3::before { width: 46px; height: 46px; top: -28px; left: 16px; }
+  .c3::after  { width: 32px; height: 32px; top: -16px; left: 62px; }
+  @keyframes cloud-drift {
+    from { transform: translateX(-180px); }
+    to   { transform: translateX(760px); }
+  }
+
+  #world {
+    position: absolute; inset: 0;
+    transition: transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 1; will-change: transform;
+  }
+
+  /* Grass blades */
+  #grass-blades {
+    position: absolute; bottom: 18px; left: 0; right: 0;
+    height: 22px; z-index: 2; pointer-events: none;
+  }
+  .grass-blade {
+    position: absolute; bottom: 0; width: 3px;
+    background: linear-gradient(to top, #6aaa3e, #90cc55);
+    border-radius: 2px 2px 0 0;
+    transform-origin: bottom center;
+    animation: blade-sway 2s ease-in-out infinite;
+  }
+  @keyframes blade-sway {
+    0%, 100% { transform: rotate(-7deg); }
+    50%       { transform: rotate(7deg); }
+  }
+
+  /* ---- Sheep ---- */
   #sheep {
     position: absolute;
     left: 50%;
     bottom: 24px;
     transform: translateX(-50%);
-    font-size: 44px;
     transition: left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95),
                 bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95),
                 transform 0.3s, opacity 0.3s;
     z-index: 3;
-    line-height: 1;
   }
-  #sheep-emoji { display: block; }
-  #sheep-legs {
-    position: absolute;
-    bottom: -6px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-    pointer-events: none;
-    gap: 8px;
+  #sheep-dead { display: none; font-size: 44px; line-height: 1; }
+  /* SVG leg animation */
+  .leg { transform-box: fill-box; transform-origin: 50% 0%; }
+  #sheep.walking .leg-fl { animation: leg-swing 360ms ease-in-out infinite; }
+  #sheep.walking .leg-fr { animation: leg-swing 360ms ease-in-out infinite 180ms; }
+  #sheep.walking .leg-bl { animation: leg-swing 360ms ease-in-out infinite 180ms; }
+  #sheep.walking .leg-br { animation: leg-swing 360ms ease-in-out infinite; }
+  @keyframes leg-swing {
+    0%, 100% { transform: rotate(-20deg); }
+    50%       { transform: rotate(20deg); }
   }
-  .leg-l, .leg-r {
-    width: 5px;
-    height: 11px;
-    background: #c4a97d;
-    border-radius: 0 0 3px 3px;
-    display: inline-block;
-  }
-  .leg-l { animation: leg-walk 320ms ease-in-out infinite; }
-  .leg-r { animation: leg-walk 320ms ease-in-out infinite 160ms; }
+
   #grass-front {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 18px;
-    background: var(--grass-dark);
+    position: absolute; bottom: 0; left: 0; right: 0; height: 18px;
+    background: linear-gradient(to bottom, #9acc6a, #88bb55);
     z-index: 2;
   }
   #message {
-    position: absolute;
-    bottom: 28px;
-    left: 0;
-    right: 0;
-    text-align: center;
-    font-size: 14px;
-    font-weight: 500;
-    min-height: 20px;
-    z-index: 4;
-    pointer-events: none;
+    position: absolute; bottom: 28px; left: 0; right: 0;
+    text-align: center; font-size: 14px; font-weight: 500;
+    min-height: 20px; z-index: 4; pointer-events: none;
   }
   #level-up-banner {
-    position: absolute;
-    top: 50%;
-    left: 50%;
+    position: absolute; top: 50%; left: 50%;
     transform: translate(-50%, -50%) scale(0.5);
     opacity: 0;
-    background: rgba(15, 110, 86, 0.95);
-    color: #fff;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    z-index: 5;
-    pointer-events: none;
-    transition: transform 0.4s, opacity 0.4s;
-    text-align: center;
+    background: rgba(15, 110, 86, 0.95); color: #fff;
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 16px; font-weight: 500;
+    z-index: 5; pointer-events: none;
+    transition: transform 0.4s, opacity 0.4s; text-align: center;
   }
+
+  /* ---- Buttons ---- */
   button {
-    background: var(--bg-card);
-    border: 0.5px solid var(--border);
-    border-radius: 8px;
-    padding: 8px 16px;
-    font-size: 14px;
-    cursor: pointer;
-    font-family: inherit;
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 8px 16px; font-size: 14px;
+    cursor: pointer; font-family: inherit;
     transition: background 0.15s, transform 0.1s;
     touch-action: manipulation;
   }
@@ -205,28 +208,16 @@
   button:active { transform: scale(0.98); }
   button:disabled { opacity: 0.45; cursor: default; }
   #hint-btn:not(:disabled) {
-    background: #e8f5e9;
-    border-color: #81c784;
-    color: #2e7d32;
-    font-weight: 500;
+    background: #e8f5e9; border-color: #81c784; color: #2e7d32; font-weight: 500;
   }
   #hint-btn:not(:disabled):hover { background: #c8e6c9; }
-  input[type="text"] {
-    border: 0.5px solid var(--border);
-    border-radius: 8px;
-    padding: 8px;
-    font-family: inherit;
-  }
-  input[type="text"]:focus {
-    outline: none;
-    border-color: var(--info);
-    box-shadow: 0 0 0 2px var(--info-soft);
-  }
+  input[type="text"] { border: 0.5px solid var(--border); border-radius: 8px; padding: 8px; font-family: inherit; }
+  input[type="text"]:focus { outline: none; border-color: var(--info); box-shadow: 0 0 0 2px var(--info-soft); }
+
+  /* ---- Panels ---- */
   #hiscore-entry, #leaderboard {
-    background: var(--bg-card);
-    border: 0.5px solid var(--border);
-    border-radius: 8px;
-    padding: 14px;
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 14px;
   }
   #hiscore-entry { margin-top: 16px; text-align: center; }
   #hiscore-entry .entry-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
@@ -234,57 +225,98 @@
   #hiscore-entry .entry-row { display: flex; gap: 8px; justify-content: center; align-items: center; }
   #leaderboard { margin-top: 16px; font-size: 13px; }
   .leaderboard-title {
-    font-weight: 500;
-    margin-bottom: 8px;
-    color: var(--text-secondary);
-    font-size: 12px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    font-weight: 500; margin-bottom: 8px; color: var(--text-secondary);
+    font-size: 12px; display: flex; justify-content: space-between; align-items: center;
   }
   .leaderboard-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 6px 0;
-    border-bottom: 0.5px solid var(--border);
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 0.5px solid var(--border);
   }
   .leaderboard-row:last-child { border-bottom: none; }
-  .lb-name {
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-    letter-spacing: 2px;
-    font-weight: 500;
-  }
-  .lb-rank {
-    color: var(--text-muted);
-    margin-right: 8px;
-    font-family: ui-monospace, "SF Mono", Menlo, monospace;
-  }
+  .lb-name { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 2px; font-weight: 500; }
+  .lb-rank { color: var(--text-muted); margin-right: 8px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
   .lb-score { font-weight: 500; }
   .action-bar { display: flex; gap: 8px; margin-top: 16px; justify-content: center; min-height: 36px; }
-  .gate-plank { height: 8px; background: var(--gate-wood-dark); border-radius: 2px; }
+
+  /* ---- Gates ---- */
+  .gate-plank {
+    height: 8px;
+    background: linear-gradient(to bottom, #7a5c38, #4e3b22, #3a2c18);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
   .horn-hint {
-    position: absolute;
-    top: -14px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 18px;
-    line-height: 1;
-    pointer-events: none;
-    z-index: 5;
+    position: absolute; top: -14px; left: 50%;
+    transform: translateX(-50%); font-size: 18px; line-height: 1;
+    pointer-events: none; z-index: 5;
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
+
+  /* ---- Particle effects ---- */
+  .crash-particle {
+    position: absolute; pointer-events: none; z-index: 10;
+    border-radius: 2px;
+    animation: particle-fly 0.55s ease-out forwards;
+  }
+  @keyframes particle-fly {
+    0%   { transform: translate(0, 0) rotate(0deg);   opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(540deg); opacity: 0; }
+  }
+  .confetti-piece {
+    position: absolute; pointer-events: none; z-index: 10;
+    border-radius: 2px;
+    animation: confetti-fall var(--dur) ease-in forwards;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0)     rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(220px) rotate(var(--rot)); opacity: 0; }
+  }
+  .floating-score {
+    position: absolute; pointer-events: none; z-index: 10;
+    color: #1a8a60; font-weight: 700; font-size: 17px;
+    transform: translateX(-50%);
+    animation: score-float 0.85s ease-out forwards;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  @keyframes score-float {
+    0%   { transform: translateX(-50%) translateY(0);     opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-44px); opacity: 0; }
+  }
+  .hoof-print {
+    position: absolute; pointer-events: none; z-index: 1;
+    animation: print-fade 2.2s ease-out forwards;
+  }
+  @keyframes print-fade {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.4); }
+    15%  { opacity: 0.45; transform: translateX(-50%) scale(1); }
+    100% { opacity: 0;   transform: translateX(-50%) scale(1); }
+  }
+
+  /* ---- Screen shake ---- */
+  @keyframes screen-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    12%  { transform: translate(-5px, -2px) rotate(-0.6deg); }
+    25%  { transform: translate(5px, 1px)  rotate(0.6deg); }
+    37%  { transform: translate(-4px, 2px) rotate(-0.4deg); }
+    50%  { transform: translate(4px, -1px) rotate(0.4deg); }
+    62%  { transform: translate(-2px, 1px) rotate(-0.2deg); }
+    75%  { transform: translate(2px, -1px) rotate(0.2deg); }
+  }
+  #field.shaking { animation: screen-shake 0.5s ease-out; }
+
+  /* ---- Bob animation ---- */
   @keyframes sheep-bob {
     0%, 100% { transform: translateX(-50%) translateY(-2px); }
     50%       { transform: translateX(-50%) translateY(2px); }
   }
-  @keyframes leg-walk {
-    0%, 100% { transform: translateY(0);    }
-    50%       { transform: translateY(-6px); }
-  }
+
+  /* ---- Misc ---- */
   details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
   details summary { cursor: pointer; }
   details p { margin: 8px 0 0; line-height: 1.6; }
+  .sync-indicator { font-size: 11px; color: var(--text-muted); }
+  .sync-indicator.syncing { color: var(--info); }
+  .sync-indicator.error { color: var(--danger); }
   @media (max-width: 480px) {
     body { padding: 12px 8px; }
     h1 { font-size: 22px; }
@@ -294,19 +326,6 @@
     .stat-group { align-self: flex-end; }
     .stat { padding: 5px 10px; }
   }
-  .footer {
-    text-align: center;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-top: 20px;
-  }
-  .footer a { color: var(--text-secondary); }
-  .sync-indicator {
-    font-size: 11px;
-    color: var(--text-muted);
-  }
-  .sync-indicator.syncing { color: var(--info); }
-  .sync-indicator.error { color: var(--danger); }
 </style>
 </head>
 <body>
@@ -347,10 +366,57 @@
     </div>
 
     <div id="field">
+      <div id="field-overlay"></div>
+      <div id="stars"></div>
+      <div id="clouds">
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div class="cloud c3"></div>
+      </div>
       <div id="world"></div>
+      <div id="grass-blades"></div>
       <div id="sheep" aria-hidden="true">
-        <span id="sheep-emoji">🐑</span>
-        <div id="sheep-legs"><div class="leg-l"></div><div class="leg-r"></div></div>
+        <span id="sheep-dead">💀</span>
+        <svg id="sheep-svg" viewBox="0 0 70 58" width="70" height="58"
+             xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;">
+          <!-- Wool body -->
+          <circle cx="38" cy="26" r="17" fill="#eeeae0"/>
+          <circle cx="27" cy="21" r="12" fill="#f3f1e8"/>
+          <circle cx="44" cy="19" r="12" fill="#edeae2"/>
+          <circle cx="51" cy="27" r="10" fill="#e9e6dc"/>
+          <circle cx="28" cy="33" r="10" fill="#e9e6dc"/>
+          <circle cx="41" cy="34" r="8"  fill="#e6e3d9"/>
+          <!-- Head -->
+          <ellipse cx="13" cy="33" rx="10" ry="9" fill="#d5caaf"/>
+          <!-- Snout -->
+          <ellipse cx="6" cy="37" rx="5" ry="4" fill="#c9bda0"/>
+          <circle cx="4.5" cy="38.5" r="1.1" fill="#9c8c74"/>
+          <circle cx="7.5" cy="38.5" r="1.1" fill="#9c8c74"/>
+          <!-- Eye -->
+          <circle cx="11" cy="30" r="2.2" fill="#1e1810"/>
+          <circle cx="10.2" cy="29.2" r="0.6" fill="white"/>
+          <!-- Ear -->
+          <ellipse cx="18" cy="25" rx="3.5" ry="5.5" fill="#d5caaf" transform="rotate(15,18,25)"/>
+          <ellipse cx="18" cy="25" rx="2"   ry="3.5" fill="#edc0b8" transform="rotate(15,18,25)"/>
+          <!-- Back legs (slightly darker, drawn first) -->
+          <g class="leg leg-bl">
+            <rect x="49" y="42" width="6" height="13" rx="3"   fill="#c2b89a"/>
+            <rect x="49" y="51" width="6" height="5"  rx="2"   fill="#3a2e1e"/>
+          </g>
+          <g class="leg leg-br">
+            <rect x="55" y="42" width="5" height="13" rx="2.5" fill="#b4aa8c"/>
+            <rect x="55" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
+          </g>
+          <!-- Front legs -->
+          <g class="leg leg-fl">
+            <rect x="26" y="42" width="6" height="13" rx="3"   fill="#cac0a0"/>
+            <rect x="26" y="51" width="6" height="5"  rx="2"   fill="#3a2e1e"/>
+          </g>
+          <g class="leg leg-fr">
+            <rect x="33" y="42" width="5" height="13" rx="2.5" fill="#bcb294"/>
+            <rect x="33" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
+          </g>
+        </svg>
       </div>
       <div id="grass-front"></div>
       <div id="message"></div>
@@ -398,62 +464,57 @@
   const MAX_LEADERBOARD = 10;
   const LOCAL_FALLBACK_KEY = "sheepgate:local-leaderboard";
   const SHEEP_TRANSITION = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
-  const SHEEP_TRANSITION_WALK = 'bottom 1.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s, opacity 0.3s';
   const WORLD_TRANSITION = 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
   let state = {
-    score: 0,
-    blockedGates: [],
-    animating: false,
-    gameOver: false,
-    hintUsed: false,
-    currentSetEl: null,
-    worldOffset: 0
+    score: 0, blockedGates: [], animating: false,
+    gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0
   };
 
   let leaderboard = [];
   let _wiggleId = null;
 
   const $ = id => document.getElementById(id);
-  const worldEl = $('world');
-  const messageEl = $('message');
-  const sheepEl = $('sheep');
-  const sheepEmojiEl = $('sheep-emoji');
-  const sheepLegsEl = $('sheep-legs');
-  const roundLabel = $('round-label');
-  const statusLabel = $('status-label');
-  const scoreEl = $('score');
-  const bestDisplay = $('best-display');
-  const levelLabel = $('level-label');
+  const worldEl        = $('world');
+  const messageEl      = $('message');
+  const sheepEl        = $('sheep');
+  const sheepSvgEl     = $('sheep-svg');
+  const sheepDeadEl    = $('sheep-dead');
+  const roundLabel     = $('round-label');
+  const statusLabel    = $('status-label');
+  const scoreEl        = $('score');
+  const bestDisplay    = $('best-display');
+  const levelLabel     = $('level-label');
   const levelProgressText = $('level-progress-text');
-  const levelProgressBar = $('level-progress-bar');
-  const hintBtn = $('hint-btn');
-  const restartBtn = $('restart-btn');
-  const hiscoreEntry = $('hiscore-entry');
-  const hiscoreName = $('hiscore-name');
-  const hiscoreSave = $('hiscore-save');
-  const leaderboardEl = $('leaderboard');
+  const levelProgressBar  = $('level-progress-bar');
+  const hintBtn        = $('hint-btn');
+  const restartBtn     = $('restart-btn');
+  const hiscoreEntry   = $('hiscore-entry');
+  const hiscoreName    = $('hiscore-name');
+  const hiscoreSave    = $('hiscore-save');
+  const leaderboardEl  = $('leaderboard');
   const leaderboardList = $('leaderboard-list');
-  const fieldEl = $('field');
-  const levelBanner = $('level-up-banner');
-  const syncIndicator = $('sync-indicator');
+  const fieldEl        = $('field');
+  const levelBanner    = $('level-up-banner');
+  const syncIndicator  = $('sync-indicator');
+  const fieldOverlayEl = $('field-overlay');
+  const starsEl        = $('stars');
+  const grassBladesEl  = $('grass-blades');
 
-  function getLevel() { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
+  function getLevel()        { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
   function getBlockedCount() { return Math.min(getLevel(), GATES_PER_ROUND - 1); }
-  function getOpenCount() { return GATES_PER_ROUND - getBlockedCount(); }
+  function getOpenCount()    { return GATES_PER_ROUND - getBlockedCount(); }
   function getRoundInLevel() { return (state.score % ROUNDS_PER_LEVEL) + 1; }
 
-  // ---- Leaderboard storage ----------------------------------------------
+  // ---- Leaderboard --------------------------------------------------------
   function setSyncStatus(text, kind) {
     syncIndicator.textContent = text || '';
     syncIndicator.className = 'sync-indicator' + (kind ? ' ' + kind : '');
   }
-
   function loadLocalLeaderboard() {
     try { leaderboard = sanitizeLeaderboard(JSON.parse(localStorage.getItem(LOCAL_FALLBACK_KEY))); }
     catch (_) { leaderboard = []; }
   }
-
   async function loadLeaderboard() {
     setSyncStatus('Syncing...', 'syncing');
     try {
@@ -469,23 +530,16 @@
     }
     renderLeaderboard();
   }
-
   async function saveLeaderboard() {
-    // Cache locally as a fallback
-    try {
-      localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard));
-    } catch (_) {}
-
+    try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
     setSyncStatus('Saving...', 'syncing');
     try {
-      // Re-fetch latest to minimize race-condition score loss
       const latestRes = await fetch(`${WORKER_URL}/scores`);
       let serverScores = [];
       if (latestRes.ok) {
         const latest = await latestRes.json();
         serverScores = sanitizeLeaderboard(latest && latest.scores);
       }
-      // Merge: combine server scores + our local additions, dedupe-ish & keep top N
       const combined = [...serverScores, ...leaderboard];
       const seen = new Set();
       const merged = [];
@@ -495,7 +549,6 @@
       }
       merged.sort((a, b) => b.score - a.score);
       const trimmed = merged.slice(0, MAX_LEADERBOARD);
-
       const putRes = await fetch(`${WORKER_URL}/scores`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
@@ -511,9 +564,6 @@
       return false;
     }
   }
-
-  // Drop any entry from external sources that doesn't match the schema we write.
-  // Prevents stored XSS even if the JSONBin bin is written to directly via the API.
   function sanitizeLeaderboard(data) {
     if (!Array.isArray(data)) return [];
     return data.filter(entry =>
@@ -524,12 +574,10 @@
       entry.score >= 0
     ).slice(0, MAX_LEADERBOARD);
   }
-
   function isNewBest(score) {
     if (leaderboard.length < MAX_LEADERBOARD) return score > 0;
     return score > leaderboard[leaderboard.length - 1].score;
   }
-
   function renderLeaderboard() {
     if (!leaderboard.length) {
       bestDisplay.textContent = '—';
@@ -540,14 +588,12 @@
       leaderboardList.replaceChildren(empty);
       return;
     }
-    const top = leaderboard[0];
-    bestDisplay.textContent = top.score + ' (' + top.name + ')';
+    bestDisplay.textContent = leaderboard[0].score + ' (' + leaderboard[0].name + ')';
     leaderboardEl.style.display = 'block';
     leaderboardList.innerHTML = '';
     leaderboard.forEach((entry, idx) => {
-      const row = document.createElement('div');
+      const row  = document.createElement('div');
       row.className = 'leaderboard-row';
-
       const left = document.createElement('div');
       const rank = document.createElement('span');
       rank.className = 'lb-rank';
@@ -555,84 +601,72 @@
       const name = document.createElement('span');
       name.className = 'lb-name';
       name.textContent = entry.name;
-      left.appendChild(rank);
-      left.appendChild(name);
-
-      const score = document.createElement('span');
-      score.className = 'lb-score';
-      score.textContent = entry.score;
-
-      row.appendChild(left);
-      row.appendChild(score);
+      left.appendChild(rank); left.appendChild(name);
+      const sc = document.createElement('span');
+      sc.className = 'lb-score'; sc.textContent = entry.score;
+      row.appendChild(left); row.appendChild(sc);
       leaderboardList.appendChild(row);
     });
   }
 
-  // ---- Gate building ----------------------------------------------------
+  // ---- Gate building ------------------------------------------------------
   function pickBlockedIndices(count) {
-    const indices = [];
-    const pool = Array.from({ length: GATES_PER_ROUND }, (_, i) => i);
+    const indices = [], pool = Array.from({ length: GATES_PER_ROUND }, (_, i) => i);
     for (let n = 0; n < count; n++) {
       const idx = Math.floor(Math.random() * pool.length);
-      indices.push(pool[idx]);
-      pool.splice(idx, 1);
+      indices.push(pool[idx]); pool.splice(idx, 1);
     }
     return indices;
   }
-
   function buildGateSet(yOffset) {
     const set = document.createElement('div');
     set.className = 'gate-set';
-    set.style.cssText = 'position: absolute; left: 16px; right: 16px; top: ' + yOffset + 'px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; height: 95px;';
-
+    set.style.cssText = 'position:absolute;left:16px;right:16px;top:' + yOffset + 'px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;height:95px;';
     for (let i = 0; i < GATES_PER_ROUND; i++) {
       const wrap = document.createElement('div');
-      wrap.style.cssText = 'position: relative; height: 95px; perspective: 400px;';
-
+      wrap.style.cssText = 'position:relative;height:95px;perspective:400px;';
       const hinge = document.createElement('div');
-      hinge.style.cssText = 'position: absolute; top: 0; bottom: 0; left: 0; width: 4px; background: #4a3a24; border-radius: 2px; z-index: 0;';
+      hinge.style.cssText = 'position:absolute;top:0;bottom:0;left:0;width:4px;background:linear-gradient(to right,#3a2a14,#5d4a30);border-radius:2px;z-index:0;box-shadow:2px 0 4px rgba(0,0,0,0.3);';
       wrap.appendChild(hinge);
-
       const gate = document.createElement('button');
       gate.className = 'gate';
       gate.dataset.idx = i;
-      gate.style.cssText = 'position: absolute; top: 0; left: 4px; right: 0; bottom: 0; background: var(--gate-wood); border: 2px solid var(--gate-wood-dark); border-radius: 0 4px 4px 0; padding: 0; cursor: pointer; transform-origin: left center; transform: rotateY(0deg); transition: transform 0.15s, background 0.4s, border-color 0.4s; display: flex; align-items: center; justify-content: center; overflow: hidden; will-change: transform; touch-action: manipulation;';
-
+      gate.style.cssText = 'position:absolute;top:0;left:4px;right:0;bottom:0;background:repeating-linear-gradient(90deg,#9c7b44 0px,#8b6f47 4px,#7a5c35 7px,#8b6f47 10px,#9a7840 14px);border:2px solid #5d4a30;border-left:none;border-radius:0 4px 4px 0;padding:0;cursor:pointer;transform-origin:left center;transform:rotateY(0deg);transition:transform 0.15s,background 0.4s,border-color 0.4s;display:flex;align-items:center;justify-content:center;overflow:hidden;will-change:transform;touch-action:manipulation;box-shadow:inset 0 0 12px rgba(0,0,0,0.15),2px 0 4px rgba(0,0,0,0.2);';
       const planks = document.createElement('div');
       planks.className = 'planks';
-      planks.style.cssText = 'width: 82%; height: 100%; display: flex; flex-direction: column; justify-content: space-around; padding: 5px 0; transition: opacity 0.3s;';
+      planks.style.cssText = 'width:82%;height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:5px 0;transition:opacity 0.3s;';
       for (let p = 0; p < 3; p++) {
         const plank = document.createElement('div');
-        plank.className = 'gate-plank';
-        planks.appendChild(plank);
+        plank.className = 'gate-plank'; planks.appendChild(plank);
       }
       gate.appendChild(planks);
-
       gate.onmouseover = () => { if (!gate.disabled) gate.style.transform = 'translateY(-3px)'; };
-      gate.onmouseout = () => { if (!gate.disabled) gate.style.transform = 'translateY(0)'; };
+      gate.onmouseout  = () => { if (!gate.disabled) gate.style.transform = 'translateY(0)'; };
       gate.onclick = () => pickGate(i);
       gate.setAttribute('aria-label', 'Gate ' + (i + 1));
-      wrap.appendChild(gate);
-      set.appendChild(wrap);
+      wrap.appendChild(gate); set.appendChild(wrap);
     }
     return set;
   }
 
+  // ---- HUD ----------------------------------------------------------------
   function newRound() {
     state.blockedGates = pickBlockedIndices(getBlockedCount());
     state.animating = false;
-    messageEl.textContent = '';
-    messageEl.style.color = 'var(--text-primary)';
+    messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
     restartBtn.style.display = 'none';
     statusLabel.textContent = 'Pick the open gate';
-    sheepEmojiEl.textContent = '🐑';
-    sheepLegsEl.style.display = 'none';
+    showSheep();
     updateHud();
     const newSet = buildGateSet(95 - state.worldOffset);
     worldEl.appendChild(newSet);
     state.currentSetEl = newSet;
   }
-
+  function showSheep() {
+    sheepDeadEl.style.display = 'none';
+    sheepSvgEl.style.display  = 'block';
+    sheepEl.classList.remove('walking');
+  }
   function updateHud() {
     const level = getLevel();
     const round = getRoundInLevel();
@@ -642,8 +676,8 @@
     levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
     levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
     scoreEl.textContent = state.score;
+    updateFieldAmbience(level);
   }
-
   function showLevelUp(newLevel) {
     levelBanner.textContent = 'Level ' + newLevel + ' · ' + (GATES_PER_ROUND - getBlockedCount()) + ' open';
     levelBanner.style.opacity = '1';
@@ -652,9 +686,82 @@
       levelBanner.style.opacity = '0';
       levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
     }, 1200);
+    spawnConfetti();
   }
 
-  // ---- Web Audio sounds ------------------------------------------------
+  // ---- Ambience (day → dusk → night) -------------------------------------
+  function updateFieldAmbience(level) {
+    const p = Math.min((level - 1) / 6, 1);
+    if (p < 0.35) {
+      fieldOverlayEl.style.background = 'transparent';
+    } else if (p < 0.65) {
+      const a = ((p - 0.35) / 0.3) * 0.28;
+      fieldOverlayEl.style.background =
+        'linear-gradient(to bottom,rgba(255,130,30,' + (a * 0.7) + ') 0%,rgba(200,60,0,' + a + ') 30%,transparent 65%)';
+    } else {
+      const a = ((p - 0.65) / 0.35) * 0.5;
+      fieldOverlayEl.style.background = 'rgba(15,18,55,' + a + ')';
+    }
+    starsEl.style.opacity = p > 0.55 ? Math.min(1, (p - 0.55) / 0.35) : 0;
+  }
+
+  // ---- Particle effects --------------------------------------------------
+  function spawnCrashParticles(gateEl) {
+    const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const cx = gr.left - fr.left + gr.width / 2;
+    const cy = gr.top  - fr.top  + gr.height / 2;
+    const colors = ['#9c7b44','#8b6f47','#7a5c35','#c4a060','#5d4a30'];
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement('div');
+      p.className = 'crash-particle';
+      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
+      const speed = 28 + Math.random() * 44;
+      const w = 4 + Math.random() * 6, h = 2 + Math.random() * 4;
+      p.style.cssText = 'width:' + w + 'px;height:' + h + 'px;background:' + colors[i % colors.length] + ';left:' + cx + 'px;top:' + cy + 'px;';
+      p.style.setProperty('--dx', (Math.cos(angle) * speed) + 'px');
+      p.style.setProperty('--dy', (Math.sin(angle) * speed) + 'px');
+      fieldEl.appendChild(p);
+      setTimeout(() => p.remove(), 600);
+    }
+  }
+  function spawnConfetti() {
+    const colors = ['#ff6b6b','#4ecdc4','#45b7d1','#f9ca24','#a29bfe','#fd79a8','#6ab04c'];
+    for (let i = 0; i < 22; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      const size = 6 + Math.random() * 6;
+      const dur  = (0.7 + Math.random() * 0.6) + 's';
+      const rot  = (360 + Math.random() * 360) + 'deg';
+      p.style.cssText = 'width:' + size + 'px;height:' + size + 'px;background:' + colors[i % colors.length] + ';left:' + (15 + Math.random() * 70) + '%;top:2px;';
+      p.style.setProperty('--dur', dur);
+      p.style.setProperty('--rot', rot);
+      p.style.animationDelay = (Math.random() * 0.25) + 's';
+      fieldEl.appendChild(p);
+      setTimeout(() => p.remove(), 1600);
+    }
+  }
+  function spawnFloatingScore(gateEl) {
+    const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const el = document.createElement('div');
+    el.className = 'floating-score';
+    el.textContent = '+1';
+    el.style.left = (gr.left - fr.left + gr.width / 2) + 'px';
+    el.style.top  = (gr.top  - fr.top) + 'px';
+    fieldEl.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+  function spawnHoofPrint() {
+    const sr = sheepEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const cx = sr.left - fr.left + sr.width / 2;
+    const el = document.createElement('div');
+    el.className = 'hoof-print';
+    const isLeft = Math.random() < 0.5;
+    el.style.cssText = 'width:8px;height:5px;border-radius:50%;background:rgba(80,55,25,0.28);left:' + (cx + (isLeft ? -8 : 8)) + 'px;bottom:19px;';
+    fieldEl.appendChild(el);
+    setTimeout(() => el.remove(), 2400);
+  }
+
+  // ---- Web Audio ---------------------------------------------------------
   let _audioCtx = null;
   function _audio() {
     try {
@@ -675,7 +782,7 @@
     g.gain.exponentialRampToValueAtTime(0.001, t + dur);
     o.start(t); o.stop(t + dur);
   }
-  function playGateOpen() {
+  function playGateOpen()  {
     _tone(523, 'triangle', 0.15, 0,    0.3);
     _tone(659, 'triangle', 0.12, 0.09, 0.3);
     _tone(784, 'triangle', 0.10, 0.18, 0.4);
@@ -683,16 +790,12 @@
   function playGateCrash() {
     const ctx = _audio(); if (!ctx) return;
     const t = ctx.currentTime;
-    // Descending thud
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
     o.type = 'sawtooth';
-    o.frequency.setValueAtTime(200, t);
-    o.frequency.exponentialRampToValueAtTime(40, t + 0.25);
-    g.gain.setValueAtTime(0.25, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.frequency.setValueAtTime(200, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.25);
+    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
     o.start(t); o.stop(t + 0.3);
-    // Noise burst
     const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.18), ctx.sampleRate);
     const d = buf.getChannelData(0);
     for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
@@ -707,19 +810,18 @@
     const o = ctx.createOscillator(), g = ctx.createGain();
     o.connect(g); g.connect(ctx.destination);
     o.type = 'sine';
-    o.frequency.setValueAtTime(85, t);
-    o.frequency.exponentialRampToValueAtTime(50, t + 0.04);
-    g.gain.setValueAtTime(0.07, t);
-    g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    o.frequency.setValueAtTime(85, t); o.frequency.exponentialRampToValueAtTime(50, t + 0.04);
+    g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
     o.start(t); o.stop(t + 0.07);
+    spawnHoofPrint();
   }
   function playHintFound() {
-    _tone(784,  'sine', 0.12, 0,    0.3);
-    _tone(988,  'sine', 0.10, 0.1,  0.3);
-    _tone(1175, 'sine', 0.08, 0.2,  0.35);
+    _tone(784,  'sine', 0.12, 0,   0.3);
+    _tone(988,  'sine', 0.10, 0.1, 0.3);
+    _tone(1175, 'sine', 0.08, 0.2, 0.35);
   }
 
-  // ---- Hint discovery --------------------------------------------------
+  // ---- Hint discovery ----------------------------------------------------
   function tryGrantHint(gateEl) {
     if (Math.random() >= 0.05) return;
     const pop = document.createElement('div');
@@ -735,13 +837,11 @@
       hintBtn.disabled = false;
       hintBtn.textContent = '🐮 Hint';
       playHintFound();
-      setTimeout(() => {
-        pop.style.opacity = '0';
-        setTimeout(() => pop.remove(), 250);
-      }, 900);
+      setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
     }, 450);
   }
 
+  // ---- Gate interaction --------------------------------------------------
   function pickGate(index) {
     if (state.gameOver || state.animating) return;
     state.animating = true;
@@ -750,19 +850,17 @@
     gates.forEach(g => {
       g.disabled = true;
       g.onmouseover = null; g.onmouseout = null; g.onclick = null;
-      g.style.cursor = 'default';
-      g.style.transform = 'translateY(0)';
+      g.style.cursor = 'default'; g.style.transform = 'translateY(0)';
     });
 
     const gateEl = gates[index];
     const gateRect = gateEl.getBoundingClientRect();
     const fieldRect = fieldEl.getBoundingClientRect();
-    const gateCenterX = (gateRect.left - fieldRect.left) + (gateRect.width / 2);
-    const leftPct = (gateCenterX / fieldRect.width) * 100;
+    const leftPct = ((gateRect.left - fieldRect.left + gateRect.width / 2) / fieldRect.width) * 100;
 
     statusLabel.textContent = 'Trotting over...';
     sheepEl.style.left = leftPct + '%';
-    sheepLegsEl.style.display = 'flex';
+    sheepEl.classList.add('walking');
 
     let wiggleCount = 0;
     _wiggleId = setInterval(() => {
@@ -773,7 +871,7 @@
 
     setTimeout(() => {
       clearInterval(_wiggleId); _wiggleId = null;
-      sheepEl.style.transform = 'translateX(-50%) rotate(0deg)';
+      sheepEl.style.transform = 'translateX(-50%)';
       sheepEl.style.bottom = '80px';
       statusLabel.textContent = 'Nudging the gate...';
       setTimeout(() => {
@@ -799,6 +897,7 @@
       playGateOpen();
       tryGrantHint(gateEl);
       state.score++;
+      spawnFloatingScore(gateEl);
       const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
       updateHud();
 
@@ -818,12 +917,11 @@
         setTimeout(() => {
           sheepEl.style.animation = '';
           sheepEl.style.transform = 'translateX(-50%)';
-          if (state.currentSetEl && state.currentSetEl.parentNode === worldEl) {
+          if (state.currentSetEl && state.currentSetEl.parentNode === worldEl)
             worldEl.removeChild(state.currentSetEl);
-          }
           state.currentSetEl = nextSet;
+          sheepEl.classList.remove('walking');
           sheepEl.style.transition = 'left 0.5s ease, bottom 0.5s ease, transform 0.3s, opacity 0.3s';
-          sheepLegsEl.style.display = 'none';
           sheepEl.style.left = '50%';
           sheepEl.style.bottom = '24px';
           setTimeout(() => {
@@ -835,6 +933,7 @@
           }, 550);
         }, 1500);
       }, 500);
+
     } else {
       gateEl.style.transformOrigin = 'left bottom';
       gateEl.style.transition = 'transform 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53), background 0.4s, border-color 0.4s';
@@ -843,15 +942,19 @@
       gateEl.style.zIndex = '4';
       gateEl.style.transform = 'rotate(-3deg)';
       playGateCrash();
+      spawnCrashParticles(gateEl);
+      fieldEl.classList.add('shaking');
+      setTimeout(() => fieldEl.classList.remove('shaking'), 520);
       setTimeout(() => { gateEl.style.transform = 'rotate(2deg)'; }, 150);
       setTimeout(() => { gateEl.style.transform = 'rotate(90deg)'; }, 350);
       setTimeout(() => {
-        sheepLegsEl.style.display = 'none';
+        sheepEl.classList.remove('walking');
         sheepEl.style.transition = 'all 0.4s ease-out';
         sheepEl.style.transform = 'translateX(-50%) translateY(8px) scaleY(0.4) scaleX(1.4)';
       }, 700);
       setTimeout(() => {
-        sheepEmojiEl.textContent = '💀';
+        sheepSvgEl.style.display = 'none';
+        sheepDeadEl.style.display = 'block';
         handleEndOfGame();
       }, 1300);
     }
@@ -865,19 +968,15 @@
     const blockedIdx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
     const gateWrap = state.currentSetEl.querySelectorAll('.gate')[blockedIdx].parentNode;
     const horn = document.createElement('div');
-    horn.className = 'horn-hint';
-    horn.textContent = '🐮';
+    horn.className = 'horn-hint'; horn.textContent = '🐮';
     gateWrap.appendChild(horn);
   };
 
   function handleEndOfGame() {
-    state.animating = false;
-    state.gameOver = true;
-    hintBtn.disabled = true;
+    state.animating = false; state.gameOver = true; hintBtn.disabled = true;
     messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
     messageEl.style.color = 'var(--danger)';
     statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
-
     if (isNewBest(state.score)) {
       showHiscoreEntry();
     } else {
@@ -885,18 +984,15 @@
       restartBtn.textContent = 'Try again';
     }
   }
-
   function showHiscoreEntry() {
     hiscoreEntry.style.display = 'block';
     hiscoreName.value = '';
     setTimeout(() => hiscoreName.focus(), 100);
   }
-
   hiscoreSave.onclick = async () => {
     let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
     if (name.length === 0) name = 'ANON';
-    const entry = { name, score: state.score, date: new Date().toISOString() };
-    leaderboard.push(entry);
+    leaderboard.push({ name, score: state.score, date: new Date().toISOString() });
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
     renderLeaderboard();
@@ -905,25 +1001,21 @@
     restartBtn.style.display = 'inline-block';
     restartBtn.textContent = 'Try again';
   };
-
-  hiscoreName.addEventListener('input', (e) => {
+  hiscoreName.addEventListener('input', e => {
     e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
   });
-  hiscoreName.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') hiscoreSave.click();
-  });
+  hiscoreName.addEventListener('keydown', e => { if (e.key === 'Enter') hiscoreSave.click(); });
 
   restartBtn.onclick = () => {
     clearInterval(_wiggleId); _wiggleId = null;
     sheepEl.style.animation = '';
-    sheepLegsEl.style.display = 'none';
-    sheepEmojiEl.textContent = '🐑';
+    sheepEl.classList.remove('walking');
+    showSheep();
     hintBtn.disabled = false;
     hintBtn.textContent = '🐮 Hint';
     state = {
-      score: 0, blockedGates: [],
-      animating: false, gameOver: false,
-      hintUsed: false, currentSetEl: null, worldOffset: 0
+      score: 0, blockedGates: [], animating: false,
+      gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0
     };
     worldEl.innerHTML = '';
     worldEl.style.transition = 'none';
@@ -931,18 +1023,47 @@
     sheepEl.style.transition = 'none';
     sheepEl.style.left = '50%';
     sheepEl.style.bottom = '24px';
-    sheepEl.style.fontSize = '44px';
     sheepEl.style.transform = 'translateX(-50%)';
     sheepEl.style.opacity = '1';
+    fieldOverlayEl.style.background = 'transparent';
+    starsEl.style.opacity = '0';
     setTimeout(() => {
       worldEl.style.transition = WORLD_TRANSITION;
       sheepEl.style.transition = SHEEP_TRANSITION;
-      loadLeaderboard(); // refresh in case others have played
+      loadLeaderboard();
       newRound();
     }, 30);
   };
 
-  // Boot
+  // ---- World generation --------------------------------------------------
+  function generateGrassBlades() {
+    for (let i = 0; i < 24; i++) {
+      const b = document.createElement('div');
+      b.className = 'grass-blade';
+      b.style.left = (i / 24 * 100 + Math.random() * 2) + '%';
+      b.style.height = (12 + Math.random() * 10) + 'px';
+      b.style.animationDelay  = (Math.random() * 2) + 's';
+      b.style.animationDuration = (1.4 + Math.random() * 1.2) + 's';
+      grassBladesEl.appendChild(b);
+    }
+  }
+  function generateStars() {
+    for (let i = 0; i < 28; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.top  = (Math.random() * 90)  + '%';
+      s.style.animationDelay = (Math.random() * 3) + 's';
+      s.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      if (Math.random() < 0.3) { s.style.width = '3px'; s.style.height = '3px'; }
+      starsEl.appendChild(s);
+    }
+  }
+
+  // ---- Boot --------------------------------------------------------------
+  generateGrassBlades();
+  generateStars();
+  updateFieldAmbience(1);
   loadLeaderboard();
   newRound();
 })();
