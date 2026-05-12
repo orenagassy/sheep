@@ -38,5 +38,5 @@ Pick the open gate. Keep walking. Every level, one more gate locks — and the s
 - 🏆 **Achievements** — 9 badges to unlock across all your runs
 - 📊 **All-time stats** — gates cleared, games played, best level, hints found
 - 🥇 **Leaderboards** — separate Top 10 for Normal and Sport
-- 🐮 **Hint** — spend one per run to mark a bad gate. Lucky sheep sometimes find hints on their own
+- 🍗 **Chicken leg** — sometimes hides behind an open gate. Find one and it saves you the next time you walk into a wolf
 - 📱 **Haptic feedback** — feel every gate and every crash on mobile

@@ -197,10 +197,7 @@
   button:hover { background: var(--bg-soft); }
   button:active { transform: scale(0.98); }
   button:disabled { opacity: 0.45; cursor: default; }
-  #hint-btn:not(:disabled) {
-    background: #e8f5e9; border-color: #81c784; color: #2e7d32; font-weight: 500;
-  }
-  #hint-btn:not(:disabled):hover { background: #c8e6c9; }
+  /* chicken-leg styles below */
   input[type="text"] { border: 0.5px solid var(--border); border-radius: 8px; padding: 8px; font-family: inherit; }
   input[type="text"]:focus { outline: none; border-color: var(--info); box-shadow: 0 0 0 2px var(--info-soft); }
 
@@ -234,6 +231,18 @@
     background: linear-gradient(to bottom, #7a5c38, #4e3b22, #3a2c18);
     border-radius: 2px;
     box-shadow: 0 1px 2px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  /* ---- Chicken leg HUD ---- */
+  #chicken-leg-hud {
+    position: absolute; top: 10px; right: 10px; z-index: 8;
+    font-size: 28px; line-height: 1; display: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+    animation: drumstick-bounce 1.8s ease-in-out infinite;
+    cursor: default; user-select: none;
+  }
+  @keyframes drumstick-bounce {
+    0%, 100% { transform: scale(1) rotate(-12deg); }
+    50%       { transform: scale(1.18) rotate(10deg); }
   }
   .horn-hint {
     position: absolute; top: -14px; left: 50%;
@@ -502,6 +511,7 @@
     </div>
 
     <div id="field">
+      <div id="chicken-leg-hud" title="You have a chicken leg! The wolf will eat it instead of you.">🍗</div>
       <div id="sport-timer"><div id="sport-timer-bar"></div></div>
       <div id="field-overlay"></div>
       <div id="stars"></div>
@@ -564,7 +574,6 @@
     </div>
 
     <div class="action-bar">
-      <button id="hint-btn">🐮 Hint</button>
       <button id="restart-btn" style="display: none;">Try again</button>
     </div>
 
@@ -596,11 +605,11 @@
           <div class="stat-item-value" id="stat-level">1</div>
         </div>
         <div>
-          <div class="stat-item-label">Hints used</div>
+          <div class="stat-item-label">Lives saved 🍗</div>
           <div class="stat-item-value" id="stat-hints-used">0</div>
         </div>
         <div>
-          <div class="stat-item-label">Hints found</div>
+          <div class="stat-item-label">Drumsticks found</div>
           <div class="stat-item-value" id="stat-hints-found">0</div>
         </div>
         <div>
@@ -617,7 +626,7 @@
     <details>
       <summary>How to play</summary>
       <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
-      Use 🐮 Hint to mark one bad gate — once per run. Lucky sheep sometimes find a hint hiding behind an open gate!<br/>
+      Sometimes a 🍗 chicken leg hides behind an open gate — it appears top-right when you find one. If you pick a wolf gate while holding a chicken leg, you feed the wolf and survive!<br/>
       <strong>⚡ Sport</strong> — 8 seconds per gate or the wolf gets you. Pick fast for bonus points: under 1s = +3 ⚡⚡, under 2.5s = +2 ⚡, under 4s = +1.</p>
     </details>
   </div>
@@ -682,7 +691,7 @@
     { id: 'level5',   icon: '🌙', label: 'Night Shift',      desc: 'Reach Level 5',                 check: (s, st) => st.bestLevel >= 5 },
     { id: 'score10',  icon: '🐑', label: 'Ten Gates',        desc: 'Clear 10 gates in one run',     check: (s, st) => s.score >= 10 },
     { id: 'score25',  icon: '🏆', label: 'Quarter Century',  desc: 'Clear 25 gates in one run',     check: (s, st) => s.score >= 25 },
-    { id: 'hintfound',icon: '🐮', label: 'Lucky Sheep',      desc: 'Find a hint behind a gate',     check: (s, st) => st.hintsFound >= 1 },
+    { id: 'hintfound',icon: '🍗', label: 'Drumstick!',        desc: 'Find a chicken leg',            check: (s, st) => st.hintsFound >= 1 },
     { id: 'streak5',  icon: '🔥', label: 'Hot Streak',       desc: '5 gates in a row',              check: (s, st) => st.streakBest >= 5 },
     { id: 'games10',  icon: '🎮', label: 'Dedicated',        desc: 'Play 10 games',                 check: (s, st) => st.gamesPlayed >= 10 },
   ];
@@ -748,7 +757,7 @@
   // ---- State --------------------------------------------------------------
   let state = {
     score: 0, blockedGates: [], animating: false,
-    gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0,
+    gameOver: false, hasChickenLeg: false, currentSetEl: null, worldOffset: 0,
     hintGateIdx: -1, streak: 0, roundStartTime: 0
   };
 
@@ -771,7 +780,7 @@
   const levelProgressText   = $('level-progress-text');
   const levelProgressBar    = $('level-progress-bar');
   const streakRowEl         = $('streak-row');
-  const hintBtn             = $('hint-btn');
+  const chickenLegHudEl     = $('chicken-leg-hud');
   const restartBtn          = $('restart-btn');
   const hiscoreEntry        = $('hiscore-entry');
   const hiscoreName         = $('hiscore-name');
@@ -1228,26 +1237,82 @@
     _tone(1175, 'sine', 0.08, 0.2, 0.35);
   }
 
-  // ---- Hint discovery ----------------------------------------------------
-  function tryGrantHint(gateEl, index) {
+  // ---- Chicken leg discovery ---------------------------------------------
+  function updateChickenLegHud() {
+    chickenLegHudEl.style.display = state.hasChickenLeg ? 'block' : 'none';
+  }
+  function tryGrantChickenLeg(gateEl, index) {
+    if (state.hasChickenLeg) return;
     const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < _cfg._b);
     if (!shouldGrant) return;
     stats.hintsFound++;
+    state.hasChickenLeg = true;
+    updateChickenLegHud();
     const pop = document.createElement('div');
-    pop.textContent = '🐮';
-    pop.style.cssText = 'position:absolute;top:50%;left:50%;font-size:26px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
+    pop.textContent = '🍗';
+    pop.style.cssText = 'position:absolute;top:50%;left:50%;font-size:30px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
     gateEl.parentNode.appendChild(pop);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       pop.style.transform = 'translate(-50%,-50%) scale(1)';
       pop.style.opacity = '1';
     }));
     setTimeout(() => {
-      state.hintUsed = false;
-      hintBtn.disabled = false;
-      hintBtn.textContent = '🐮 Hint';
       playHintFound();
       setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
-    }, 450);
+    }, 350);
+  }
+
+  // ---- Walk to next round (shared between success and wolf-fed paths) ----
+  function walkToNextRound(wasLevelUp) {
+    setTimeout(() => {
+      statusLabel.textContent = 'Walking on...';
+      sheepEl.style.animation = 'sheep-bob 360ms linear infinite';
+      state.currentSetEl.style.transition = 'opacity 0.5s ease-out';
+      state.currentSetEl.style.opacity = '0';
+      state.worldOffset += FIELD_HEIGHT;
+      worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
+      const nextSet = buildGateSet(95 - state.worldOffset);
+      worldEl.appendChild(nextSet);
+      setTimeout(() => {
+        sheepEl.style.animation = '';
+        sheepEl.style.transform = 'translateX(-50%)';
+        if (state.currentSetEl && state.currentSetEl.parentNode === worldEl)
+          worldEl.removeChild(state.currentSetEl);
+        state.currentSetEl = nextSet;
+        sheepEl.classList.remove('walking');
+        sheepEl.style.transition = 'bottom 0.5s ease, transform 0.3s, opacity 0.3s';
+        sheepEl.style.bottom = '24px';
+        setTimeout(() => {
+          sheepEl.style.transition = SHEEP_TRANSITION;
+          state.blockedGates = pickBlockedIndices(getBlockedCount());
+          state.animating = false;
+          statusLabel.textContent = 'Pick the open gate';
+          if (wasLevelUp) showLevelUp(getLevel());
+          if (SPORT_MODE) startSportTimer();
+        }, 550);
+      }, 1500);
+    }, 500);
+  }
+
+  // ---- Feed the wolf (survive using chicken leg) -------------------------
+  function feedWolf(gateEl) {
+    state.hasChickenLeg = false;
+    stats.hintsUsed++;
+    updateChickenLegHud();
+    saveStats();
+    statusLabel.textContent = '🍗 The wolf is fed — keep going!';
+    spawnFloatingScore(gateEl, '🍗');
+    gateEl.style.transition = 'background 0.15s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
+    gateEl.style.background = '#e65100';
+    setTimeout(() => {
+      gateEl.style.background = '';
+      gateEl.style.transform = 'rotateY(-110deg)';
+    }, 150);
+    playGateOpen();
+    navigator.vibrate && navigator.vibrate([30, 20, 60]);
+    updateHud();
+    checkAchievements();
+    walkToNextRound(false);
   }
 
   // ---- Gate interaction --------------------------------------------------
@@ -1307,7 +1372,7 @@
       showNearMiss(state.currentSetEl, state.blockedGates);
       playGateOpen();
       navigator.vibrate && navigator.vibrate(25);
-      tryGrantHint(gateEl, index);
+      tryGrantChickenLeg(gateEl, index);
       state.score++;
       state.streak++;
 
@@ -1325,41 +1390,10 @@
       const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
       updateHud();
       checkAchievements();
-
-      setTimeout(() => {
-        statusLabel.textContent = 'Walking on...';
-        sheepEl.style.animation = 'sheep-bob 360ms linear infinite';
-
-        state.currentSetEl.style.transition = 'opacity 0.5s ease-out';
-        state.currentSetEl.style.opacity = '0';
-
-        state.worldOffset += FIELD_HEIGHT;
-        worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
-
-        const nextSet = buildGateSet(95 - state.worldOffset);
-        worldEl.appendChild(nextSet);
-
-        setTimeout(() => {
-          sheepEl.style.animation = '';
-          sheepEl.style.transform = 'translateX(-50%)';
-          if (state.currentSetEl && state.currentSetEl.parentNode === worldEl)
-            worldEl.removeChild(state.currentSetEl);
-          state.currentSetEl = nextSet;
-          sheepEl.classList.remove('walking');
-          sheepEl.style.transition = 'bottom 0.5s ease, transform 0.3s, opacity 0.3s';
-          sheepEl.style.bottom = '24px';
-          setTimeout(() => {
-            sheepEl.style.transition = SHEEP_TRANSITION;
-            state.blockedGates = pickBlockedIndices(getBlockedCount());
-            state.animating = false;
-            statusLabel.textContent = 'Pick the open gate';
-            if (wasLevelUp) showLevelUp(getLevel());
-            if (SPORT_MODE) startSportTimer();
-          }, 550);
-        }, 1500);
-      }, 500);
+      walkToNextRound(wasLevelUp);
 
     } else {
+      if (state.hasChickenLeg) { feedWolf(gateEl); return; }
       gateEl.style.transformOrigin = 'left bottom';
       gateEl.style.transition = 'transform 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53), background 0.4s, border-color 0.4s';
       gateEl.style.background = '#a33c1d';
@@ -1387,22 +1421,9 @@
     }
   }
 
-  hintBtn.onclick = () => {
-    if (state.hintUsed || state.animating || state.gameOver || !state.blockedGates.length) return;
-    state.hintUsed = true;
-    stats.hintsUsed++;
-    hintBtn.disabled = true;
-    hintBtn.textContent = '🐮 Hint used';
-    const blockedIdx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
-    const gateWrap = state.currentSetEl.querySelectorAll('.gate')[blockedIdx].parentNode;
-    const horn = document.createElement('div');
-    horn.className = 'horn-hint'; horn.textContent = '🐮';
-    gateWrap.appendChild(horn);
-  };
-
   function handleEndOfGame() {
     cancelSportTimer();
-    state.animating = false; state.gameOver = true; hintBtn.disabled = true;
+    state.animating = false; state.gameOver = true;
 
     stats.gamesPlayed++;
     stats.totalScore += state.score;
@@ -1468,13 +1489,12 @@
     sheepEl.style.animation = '';
     sheepEl.classList.remove('walking');
     showSheep();
-    hintBtn.disabled = false;
-    hintBtn.textContent = '🐮 Hint';
     state = {
       score: 0, blockedGates: [], animating: false,
-      gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0,
+      gameOver: false, hasChickenLeg: false, currentSetEl: null, worldOffset: 0,
       hintGateIdx: -1, streak: 0, roundStartTime: 0
     };
+    updateChickenLegHud();
     worldEl.innerHTML = '';
     fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
     worldEl.style.transition = 'none';
