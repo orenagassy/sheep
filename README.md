@@ -1,16 +1,18 @@
 # 🐑 Sheep Gates
 
-A browser game where you bet on the open gate and survive as long as you can.
+**Can you outrun the odds?**
 
-![Sheep Gates](screenshot.png)
+Pick the open gate. Keep walking. Every level, one more gate locks — and the sheep has nowhere to hide.
 
 **[Play now →](https://orenagassy.github.io/sheep/)**
 
+![Sheep Gates](screenshot.png)
+
 ---
 
-## How to play
+## How it works
 
-7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks:
+7 gates. One wrong pick and it's over. Clear enough gates and the next level locks one more — starting easy, ending brutal.
 
 | Level | Open gates |
 |-------|-----------|
@@ -19,29 +21,24 @@ A browser game where you bet on the open gate and survive as long as you can.
 | … | … |
 | 6 | 1 of 7 |
 
-Use the 🐮 **Hint** button to reveal one bad gate — once per run. Lucky sheep sometimes find a hint hiding behind an open gate.
+---
 
-Scores sync to a shared global leaderboard. Top 10 of all time.
+## Modes
+
+**Normal** — play at your own pace. Top scores go on the global leaderboard.
+
+**📅 Daily** — everyone faces the same gate sequence each day. One shared challenge. One chance to top the daily board.
+
+**⚡ Sport** — 8 seconds per gate or the sheep runs into the wall. Pick in under 2 seconds and earn a speed bonus (+2 instead of +1). Fast fingers, higher scores.
 
 ---
 
-## Test mode
+## Features
 
-Add `?test` to the URL to enable test mode. It pre-marks which open gate hides a hint (shown with 💡) and skips leaderboard saving.
-
-```
-https://orenagassy.github.io/sheep/?test
-```
-
----
-
-## Tech
-
-Single `index.html` — no build step, no dependencies.
-
-- SVG sheep with animated walking legs
-- Web Audio API for procedural sounds
-- Animated clouds, twinkling stars, swaying grass, day/night cycle across levels
-- Crash particles, confetti, floating score, hoof-print trail, screen shake
-- Scores proxied through a [Cloudflare Worker](https://workers.cloudflare.com/) — API key never reaches the browser
-- Leaderboard stored on [JSONBin](https://jsonbin.io/)
+- 🔥 **Streak counter** — build momentum and watch the fire grow
+- ✕ **Near-miss reveal** — after a good pick, see just how close the blocked gates were
+- 🏆 **Achievements** — 9 badges to unlock across all your runs
+- 📊 **All-time stats** — gates cleared, games played, best level, hints found
+- 🥇 **Leaderboards** — separate Top 10 for Normal, Daily, and Sport
+- 🐮 **Hint** — spend one per run to mark a bad gate. Lucky sheep sometimes find hints on their own
+- 📱 **Haptic feedback** — feel every gate and every crash on mobile
