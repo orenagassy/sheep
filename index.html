@@ -453,11 +453,8 @@
     100% { opacity: 0; transform: scale(1); }
   }
 
-  /* ---- Stats panel ---- */
-  #stats-panel {
-    background: var(--bg-card); border: 0.5px solid var(--border);
-    border-radius: 8px; padding: 14px; margin-top: 16px;
-  }
+  /* ---- Stats panel (inside drawer) ---- */
+  #stats-panel { margin-top: 20px; }
   .stats-title {
     font-weight: 500; font-size: 12px; color: var(--text-secondary);
     margin-bottom: 10px;
@@ -467,6 +464,41 @@
   }
   .stat-item-label { font-size: 11px; color: var(--text-muted); }
   .stat-item-value { font-weight: 500; font-size: 14px; }
+
+  /* ---- Info drawer ---- */
+  #info-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 200; display: none;
+  }
+  #info-overlay.open { display: block; }
+  #info-drawer {
+    position: fixed; right: 0; top: 0; bottom: 0;
+    width: min(340px, 92vw); background: var(--bg-page);
+    z-index: 201; overflow-y: auto; padding: 20px;
+    box-shadow: -4px 0 28px rgba(0,0,0,0.18);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  #info-drawer.open { transform: translateX(0); }
+  #info-drawer-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  #info-drawer-header span { font-size: 15px; font-weight: 500; }
+  #info-close {
+    background: none; border: none; cursor: pointer; padding: 4px 8px;
+    font-size: 18px; color: var(--text-secondary); line-height: 1;
+  }
+  #info-close:hover { color: var(--text-primary); }
+  /* leaderboard styles when inside drawer */
+  #leaderboard { border: none; padding: 0; }
+  /* hamburger button */
+  #stats-btn {
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 6px 11px; font-size: 16px;
+    cursor: pointer; line-height: 1; color: var(--text-primary);
+  }
+  #stats-btn:hover { background: var(--bg-soft); }
 
   /* ---- Misc ---- */
   details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
@@ -510,19 +542,18 @@
           <div class="hud-subtitle" id="status-label">Pick the open gate</div>
         </div>
       </div>
-      <div class="stat-group">
-        <div class="stat">
-          <div class="stat-label">Score</div>
-          <div class="stat-value" id="score">0</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div class="stat-group">
+          <div class="stat">
+            <div class="stat-label">Score</div>
+            <div class="stat-value" id="score">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-label">Your best</div>
+            <div class="stat-value" id="personal-best-display">—</div>
+          </div>
         </div>
-        <div class="stat">
-          <div class="stat-label">Your best</div>
-          <div class="stat-value" id="personal-best-display">—</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">World best</div>
-          <div class="stat-value" id="best-display">—</div>
-        </div>
+        <button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
       </div>
     </div>
 
@@ -611,52 +642,6 @@
       <button id="restart-btn" style="display: none;">Try again</button>
     </div>
 
-    <div id="leaderboard" style="display: none;">
-      <div class="leaderboard-title">
-        <span id="leaderboard-title">Top 10 of all time</span>
-        <span class="sync-indicator" id="sync-indicator"></span>
-      </div>
-      <div id="leaderboard-list"></div>
-    </div>
-
-    <div id="stats-panel">
-      <div class="stats-title">Your all-time stats</div>
-      <div class="stats-grid">
-        <div>
-          <div class="stat-item-label">Gates cleared</div>
-          <div class="stat-item-value" id="stat-gates">0</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Games played</div>
-          <div class="stat-item-value" id="stat-games">0</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Average score</div>
-          <div class="stat-item-value" id="stat-avg">—</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Best level</div>
-          <div class="stat-item-value" id="stat-level">1</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Lives saved 🍗</div>
-          <div class="stat-item-value" id="stat-hints-used">0</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Drumsticks found</div>
-          <div class="stat-item-value" id="stat-hints-found">0</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Best streak</div>
-          <div class="stat-item-value" id="stat-streak">0</div>
-        </div>
-        <div>
-          <div class="stat-item-label">Personal best</div>
-          <div class="stat-item-value" id="stat-personal-best">—</div>
-        </div>
-      </div>
-    </div>
-
     <details>
       <summary>How to play</summary>
       <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
@@ -665,6 +650,58 @@
     </details>
   </div>
 
+</div>
+
+<div id="info-overlay"></div>
+<div id="info-drawer">
+  <div id="info-drawer-header">
+    <span>Leaderboard &amp; Stats</span>
+    <button id="info-close">✕</button>
+  </div>
+  <div id="leaderboard">
+    <div class="leaderboard-title">
+      <span id="leaderboard-title">Top 10 of all time</span>
+      <span class="sync-indicator" id="sync-indicator"></span>
+    </div>
+    <div id="leaderboard-list"></div>
+  </div>
+  <div id="stats-panel">
+    <div class="stats-title">Your all-time stats</div>
+    <div class="stats-grid">
+      <div>
+        <div class="stat-item-label">Gates cleared</div>
+        <div class="stat-item-value" id="stat-gates">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Games played</div>
+        <div class="stat-item-value" id="stat-games">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Average score</div>
+        <div class="stat-item-value" id="stat-avg">—</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Best level</div>
+        <div class="stat-item-value" id="stat-level">1</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Lives saved 🍗</div>
+        <div class="stat-item-value" id="stat-hints-used">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Drumsticks found</div>
+        <div class="stat-item-value" id="stat-hints-found">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Best streak</div>
+        <div class="stat-item-value" id="stat-streak">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Personal best</div>
+        <div class="stat-item-value" id="stat-personal-best">—</div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -823,7 +860,6 @@
   const roundLabel          = $('round-label');
   const statusLabel         = $('status-label');
   const scoreEl             = $('score');
-  const bestDisplay         = $('best-display');
   const personalBestDisplay = $('personal-best-display');
   const levelLabel          = $('level-label');
   const levelProgressText   = $('level-progress-text');
@@ -852,6 +888,15 @@
   const statHintsFoundEl    = $('stat-hints-found');
   const statStreakEl        = $('stat-streak');
   const statPersonalBestEl  = $('stat-personal-best');
+
+  // ---- Info drawer --------------------------------------------------------
+  const infoDrawer  = $('info-drawer');
+  const infoOverlay = $('info-overlay');
+  function openDrawer()  { infoDrawer.classList.add('open');    infoOverlay.classList.add('open'); }
+  function closeDrawer() { infoDrawer.classList.remove('open'); infoOverlay.classList.remove('open'); }
+  $('stats-btn').onclick   = openDrawer;
+  $('info-close').onclick  = closeDrawer;
+  infoOverlay.onclick      = closeDrawer;
 
   function getLevel()        { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
   function getBlockedCount() { return Math.min(getLevel(), GATES_PER_ROUND - 1); }
@@ -968,16 +1013,12 @@
   function renderLeaderboard() {
     document.getElementById('leaderboard-title').textContent = LB_TITLE;
     if (!leaderboard.length) {
-      bestDisplay.textContent = '—';
-      leaderboardEl.style.display = 'block';
       const empty = document.createElement('div');
       empty.style.cssText = 'color: var(--text-muted); font-size: 12px; padding: 4px 0;';
       empty.textContent = 'No scores yet — be the first!';
       leaderboardList.replaceChildren(empty);
       return;
     }
-    bestDisplay.textContent = leaderboard[0].score + ' (' + leaderboard[0].name + ')';
-    leaderboardEl.style.display = 'block';
     leaderboardList.innerHTML = '';
     leaderboard.forEach((entry, idx) => {
       const row  = document.createElement('div');
