@@ -368,7 +368,6 @@
 
     <div class="topbar">
       <div class="topbar-left">
-        <span class="sheep-icon" aria-hidden="true">🐑</span>
         <span id="test-badge">🧪 TEST MODE</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
@@ -719,7 +718,9 @@
     const level = getLevel();
     const round = getRoundInLevel();
     const openCount = getOpenCount();
-    roundLabel.textContent = 'Gate ' + (state.score + 1) + ' · Level ' + level;
+    roundLabel.innerHTML = 'Gate ' + (state.score + 1) + ' · Level ' + level +
+      ' &nbsp;<span style="color:#2e7d32;font-weight:600">' + openCount + '✓</span>' +
+      ' <span style="color:#a32d2d;font-weight:600">' + getBlockedCount() + '✗</span>';
     levelLabel.textContent = 'Level ' + level + ' · ' + openCount + ' of ' + GATES_PER_ROUND + ' open';
     levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
     levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
