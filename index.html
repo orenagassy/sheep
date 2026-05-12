@@ -492,11 +492,13 @@
   #info-close:hover { color: var(--text-primary); }
   /* leaderboard styles when inside drawer */
   #leaderboard { border: none; padding: 0; }
-  /* hamburger button */
+  /* hamburger button — fixed top-right on all screen sizes */
   #stats-btn {
+    position: fixed; top: 14px; right: 16px; z-index: 199;
     background: var(--bg-card); border: 0.5px solid var(--border);
-    border-radius: 8px; padding: 6px 11px; font-size: 16px;
+    border-radius: 8px; padding: 7px 12px; font-size: 17px;
     cursor: pointer; line-height: 1; color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
   }
   #stats-btn:hover { background: var(--bg-soft); }
 
@@ -542,18 +544,15 @@
           <div class="hud-subtitle" id="status-label">Pick the open gate</div>
         </div>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <div class="stat-group">
-          <div class="stat">
-            <div class="stat-label">Score</div>
-            <div class="stat-value" id="score">0</div>
-          </div>
-          <div class="stat">
-            <div class="stat-label">Your best</div>
-            <div class="stat-value" id="personal-best-display">—</div>
-          </div>
+      <div class="stat-group">
+        <div class="stat">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="score">0</div>
         </div>
-        <button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
+        <div class="stat">
+          <div class="stat-label">Your best</div>
+          <div class="stat-value" id="personal-best-display">—</div>
+        </div>
       </div>
     </div>
 
@@ -651,6 +650,7 @@
 
 </div>
 
+<button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
 <div id="info-overlay"></div>
 <div id="info-drawer">
   <div id="info-drawer-header">
