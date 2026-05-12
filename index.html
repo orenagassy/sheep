@@ -390,19 +390,7 @@
 
 <script>
 (function() {
-  // =========================================================================
-  // ⚙️ CONFIG — set these two values to enable shared scores
-  // =========================================================================
-  // 1. Create a free account at https://jsonbin.io
-  // 2. Create a new bin with initial content:  {"scores": []}
-  // 3. Paste the Bin ID here (looks like "65f1234abcd5678ef9012345")
-  const JSONBIN_BIN_ID = "6a02208b250b1311c3361731";
-  // 4. Create an Access Key (Master Key works, but a scoped Access Key is safer)
-  //    Settings → API Keys → Create Access Key with Read + Update permissions
-  const JSONBIN_ACCESS_KEY = "$2a$10$m0sl3AucAJxSvyN.dVOoVOH0JgtuRubH.lGUcAOXxh1xl6A7tMMt.";
-  // =========================================================================
-
-  const SHARED_SCORES_ENABLED = !!(JSONBIN_BIN_ID && JSONBIN_ACCESS_KEY);
+  const WORKER_URL = 'https://sheep-score.oren-agassy.workers.dev';
 
   const GATES_PER_ROUND = 7;
   const ROUNDS_PER_LEVEL = 7;
@@ -467,20 +455,12 @@
   }
 
   async function loadLeaderboard() {
-    if (!SHARED_SCORES_ENABLED) {
-      loadLocalLeaderboard();
-      setSyncStatus('Local only', '');
-      renderLeaderboard();
-      return;
-    }
     setSyncStatus('Syncing...', 'syncing');
     try {
-      const res = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-        headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
-      });
+      const res = await fetch(`${WORKER_URL}/scores`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      leaderboard = sanitizeLeaderboard(data.record && data.record.scores);
+      leaderboard = sanitizeLeaderboard(data && data.scores);
       setSyncStatus('Synced', '');
     } catch (e) {
       console.error('Failed to load leaderboard', e);
@@ -496,18 +476,14 @@
       localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard));
     } catch (_) {}
 
-    if (!SHARED_SCORES_ENABLED) return true;
-
     setSyncStatus('Saving...', 'syncing');
     try {
       // Re-fetch latest to minimize race-condition score loss
-      const latestRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-        headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
-      });
+      const latestRes = await fetch(`${WORKER_URL}/scores`);
       let serverScores = [];
       if (latestRes.ok) {
         const latest = await latestRes.json();
-        serverScores = sanitizeLeaderboard(latest.record && latest.record.scores);
+        serverScores = sanitizeLeaderboard(latest && latest.scores);
       }
       // Merge: combine server scores + our local additions, dedupe-ish & keep top N
       const combined = [...serverScores, ...leaderboard];
@@ -520,12 +496,9 @@
       merged.sort((a, b) => b.score - a.score);
       const trimmed = merged.slice(0, MAX_LEADERBOARD);
 
-      const putRes = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+      const putRes = await fetch(`${WORKER_URL}/scores`, {
         method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'X-Access-Key': JSONBIN_ACCESS_KEY
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scores: trimmed })
       });
       if (!putRes.ok) throw new Error('HTTP ' + putRes.status);
@@ -560,7 +533,7 @@
   function renderLeaderboard() {
     if (!leaderboard.length) {
       bestDisplay.textContent = '—';
-      leaderboardEl.style.display = SHARED_SCORES_ENABLED ? 'block' : 'none';
+      leaderboardEl.style.display = 'block';
       const empty = document.createElement('div');
       empty.style.cssText = 'color: var(--text-muted); font-size: 12px; padding: 4px 0;';
       empty.textContent = 'No scores yet — be the first!';
