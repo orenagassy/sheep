@@ -244,6 +244,14 @@
     0%, 100% { transform: scale(1) rotate(-12deg); }
     50%       { transform: scale(1.18) rotate(10deg); }
   }
+  /* devilish sheep face */
+  @keyframes devious-appear {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  #sheep-devious-face path, #sheep-devious-face circle, #sheep-devious-face polygon {
+    animation: devious-appear 0.25s ease-out both;
+  }
   /* flying drumstick → wolf animation */
   .flying-drumstick {
     position: absolute; font-size: 26px; line-height: 1;
@@ -575,6 +583,13 @@
             <rect x="33" y="42" width="5" height="13" rx="2.5" fill="#bcb294"/>
             <rect x="33" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
           </g>
+          <!-- devious face (shown only when feeding the wolf) -->
+          <g id="sheep-devious-face" display="none">
+            <path d="M7.5 27.5 Q10.5 24 14 27" fill="none" stroke="#1e1810" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="12" cy="30.8" r="0.65" fill="#e53935"/>
+            <path d="M3.5 39 Q6 41.8 10.5 38.5" fill="none" stroke="#6d4c41" stroke-width="1.4" stroke-linecap="round"/>
+            <polygon points="6,39.5 8,39.5 7,42" fill="white"/>
+          </g>
         </svg>
       </div>
       <div id="grass-front"></div>
@@ -804,6 +819,7 @@
   const sheepEl             = $('sheep');
   const sheepSvgEl          = $('sheep-svg');
   const sheepDeadEl         = $('sheep-dead');
+  const sheepDeviousEl      = $('sheep-devious-face');
   const roundLabel          = $('round-label');
   const statusLabel         = $('status-label');
   const scoreEl             = $('score');
@@ -879,6 +895,11 @@
   function saveLocalLeaderboard() {
     try { localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(leaderboard)); } catch (_) {}
   }
+  function extractScores(data) {
+    // handle both { scores: [...] } and JSONBin raw { record: { scores: [...] } }
+    const arr = data?.scores ?? data?.record?.scores;
+    return sanitizeLeaderboard(arr);
+  }
   async function loadLeaderboard() {
     if (SPORT_MODE) {
       loadLocalLeaderboard();
@@ -889,14 +910,14 @@
     try {
       const res = await fetch(`${WORKER_URL}/scores`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
-      const data = await res.json();
-      leaderboard = sanitizeLeaderboard(data && data.scores);
+      leaderboard = extractScores(await res.json());
       setSyncStatus('Synced', '');
     } catch (e) {
       console.error('Failed to load leaderboard', e);
       setSyncStatus('Offline', 'error');
-      loadLocalLeaderboard();
     }
+    // fall back to localStorage if server returned nothing usable
+    if (leaderboard.length === 0) loadLocalLeaderboard();
     renderLeaderboard();
   }
   async function saveLeaderboard() {
@@ -907,15 +928,11 @@
       renderLeaderboard();
       return true;
     }
-    try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
     setSyncStatus('Saving...', 'syncing');
     try {
       const latestRes = await fetch(`${WORKER_URL}/scores`);
       let serverScores = [];
-      if (latestRes.ok) {
-        const latest = await latestRes.json();
-        serverScores = sanitizeLeaderboard(latest && latest.scores);
-      }
+      if (latestRes.ok) serverScores = extractScores(await latestRes.json());
       const combined = [...serverScores, ...leaderboard];
       const seen = new Set();
       const merged = [];
@@ -932,11 +949,15 @@
       });
       if (!putRes.ok) throw new Error('HTTP ' + putRes.status);
       leaderboard = trimmed;
+      // keep localStorage in sync with the authoritative merged result
+      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
       setSyncStatus('Synced', '');
       return true;
     } catch (e) {
       console.error('Failed to save leaderboard', e);
       setSyncStatus('Save failed', 'error');
+      // persist locally so data survives if server is temporarily down
+      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
       return false;
     }
   }
@@ -1367,64 +1388,87 @@
     stats.hintsUsed++;
     saveStats();
 
-    // Capture HUD rect before hiding it
     const fieldRect = fieldEl.getBoundingClientRect();
     const hudRect   = chickenLegHudEl.getBoundingClientRect();
     const gateRect  = gateEl.getBoundingClientRect();
-    updateChickenLegHud();
+    const gx = gateRect.left - fieldRect.left + gateRect.width  / 2;
+    const gy = gateRect.top  - fieldRect.top  + gateRect.height / 2;
 
-    statusLabel.textContent = '🍗 Feeding the wolf…';
+    updateChickenLegHud();
+    statusLabel.textContent = '🐺 The wolf lurks…';
     navigator.vibrate && navigator.vibrate([30, 20, 60]);
 
-    // Flying drumstick: start at HUD center, end at gate center
-    const startX = hudRect.left  - fieldRect.left + hudRect.width  / 2;
-    const startY = hudRect.top   - fieldRect.top  + hudRect.height / 2;
-    const endX   = gateRect.left - fieldRect.left + gateRect.width / 2;
-    const endY   = gateRect.top  - fieldRect.top  + gateRect.height / 2;
+    // Phase 1 (0ms): gate cracks open — dark hint that a wolf is behind it
+    gateEl.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1), background 0.25s';
+    gateEl.style.background = '#7b1a1a';
+    gateEl.style.transform  = 'rotateY(-28deg)';
 
-    const fly = document.createElement('div');
-    fly.className = 'flying-drumstick';
-    fly.textContent = '🍗';
-    fly.style.left = startX + 'px';
-    fly.style.top  = startY + 'px';
-    fly.style.transition = 'left 0.48s cubic-bezier(0.4,0,0.2,1), top 0.48s cubic-bezier(0.4,0,0.2,1), transform 0.48s';
-    fieldEl.appendChild(fly);
-
-    // Force reflow then start flight
-    fly.getBoundingClientRect();
-    fly.style.left      = endX + 'px';
-    fly.style.top       = endY + 'px';
-    fly.style.transform = 'translate(-50%,-50%) scale(1.3) rotate(40deg)';
-
+    // Phase 2 (420ms): wolf pops up from behind the cracked gate
     setTimeout(() => {
-      // Drumstick arrives — wolf snaps it
-      fly.style.transition = 'transform 0.1s, opacity 0.1s';
-      fly.style.transform  = 'translate(-50%,-50%) scale(0)';
-      fly.style.opacity    = '0';
+      const wolfPop = document.createElement('div');
+      wolfPop.className   = 'funny-skull pop';
+      wolfPop.style.left  = gx + 'px';
+      wolfPop.style.top   = gy + 'px';
+      wolfPop.style.zIndex = '12';
+      wolfPop.innerHTML   = _WOLF_SVG;
+      fieldEl.appendChild(wolfPop);
 
-      const snap = document.createElement('div');
-      snap.className = 'wolf-snap-anim';
-      snap.textContent = '🐺';
-      gateEl.parentNode.appendChild(snap);
+      statusLabel.textContent = '🍗 Feeding the wolf…';
 
+      // Phase 3 (460ms): drumstick lifts off from HUD and flies to the wolf
       setTimeout(() => {
-        fly.remove();
-        snap.remove();
-        // Gate opens with orange flash
-        gateEl.style.transition = 'background 0.15s, transform 0.6s cubic-bezier(0.34,1.56,0.64,1)';
-        gateEl.style.background = '#e65100';
-        statusLabel.textContent = '🍗 The wolf is fed — keep going!';
-        playGateOpen();
-        spawnFloatingScore(gateEl, '🍗');
+        const startX = hudRect.left - fieldRect.left + hudRect.width  / 2;
+        const startY = hudRect.top  - fieldRect.top  + hudRect.height / 2;
+
+        const fly = document.createElement('div');
+        fly.className = 'flying-drumstick';
+        fly.textContent = '🍗';
+        fly.style.left = startX + 'px';
+        fly.style.top  = startY + 'px';
+        fly.style.transition = 'left 0.42s cubic-bezier(0.4,0,0.2,1), top 0.42s cubic-bezier(0.4,0,0.2,1), transform 0.42s';
+        fieldEl.appendChild(fly);
+        fly.getBoundingClientRect(); // force reflow
+        fly.style.left      = gx + 'px';
+        fly.style.top       = gy + 'px';
+        fly.style.transform = 'translate(-50%,-50%) scale(1.3) rotate(40deg)';
+
+        // Phase 4 (460 + 430 = 890ms): wolf snaps — drumstick vanishes
         setTimeout(() => {
-          gateEl.style.background = '';
-          gateEl.style.transform  = 'rotateY(-110deg)';
-        }, 150);
-        updateHud();
-        checkAchievements();
-        walkToNextRound(false);
-      }, 420);
-    }, 490);
+          fly.style.transition = 'transform 0.1s, opacity 0.1s';
+          fly.style.transform  = 'translate(-50%,-50%) scale(0)';
+          fly.style.opacity    = '0';
+
+          const snap = document.createElement('div');
+          snap.className = 'wolf-snap-anim';
+          snap.textContent = '🐺';
+          gateEl.parentNode.appendChild(snap);
+
+          // Phase 5 (890 + 400 = 1290ms): gate fully opens, sheep grins devilishly
+          setTimeout(() => {
+            fly.remove();
+            snap.remove();
+            wolfPop.remove();
+
+            gateEl.style.transition = 'background 0.15s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+            gateEl.style.background = '#e65100';
+            statusLabel.textContent = '🍗 The wolf is fed — keep going!';
+            playGateOpen();
+            spawnFloatingScore(gateEl, '🍗');
+            setTimeout(() => {
+              gateEl.style.background = '';
+              gateEl.style.transform  = 'rotateY(-110deg)';
+            }, 150);
+
+            sheepDeviousEl.setAttribute('display', 'block');
+            setTimeout(() => sheepDeviousEl.setAttribute('display', 'none'), 3200);
+
+            updateHud();
+            checkAchievements();
+            walkToNextRound(false);
+          }, 400);
+        }, 430);
+      }, 40);
+    }, 420);
   }
 
   // ---- Gate interaction --------------------------------------------------
@@ -1607,6 +1651,7 @@
       hintGateIdx: -1, streak: 0, roundStartTime: 0
     };
     updateChickenLegHud();
+    sheepDeviousEl.setAttribute('display', 'none');
     worldEl.innerHTML = '';
     fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
     worldEl.style.transition = 'none';
