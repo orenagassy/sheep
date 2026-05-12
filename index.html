@@ -644,19 +644,33 @@
   const FIELD_HEIGHT        = 320;
   const MAX_LEADERBOARD     = 10;
 
-  // Game mechanics — XOR-encoded so values aren't plaintext in source
-  const _cfg = Object.freeze((function(_k) {
-    const _u = n => n ^ _k;
-    return {
-      _a: _u(8007),    // sport timer ms
-      _b: _u(2) / 100, // hint grant probability
-      _c: _u(1007),    // sport tier-1 cutoff ms
-      _d: _u(2499),    // sport tier-2 cutoff ms
-      _e: _u(4007),    // sport tier-3 cutoff ms (beyond = no bonus)
-      _f: _u(5),       // tier-1 extra bonus pts
-      _g: _u(6),       // tier-2 extra bonus pts
-    };
-  })(7));
+  // Game mechanics loaded from Cloudflare Worker at boot — not stored here
+  let _cfg = null;
+  async function loadConfig() {
+    try {
+      const hit = sessionStorage.getItem('sheepgate:cfg');
+      if (hit) { _cfg = Object.freeze(JSON.parse(hit)); return; }
+    } catch(_) {}
+    try {
+      const res = await fetch(WORKER_URL + '/config');
+      if (!res.ok) throw new Error(res.status);
+      const d = await res.json();
+      _cfg = Object.freeze({
+        _a: d.sportTimerMs,
+        _b: d.hintChance,
+        _c: d.sportTier1Ms,
+        _d: d.sportTier2Ms,
+        _e: d.sportTier3Ms,
+        _f: d.sportTier1Bonus,
+        _g: d.sportTier2Bonus,
+      });
+      try { sessionStorage.setItem('sheepgate:cfg', JSON.stringify(_cfg)); } catch(_) {}
+    } catch(e) {
+      console.warn('Config unavailable, using offline defaults');
+      const _u = n => n ^ 7;
+      _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6) });
+    }
+  }
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
   const SPORT_LB_KEY        = 'sheepgate:sport-leaderboard';
   const STATS_KEY           = 'sheepgate:stats';
@@ -1563,8 +1577,11 @@
   generateStars();
   updateFieldAmbience(1);
   renderStats();
-  loadLeaderboard();
-  newRound();
+  statusLabel.textContent = 'Loading...';
+  loadConfig().then(() => {
+    loadLeaderboard();
+    newRound();
+  });
 })();
 </script>
 </body>
