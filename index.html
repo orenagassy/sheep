@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sheep Gates</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
 <style>
   :root {
     --bg-page: #f5f1e8;
@@ -252,6 +253,36 @@
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 
+  /* ---- Test mode ---- */
+  #test-badge {
+    display: none;
+    background: #fff3cd; border: 1px solid #ffc107; border-radius: 6px;
+    padding: 3px 8px; font-size: 11px; font-weight: 600; color: #856404;
+    letter-spacing: 0.5px;
+  }
+  .test-hint-indicator {
+    position: absolute; top: -18px; left: 50%;
+    transform: translateX(-50%); font-size: 14px; line-height: 1;
+    pointer-events: none; z-index: 5;
+    animation: hint-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    50%       { opacity: 1;   transform: translateX(-50%) scale(1.2); }
+  }
+
+  /* ---- Funny skull ---- */
+  .funny-skull {
+    position: absolute; pointer-events: none; z-index: 10;
+    transform: translate(-50%, -50%) scale(0) rotate(-30deg);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s;
+  }
+  .funny-skull.pop {
+    transform: translate(-50%, -50%) scale(1) rotate(5deg);
+    opacity: 1;
+  }
+
   /* ---- Particle effects ---- */
   .crash-particle {
     position: absolute; pointer-events: none; z-index: 10;
@@ -338,6 +369,7 @@
     <div class="topbar">
       <div class="topbar-left">
         <span class="sheep-icon" aria-hidden="true">🐑</span>
+        <span id="test-badge">🧪 TEST MODE</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
           <div class="hud-subtitle" id="status-label">Pick the open gate</div>
@@ -376,7 +408,7 @@
       <div id="world"></div>
       <div id="grass-blades"></div>
       <div id="sheep" aria-hidden="true">
-        <span id="sheep-dead">💀</span>
+        <span id="sheep-dead"></span>
         <svg id="sheep-svg" viewBox="0 0 70 58" width="70" height="58"
              xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;">
           <!-- Wool body -->
@@ -457,6 +489,7 @@
 <script>
 (function() {
   const WORKER_URL = 'https://sheep-score.oren-agassy.workers.dev';
+  const TEST_MODE = new URLSearchParams(location.search).has('test');
 
   const GATES_PER_ROUND = 7;
   const ROUNDS_PER_LEVEL = 7;
@@ -468,7 +501,7 @@
 
   let state = {
     score: 0, blockedGates: [], animating: false,
-    gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0
+    gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0, hintGateIdx: -1
   };
 
   let leaderboard = [];
@@ -652,6 +685,13 @@
   // ---- HUD ----------------------------------------------------------------
   function newRound() {
     state.blockedGates = pickBlockedIndices(getBlockedCount());
+    if (TEST_MODE) {
+      const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
+        .filter(i => !state.blockedGates.includes(i));
+      state.hintGateIdx = openGates[Math.floor(Math.random() * openGates.length)];
+    } else {
+      state.hintGateIdx = -1;
+    }
     state.animating = false;
     messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
     restartBtn.style.display = 'none';
@@ -660,11 +700,19 @@
     updateHud();
     const newSet = buildGateSet(95 - state.worldOffset);
     worldEl.appendChild(newSet);
+    if (TEST_MODE && state.hintGateIdx >= 0) {
+      const gates = newSet.querySelectorAll('.gate');
+      const ind = document.createElement('div');
+      ind.className = 'test-hint-indicator';
+      ind.textContent = '💡';
+      gates[state.hintGateIdx].parentNode.appendChild(ind);
+    }
     state.currentSetEl = newSet;
   }
   function showSheep() {
     sheepDeadEl.style.display = 'none';
     sheepSvgEl.style.display  = 'block';
+    sheepEl.style.opacity = '1';
     sheepEl.classList.remove('walking');
   }
   function updateHud() {
@@ -761,6 +809,35 @@
     setTimeout(() => el.remove(), 2400);
   }
 
+  function spawnFunnySkull(gateEl) {
+    const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const cx = gr.left - fr.left + gr.width / 2;
+    const cy = gr.top  - fr.top  + gr.height / 2;
+    const el = document.createElement('div');
+    el.className = 'funny-skull';
+    el.style.left = cx + 'px';
+    el.style.top  = cy + 'px';
+    el.innerHTML = `<svg viewBox="0 0 56 60" width="54" height="58" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="28" cy="57" rx="14" ry="3" fill="rgba(0,0,0,0.22)"/>
+      <circle cx="28" cy="24" r="22" fill="#f4f0df" stroke="#2c2010" stroke-width="2.5"/>
+      <ellipse cx="7" cy="31" rx="7" ry="5" fill="#ede8d0" stroke="#2c2010" stroke-width="2"/>
+      <ellipse cx="49" cy="31" rx="7" ry="5" fill="#ede8d0" stroke="#2c2010" stroke-width="2"/>
+      <g stroke="#2c2010" stroke-width="4" stroke-linecap="round">
+        <line x1="14" y1="15" x2="24" y2="25"/><line x1="24" y1="15" x2="14" y2="25"/>
+        <line x1="32" y1="15" x2="42" y2="25"/><line x1="42" y1="15" x2="32" y2="25"/>
+      </g>
+      <ellipse cx="22" cy="31" rx="3" ry="3.5" fill="#b8b099"/>
+      <ellipse cx="34" cy="31" rx="3" ry="3.5" fill="#b8b099"/>
+      <rect x="12" y="39" width="32" height="16" rx="5" fill="#f4f0df" stroke="#2c2010" stroke-width="2.5"/>
+      <line x1="20" y1="39" x2="20" y2="55" stroke="#2c2010" stroke-width="2"/>
+      <line x1="28" y1="39" x2="28" y2="55" stroke="#2c2010" stroke-width="2"/>
+      <line x1="36" y1="39" x2="36" y2="55" stroke="#2c2010" stroke-width="2"/>
+      <text x="1" y="13" font-size="11">💫</text><text x="42" y="13" font-size="11">💫</text>
+    </svg>`;
+    fieldEl.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('pop')));
+  }
+
   // ---- Web Audio ---------------------------------------------------------
   let _audioCtx = null;
   function _audio() {
@@ -822,8 +899,9 @@
   }
 
   // ---- Hint discovery ----------------------------------------------------
-  function tryGrantHint(gateEl) {
-    if (Math.random() >= 0.05) return;
+  function tryGrantHint(gateEl, index) {
+    const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < 0.05);
+    if (!shouldGrant) return;
     const pop = document.createElement('div');
     pop.textContent = '🐮';
     pop.style.cssText = 'position:absolute;top:50%;left:50%;font-size:26px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
@@ -895,7 +973,7 @@
       gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
       gateEl.style.transform = 'rotateY(-110deg)';
       playGateOpen();
-      tryGrantHint(gateEl);
+      tryGrantHint(gateEl, index);
       state.score++;
       spawnFloatingScore(gateEl);
       const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
@@ -921,8 +999,7 @@
             worldEl.removeChild(state.currentSetEl);
           state.currentSetEl = nextSet;
           sheepEl.classList.remove('walking');
-          sheepEl.style.transition = 'left 0.5s ease, bottom 0.5s ease, transform 0.3s, opacity 0.3s';
-          sheepEl.style.left = '50%';
+          sheepEl.style.transition = 'bottom 0.5s ease, transform 0.3s, opacity 0.3s';
           sheepEl.style.bottom = '24px';
           setTimeout(() => {
             sheepEl.style.transition = SHEEP_TRANSITION;
@@ -952,9 +1029,10 @@
         sheepEl.style.transition = 'all 0.4s ease-out';
         sheepEl.style.transform = 'translateX(-50%) translateY(8px) scaleY(0.4) scaleX(1.4)';
       }, 700);
+      spawnFunnySkull(gateEl);
       setTimeout(() => {
-        sheepSvgEl.style.display = 'none';
-        sheepDeadEl.style.display = 'block';
+        sheepEl.style.transition = 'opacity 0.4s';
+        sheepEl.style.opacity = '0';
         handleEndOfGame();
       }, 1300);
     }
@@ -1015,7 +1093,7 @@
     hintBtn.textContent = '🐮 Hint';
     state = {
       score: 0, blockedGates: [], animating: false,
-      gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0
+      gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0, hintGateIdx: -1
     };
     worldEl.innerHTML = '';
     worldEl.style.transition = 'none';
@@ -1059,6 +1137,8 @@
       starsEl.appendChild(s);
     }
   }
+
+  if (TEST_MODE) document.getElementById('test-badge').style.display = 'inline-block';
 
   // ---- Boot --------------------------------------------------------------
   generateGrassBlades();
