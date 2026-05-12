@@ -242,6 +242,22 @@
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 
+  /* ---- Mode selector ---- */
+  .mode-selector {
+    display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;
+  }
+  .mode-btn {
+    padding: 6px 18px; border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card); color: var(--text-secondary);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .mode-btn:hover { border-color: #999; color: var(--text-primary); }
+  .mode-btn.active          { background: #2c2c2a; color: #fff; border-color: #2c2c2a; }
+  .mode-btn.active.mode-daily { background: #1b5e20; border-color: #1b5e20; }
+  .mode-btn.active.mode-sport { background: #b71c1c; border-color: #b71c1c; }
+
   /* ---- Mode badges ---- */
   #test-badge, #sport-badge, #daily-badge {
     display: none;
@@ -420,6 +436,12 @@
 <div class="app">
   <h1>🐑 Sheep Gates</h1>
   <p class="tagline">Bet on the open gate. Survive as long as you can.</p>
+
+  <div class="mode-selector">
+    <button class="mode-btn" id="mode-normal">Normal</button>
+    <button class="mode-btn mode-daily" id="mode-daily">📅 Daily</button>
+    <button class="mode-btn mode-sport" id="mode-sport">⚡ Sport</button>
+  </div>
 
   <div id="game-container">
 
@@ -1444,6 +1466,26 @@
   if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
   if (SPORT_MODE) $('sport-badge').style.display = 'inline-block';
   if (DAILY_MODE) $('daily-badge').style.display = 'inline-block';
+
+  // Mode selector buttons
+  (function() {
+    function setMode(m) {
+      const url = new URL(location.href);
+      url.searchParams.delete('daily');
+      url.searchParams.delete('sport');
+      if (m) url.searchParams.set(m, '');
+      location.href = url.toString();
+    }
+    const btnNormal = document.getElementById('mode-normal');
+    const btnDaily  = document.getElementById('mode-daily');
+    const btnSport  = document.getElementById('mode-sport');
+    if (DAILY_MODE)       btnDaily.classList.add('active');
+    else if (SPORT_MODE)  btnSport.classList.add('active');
+    else                  btnNormal.classList.add('active');
+    btnNormal.onclick = () => setMode('');
+    btnDaily.onclick  = () => setMode('daily');
+    btnSport.onclick  = () => setMode('sport');
+  })();
 
   generateGrassBlades();
   generateStars();
