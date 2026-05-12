@@ -753,6 +753,7 @@
   };
 
   let leaderboard = [];
+  let sessionName = '';
   let _wiggleId = null;
 
   const $ = id => document.getElementById(id);
@@ -1423,7 +1424,7 @@
     statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
 
     if (!TEST_MODE && isNewBest(state.score)) {
-      showHiscoreEntry();
+      if (sessionName) autoSaveScore(); else showHiscoreEntry();
     } else {
       restartBtn.style.display = 'inline-block';
       restartBtn.textContent = 'Try again';
@@ -1434,14 +1435,24 @@
     hiscoreName.value = '';
     setTimeout(() => hiscoreName.focus(), 100);
   }
-  hiscoreSave.onclick = async () => {
-    let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().slice(0, 10);
-    if (name.length === 0) name = 'ANON';
+  async function pushScore(name) {
     leaderboard.push({ name, score: state.score, date: new Date().toISOString() });
     leaderboard.sort((a, b) => b.score - a.score);
     leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
     renderLeaderboard();
     await saveLeaderboard();
+  }
+  async function autoSaveScore() {
+    await pushScore(sessionName);
+    showAchievementToast({ icon: '🏆', label: 'Score saved', desc: 'as ' + sessionName });
+    restartBtn.style.display = 'inline-block';
+    restartBtn.textContent = 'Try again';
+  }
+  hiscoreSave.onclick = async () => {
+    let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().slice(0, 10);
+    if (name.length === 0) name = 'ANON';
+    sessionName = name;
+    await pushScore(name);
     hiscoreEntry.style.display = 'none';
     restartBtn.style.display = 'inline-block';
     restartBtn.textContent = 'Try again';
