@@ -1096,6 +1096,7 @@
       gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0, hintGateIdx: -1
     };
     worldEl.innerHTML = '';
+    fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
     worldEl.style.transition = 'none';
     worldEl.style.transform = 'translateY(0)';
     sheepEl.style.transition = 'none';
