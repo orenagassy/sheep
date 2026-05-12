@@ -29,7 +29,7 @@ Pick the open gate. Keep walking. Every level, one more gate locks — and the s
 
 **📅 Daily** — everyone faces the same gate sequence each day. One shared challenge. One chance to top the daily board.
 
-**⚡ Sport** — 8 seconds per gate or the sheep runs into the wall. Pick in under 2 seconds and earn a speed bonus (+2 instead of +1). Fast fingers, higher scores.
+**⚡ Sport** — 8 seconds per gate or the wolf gets you. Pick fast for bonus points: under 1 second scores +3, under 2.5 seconds scores +2, under 4 seconds scores +1. The faster you play, the further you climb.
 
 ---
 

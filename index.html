@@ -280,7 +280,7 @@
     50%       { opacity: 1;   transform: translateX(-50%) scale(1.2); }
   }
 
-  /* ---- Funny skull ---- */
+  /* ---- Bad wolf ---- */
   .funny-skull {
     position: absolute; pointer-events: none; z-index: 10;
     transform: translate(-50%, -50%) scale(0) rotate(-30deg);
@@ -322,6 +322,11 @@
     font-size: 26px; color: #e65c00;
     text-shadow: 0 0 12px rgba(255,160,0,0.7), 0 2px 4px rgba(0,0,0,0.3);
     animation: fast-float 1.1s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  .floating-score.turbo-bonus {
+    font-size: 32px; color: #f59e0b;
+    text-shadow: 0 0 18px rgba(251,191,36,0.9), 0 0 6px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.4);
+    animation: fast-float 1.3s cubic-bezier(0.22,1,0.36,1) forwards;
   }
   @keyframes score-float {
     0%   { transform: translateX(-50%) translateY(0);     opacity: 1; }
@@ -610,7 +615,7 @@
       <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
       Use 🐮 Hint to mark one bad gate — once per run. Lucky sheep sometimes find a hint hiding behind an open gate!<br/>
       <strong>📅 Daily</strong> — everyone faces the same gate sequence each day. Beat their score.<br/>
-      <strong>⚡ Sport</strong> — 8 seconds per gate. Pick within 2 seconds and earn a speed bonus (+2 ⚡ instead of +1).</p>
+      <strong>⚡ Sport</strong> — 8 seconds per gate or the wolf gets you. Pick fast for bonus points: under 1s = +3 ⚡⚡, under 2.5s = +2 ⚡, under 4s = +1.</p>
     </details>
   </div>
 
@@ -627,7 +632,20 @@
   const ROUNDS_PER_LEVEL   = 7;
   const FIELD_HEIGHT        = 320;
   const MAX_LEADERBOARD     = 10;
-  const SPORT_TIME_MS       = 8000;
+
+  // Game mechanics — XOR-encoded so values aren't plaintext in source
+  const _cfg = Object.freeze((function(_k) {
+    const _u = n => n ^ _k;
+    return {
+      _a: _u(8007),    // sport timer ms
+      _b: _u(2) / 100, // hint grant probability
+      _c: _u(1007),    // sport tier-1 cutoff ms
+      _d: _u(2499),    // sport tier-2 cutoff ms
+      _e: _u(4007),    // sport tier-3 cutoff ms (beyond = no bonus)
+      _f: _u(5),       // tier-1 extra bonus pts
+      _g: _u(6),       // tier-2 extra bonus pts
+    };
+  })(7));
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
   const SPORT_LB_KEY        = 'sheepgate:sport-leaderboard';
   const DAILY_LB_KEY        = 'sheepgate:daily-leaderboard';
@@ -733,7 +751,7 @@
     sportTimerEl.style.display = 'block';
     sportTimerBarEl.style.transform = 'scaleX(1)';
     (function tick() {
-      const p = Math.max(0, 1 - (performance.now() - state.roundStartTime) / SPORT_TIME_MS);
+      const p = Math.max(0, 1 - (performance.now() - state.roundStartTime) / _cfg._a);
       sportTimerBarEl.style.transform = 'scaleX(' + p + ')';
       if (p <= 0) { autoKillBySport(); return; }
       _sportRaf = requestAnimationFrame(tick);
@@ -1103,7 +1121,8 @@
   function spawnFloatingScore(gateEl, label) {
     const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
     const el = document.createElement('div');
-    el.className = 'floating-score' + (label && label.includes('⚡') ? ' fast-bonus' : '');
+    const bonus = label && label.includes('⚡⚡') ? ' turbo-bonus' : label && label.includes('⚡') ? ' fast-bonus' : '';
+    el.className = 'floating-score' + bonus;
     el.textContent = label || '+1';
     el.style.left = (gr.left - fr.left + gr.width / 2) + 'px';
     el.style.top  = (gr.top  - fr.top) + 'px';
@@ -1128,22 +1147,26 @@
     el.className = 'funny-skull';
     el.style.left = cx + 'px';
     el.style.top  = cy + 'px';
-    el.innerHTML = `<svg viewBox="0 0 56 60" width="54" height="58" xmlns="http://www.w3.org/2000/svg">
-      <ellipse cx="28" cy="57" rx="14" ry="3" fill="rgba(0,0,0,0.22)"/>
-      <circle cx="28" cy="24" r="22" fill="#f4f0df" stroke="#2c2010" stroke-width="2.5"/>
-      <ellipse cx="7" cy="31" rx="7" ry="5" fill="#ede8d0" stroke="#2c2010" stroke-width="2"/>
-      <ellipse cx="49" cy="31" rx="7" ry="5" fill="#ede8d0" stroke="#2c2010" stroke-width="2"/>
-      <g stroke="#2c2010" stroke-width="4" stroke-linecap="round">
-        <line x1="14" y1="15" x2="24" y2="25"/><line x1="24" y1="15" x2="14" y2="25"/>
-        <line x1="32" y1="15" x2="42" y2="25"/><line x1="42" y1="15" x2="32" y2="25"/>
-      </g>
-      <ellipse cx="22" cy="31" rx="3" ry="3.5" fill="#b8b099"/>
-      <ellipse cx="34" cy="31" rx="3" ry="3.5" fill="#b8b099"/>
-      <rect x="12" y="39" width="32" height="16" rx="5" fill="#f4f0df" stroke="#2c2010" stroke-width="2.5"/>
-      <line x1="20" y1="39" x2="20" y2="55" stroke="#2c2010" stroke-width="2"/>
-      <line x1="28" y1="39" x2="28" y2="55" stroke="#2c2010" stroke-width="2"/>
-      <line x1="36" y1="39" x2="36" y2="55" stroke="#2c2010" stroke-width="2"/>
-      <text x="1" y="13" font-size="11">💫</text><text x="42" y="13" font-size="11">💫</text>
+    el.innerHTML = `<svg viewBox="0 0 56 64" width="54" height="62" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="28" cy="62" rx="14" ry="3" fill="rgba(0,0,0,0.22)"/>
+      <polygon points="9,24 2,3 21,17" fill="#78716c"/>
+      <polygon points="47,24 54,3 35,17" fill="#78716c"/>
+      <polygon points="10,22 5,7 20,17" fill="#fca5a5"/>
+      <polygon points="46,22 51,7 36,17" fill="#fca5a5"/>
+      <ellipse cx="28" cy="36" rx="22" ry="20" fill="#9ca3af"/>
+      <ellipse cx="28" cy="44" rx="13" ry="10" fill="#d1d5db"/>
+      <ellipse cx="28" cy="37" rx="5" ry="3.5" fill="#1f2937"/>
+      <ellipse cx="18" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+      <ellipse cx="38" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+      <ellipse cx="18" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+      <ellipse cx="38" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+      <circle cx="20" cy="29" r="1.3" fill="white"/>
+      <circle cx="40" cy="29" r="1.3" fill="white"/>
+      <line x1="11" y1="24" x2="24" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+      <line x1="45" y1="24" x2="32" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 18 48 Q 28 55 38 48" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+      <polygon points="22,49 19,57 25,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+      <polygon points="34,49 37,57 31,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
     </svg>`;
     fieldEl.appendChild(el);
     requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('pop')));
@@ -1211,7 +1234,7 @@
 
   // ---- Hint discovery ----------------------------------------------------
   function tryGrantHint(gateEl, index) {
-    const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < 0.05);
+    const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < _cfg._b);
     if (!shouldGrant) return;
     stats.hintsFound++;
     const pop = document.createElement('div');
@@ -1293,9 +1316,13 @@
       state.streak++;
 
       let floatLabel = '+1';
-      if (SPORT_MODE && (performance.now() - state.roundStartTime) < 2000) {
-        state.score++;
-        floatLabel = '+2 ⚡';
+      if (SPORT_MODE) {
+        const elapsed = performance.now() - state.roundStartTime;
+        if (elapsed < _cfg._c) {
+          state.score += _cfg._f; floatLabel = '+3 ⚡⚡';
+        } else if (elapsed < _cfg._d) {
+          state.score += _cfg._g; floatLabel = '+2 ⚡';
+        }
       }
 
       spawnFloatingScore(gateEl, floatLabel);
