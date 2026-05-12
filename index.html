@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Sheep Gates</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5105009779643901"
+     crossorigin="anonymous"></script>
 <style>
   :root {
     --bg-page: #f5f1e8;
@@ -465,6 +467,15 @@
   .stat-item-label { font-size: 11px; color: var(--text-muted); }
   .stat-item-value { font-weight: 500; font-size: 14px; }
 
+  /* ---- Ad containers ---- */
+  .ad-wrap {
+    width: 100%; overflow: hidden;
+    display: flex; justify-content: center;
+  }
+  .ad-wrap--top    { margin: 8px 0 4px; min-height: 0; }
+  .ad-wrap--drawer { margin-top: 20px; min-height: 0; }
+  .ad-wrap:empty, .ad-wrap:has(ins:only-child) { display: none; }
+
   /* ---- Info drawer ---- */
   #info-overlay {
     position: fixed; inset: 0; background: rgba(0,0,0,0.35);
@@ -532,6 +543,10 @@
       <button class="toggle-opt" id="mode-normal">Normal</button>
       <button class="toggle-opt sport-opt" id="mode-sport">⚡ Sport</button>
     </div>
+  </div>
+
+  <div class="ad-wrap ad-wrap--top">
+    <!-- Ad unit loads here after AdSense approval -->
   </div>
 
   <div id="game-container">
@@ -701,6 +716,10 @@
         <div class="stat-item-value" id="stat-personal-best">—</div>
       </div>
     </div>
+  </div>
+
+  <div class="ad-wrap ad-wrap--drawer">
+    <!-- Ad unit loads here after AdSense approval -->
   </div>
 </div>
 
