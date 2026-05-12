@@ -281,15 +281,15 @@
   #test-badge  { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
   #sport-badge { background: #fde8e8; border: 1px solid #ef9a9a; color: #b71c1c; }
 
-  /* ---- Test mode indicator ---- */
-  .test-hint-indicator {
-    position: absolute; top: -18px; left: 50%;
-    transform: translateX(-50%); font-size: 14px; line-height: 1;
+  /* ---- Test mode markups ---- */
+  .test-mark {
+    position: absolute; top: -22px; left: 50%;
+    transform: translateX(-50%); font-size: 15px; line-height: 1;
     pointer-events: none; z-index: 5;
     animation: hint-pulse 1.2s ease-in-out infinite;
   }
   @keyframes hint-pulse {
-    0%, 100% { opacity: 0.6; transform: translateX(-50%) scale(1); }
+    0%, 100% { opacity: 0.65; transform: translateX(-50%) scale(1); }
     50%       { opacity: 1;   transform: translateX(-50%) scale(1.2); }
   }
 
@@ -1016,12 +1016,20 @@
     updateHud();
     const newSet = buildGateSet(95 - state.worldOffset);
     worldEl.appendChild(newSet);
-    if (TEST_MODE && state.hintGateIdx >= 0) {
+    if (TEST_MODE) {
       const gates = newSet.querySelectorAll('.gate');
-      const ind = document.createElement('div');
-      ind.className = 'test-hint-indicator';
-      ind.textContent = '💡';
-      gates[state.hintGateIdx].parentNode.appendChild(ind);
+      state.blockedGates.forEach(idx => {
+        const ind = document.createElement('div');
+        ind.className = 'test-mark';
+        ind.textContent = '🐺';
+        gates[idx].parentNode.appendChild(ind);
+      });
+      if (state.hintGateIdx >= 0 && !state.hasChickenLeg) {
+        const ind = document.createElement('div');
+        ind.className = 'test-mark';
+        ind.textContent = '🍗';
+        gates[state.hintGateIdx].parentNode.appendChild(ind);
+      }
     }
     state.currentSetEl = newSet;
     if (SPORT_MODE) startSportTimer();
