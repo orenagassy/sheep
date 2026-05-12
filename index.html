@@ -242,31 +242,35 @@
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 
-  /* ---- Mode selector ---- */
-  .mode-selector {
-    display: flex; gap: 8px; justify-content: center; margin-bottom: 16px;
+  /* ---- Mode toggle ---- */
+  .mode-toggle-wrap {
+    display: flex; justify-content: center; margin-bottom: 16px;
   }
-  .mode-btn {
-    padding: 6px 18px; border-radius: 20px;
-    border: 1.5px solid var(--border);
-    background: var(--bg-card); color: var(--text-secondary);
+  .mode-toggle {
+    display: inline-flex; background: var(--bg-soft);
+    border: 1px solid var(--border); border-radius: 24px; padding: 3px;
+  }
+  .toggle-opt {
+    padding: 6px 22px; border-radius: 20px; border: none;
+    background: transparent; color: var(--text-secondary);
     font-size: 13px; font-weight: 500; cursor: pointer;
-    transition: background 0.15s, color 0.15s, border-color 0.15s;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
   }
-  .mode-btn:hover { border-color: #999; color: var(--text-primary); }
-  .mode-btn.active          { background: #2c2c2a; color: #fff; border-color: #2c2c2a; }
-  .mode-btn.active.mode-daily { background: #1b5e20; border-color: #1b5e20; }
-  .mode-btn.active.mode-sport { background: #b71c1c; border-color: #b71c1c; }
+  .toggle-opt:hover { color: var(--text-primary); }
+  .toggle-opt.active {
+    background: var(--bg-card); color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.13);
+  }
+  .toggle-opt.sport-opt.active { background: #b71c1c; color: #fff; }
 
   /* ---- Mode badges ---- */
-  #test-badge, #sport-badge, #daily-badge {
+  #test-badge, #sport-badge {
     display: none;
     border-radius: 6px; padding: 3px 8px;
     font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
   }
   #test-badge  { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
   #sport-badge { background: #fde8e8; border: 1px solid #ef9a9a; color: #b71c1c; }
-  #daily-badge { background: #e8f5e9; border: 1px solid #a5d6a7; color: #1b5e20; }
 
   /* ---- Test mode indicator ---- */
   .test-hint-indicator {
@@ -402,14 +406,14 @@
   .near-miss-x {
     position: absolute; inset: 0; display: flex;
     align-items: center; justify-content: center;
-    font-size: 22px; font-weight: 900;
-    color: rgba(190,30,30,0.9); pointer-events: none; z-index: 3;
-    animation: miss-flash 0.75s ease-out forwards;
+    pointer-events: none; z-index: 3;
+    animation: miss-flash 0.85s ease-out forwards;
   }
+  .near-miss-x svg { opacity: 0.52; }
   @keyframes miss-flash {
-    0%   { opacity: 0; transform: scale(0.5); }
-    20%  { opacity: 1; transform: scale(1.1); }
-    70%  { opacity: 1; }
+    0%   { opacity: 0; transform: scale(0.4); }
+    20%  { opacity: 1; transform: scale(1.05); }
+    65%  { opacity: 1; }
     100% { opacity: 0; transform: scale(1); }
   }
 
@@ -452,10 +456,11 @@
   <h1>🐑 Sheep Gates</h1>
   <p class="tagline">Bet on the open gate. Survive as long as you can.</p>
 
-  <div class="mode-selector">
-    <button class="mode-btn" id="mode-normal">Normal</button>
-    <button class="mode-btn mode-daily" id="mode-daily">📅 Daily</button>
-    <button class="mode-btn mode-sport" id="mode-sport">⚡ Sport</button>
+  <div class="mode-toggle-wrap">
+    <div class="mode-toggle">
+      <button class="toggle-opt" id="mode-normal">Normal</button>
+      <button class="toggle-opt sport-opt" id="mode-sport">⚡ Sport</button>
+    </div>
   </div>
 
   <div id="game-container">
@@ -464,7 +469,6 @@
       <div class="topbar-left">
         <span id="test-badge">🧪 TEST</span>
         <span id="sport-badge">⚡ SPORT</span>
-        <span id="daily-badge">📅 DAILY</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
           <div class="hud-subtitle" id="status-label">Pick the open gate</div>
@@ -551,10 +555,10 @@
 
     <div id="hiscore-entry" style="display: none;">
       <div class="entry-title">🏅 New world best!</div>
-      <div class="entry-subtitle">Enter your initials (up to 4 letters)</div>
+      <div class="entry-subtitle">Enter your name (up to 10 characters)</div>
       <div class="entry-row">
-        <input id="hiscore-name" type="text" maxlength="4" autocomplete="off"
-               style="width: 90px; text-align: center; text-transform: uppercase; font-size: 18px; letter-spacing: 4px; font-weight: 500;" />
+        <input id="hiscore-name" type="text" maxlength="10" autocomplete="off"
+               style="width: 160px; text-align: center; text-transform: uppercase; font-size: 16px; letter-spacing: 2px; font-weight: 500;" />
         <button id="hiscore-save" style="font-weight: 500;">Save</button>
       </div>
     </div>
@@ -614,7 +618,6 @@
       <summary>How to play</summary>
       <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
       Use 🐮 Hint to mark one bad gate — once per run. Lucky sheep sometimes find a hint hiding behind an open gate!<br/>
-      <strong>📅 Daily</strong> — everyone faces the same gate sequence each day. Beat their score.<br/>
       <strong>⚡ Sport</strong> — 8 seconds per gate or the wolf gets you. Pick fast for bonus points: under 1s = +3 ⚡⚡, under 2.5s = +2 ⚡, under 4s = +1.</p>
     </details>
   </div>
@@ -626,7 +629,6 @@
   const WORKER_URL = 'https://sheep-score.oren-agassy.workers.dev';
   const TEST_MODE  = new URLSearchParams(location.search).has('test');
   const SPORT_MODE = new URLSearchParams(location.search).has('sport');
-  const DAILY_MODE = new URLSearchParams(location.search).has('daily');
 
   const GATES_PER_ROUND    = 7;
   const ROUNDS_PER_LEVEL   = 7;
@@ -648,11 +650,9 @@
   })(7));
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
   const SPORT_LB_KEY        = 'sheepgate:sport-leaderboard';
-  const DAILY_LB_KEY        = 'sheepgate:daily-leaderboard';
   const STATS_KEY           = 'sheepgate:stats';
   const PERSONAL_BEST_KEY   = 'sheepgate:personal-best';
   const ACHIEVEMENTS_KEY    = 'sheepgate:achievements';
-  const DAILY_KEY           = 'sheepgate:daily';
   const SHEEP_TRANSITION = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
   const WORLD_TRANSITION = 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
@@ -719,29 +719,6 @@
       setTimeout(() => { el.remove(); drainToastQueue(); }, 450);
     }, 3000);
   }
-
-  // ---- Daily challenge ----------------------------------------------------
-  function seededRng(seed) {
-    let s = seed >>> 0;
-    return () => {
-      s ^= s << 13; s ^= s >>> 17; s ^= s << 5;
-      return (s >>> 0) / 0x100000000;
-    };
-  }
-  function dailySeed() {
-    const d = new Date().toISOString().slice(0, 10);
-    return d.split('').reduce((h, c) => (Math.imul(31, h) + c.charCodeAt(0)) | 0, 0);
-  }
-  function loadDailyState() {
-    try {
-      const d = JSON.parse(localStorage.getItem(DAILY_KEY));
-      const today = new Date().toISOString().slice(0, 10);
-      if (d && d.date === today) return d;
-    } catch(_) {}
-    return { date: new Date().toISOString().slice(0, 10), best: 0 };
-  }
-  let dailyState = loadDailyState();
-  let dailyRng = DAILY_MODE ? seededRng(dailySeed()) : null;
 
   // ---- Sport timer --------------------------------------------------------
   let _sportRaf = null;
@@ -835,8 +812,8 @@
   }
 
   // ---- Leaderboard --------------------------------------------------------
-  const LB_LOCAL_KEY = SPORT_MODE ? SPORT_LB_KEY : DAILY_MODE ? DAILY_LB_KEY : LOCAL_FALLBACK_KEY;
-  const LB_TITLE = SPORT_MODE ? '⚡ Sport Top 10' : DAILY_MODE ? '📅 Daily Top 10' : 'Top 10 of all time';
+  const LB_LOCAL_KEY = SPORT_MODE ? SPORT_LB_KEY : LOCAL_FALLBACK_KEY;
+  const LB_TITLE = SPORT_MODE ? '⚡ Sport Top 10' : 'Top 10 of all time';
 
   function setSyncStatus(text, kind) {
     syncIndicator.textContent = text || '';
@@ -847,7 +824,7 @@
     return data.filter(entry =>
       entry &&
       typeof entry.name === 'string' &&
-      /^[A-Z0-9]{1,4}$/.test(entry.name) &&
+      /^[A-Z0-9 ]{1,10}$/.test(entry.name) &&
       Number.isFinite(entry.score) &&
       entry.score >= 0
     ).slice(0, MAX_LEADERBOARD);
@@ -860,7 +837,7 @@
     try { localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(leaderboard)); } catch (_) {}
   }
   async function loadLeaderboard() {
-    if (SPORT_MODE || DAILY_MODE) {
+    if (SPORT_MODE) {
       loadLocalLeaderboard();
       renderLeaderboard();
       return;
@@ -880,7 +857,7 @@
     renderLeaderboard();
   }
   async function saveLeaderboard() {
-    if (SPORT_MODE || DAILY_MODE) {
+    if (SPORT_MODE) {
       leaderboard.sort((a, b) => b.score - a.score);
       leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
       saveLocalLeaderboard();
@@ -999,7 +976,7 @@
 
   // ---- HUD ----------------------------------------------------------------
   function newRound() {
-    state.blockedGates = pickBlockedIndices(getBlockedCount(), DAILY_MODE ? dailyRng : null);
+    state.blockedGates = pickBlockedIndices(getBlockedCount());
     if (TEST_MODE) {
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
@@ -1073,12 +1050,30 @@
   }
 
   // ---- Near-miss reveal ---------------------------------------------------
+  const _WOLF_SVG = `<svg viewBox="0 0 56 64" width="38" height="43" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="9,24 2,3 21,17" fill="#78716c"/>
+    <polygon points="47,24 54,3 35,17" fill="#78716c"/>
+    <polygon points="10,22 5,7 20,17" fill="#fca5a5"/>
+    <polygon points="46,22 51,7 36,17" fill="#fca5a5"/>
+    <ellipse cx="28" cy="36" rx="22" ry="20" fill="#9ca3af"/>
+    <ellipse cx="28" cy="44" rx="13" ry="10" fill="#d1d5db"/>
+    <ellipse cx="28" cy="37" rx="5" ry="3.5" fill="#1f2937"/>
+    <ellipse cx="18" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+    <ellipse cx="38" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+    <ellipse cx="18" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+    <ellipse cx="38" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+    <line x1="11" y1="24" x2="24" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+    <line x1="45" y1="24" x2="32" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 18 48 Q 28 55 38 48" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="22,49 19,57 25,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+    <polygon points="34,49 37,57 31,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+  </svg>`;
   function showNearMiss(setEl, blockedIndices) {
     const gates = setEl.querySelectorAll('.gate');
     blockedIndices.forEach(idx => {
       const m = document.createElement('div');
       m.className = 'near-miss-x';
-      m.textContent = '✕';
+      m.innerHTML = _WOLF_SVG;
       gates[idx].parentNode.appendChild(m);
     });
   }
@@ -1354,7 +1349,7 @@
           sheepEl.style.bottom = '24px';
           setTimeout(() => {
             sheepEl.style.transition = SHEEP_TRANSITION;
-            state.blockedGates = pickBlockedIndices(getBlockedCount(), DAILY_MODE ? dailyRng : null);
+            state.blockedGates = pickBlockedIndices(getBlockedCount());
             state.animating = false;
             statusLabel.textContent = 'Pick the open gate';
             if (wasLevelUp) showLevelUp(getLevel());
@@ -1427,14 +1422,7 @@
     messageEl.style.color = 'var(--danger)';
     statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
 
-    if (DAILY_MODE) {
-      if (state.score > dailyState.best) {
-        dailyState.best = state.score;
-        try { localStorage.setItem(DAILY_KEY, JSON.stringify(dailyState)); } catch(_) {}
-      }
-      restartBtn.style.display = 'inline-block';
-      restartBtn.textContent = 'Try again · Daily best: ' + dailyState.best;
-    } else if (!TEST_MODE && isNewBest(state.score)) {
+    if (!TEST_MODE && isNewBest(state.score)) {
       showHiscoreEntry();
     } else {
       restartBtn.style.display = 'inline-block';
@@ -1447,7 +1435,7 @@
     setTimeout(() => hiscoreName.focus(), 100);
   }
   hiscoreSave.onclick = async () => {
-    let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().slice(0, 10);
     if (name.length === 0) name = 'ANON';
     leaderboard.push({ name, score: state.score, date: new Date().toISOString() });
     leaderboard.sort((a, b) => b.score - a.score);
@@ -1459,7 +1447,7 @@
     restartBtn.textContent = 'Try again';
   };
   hiscoreName.addEventListener('input', e => {
-    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 4);
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, 10);
   });
   hiscoreName.addEventListener('keydown', e => { if (e.key === 'Enter') hiscoreSave.click(); });
 
@@ -1471,7 +1459,6 @@
     showSheep();
     hintBtn.disabled = false;
     hintBtn.textContent = '🐮 Hint';
-    if (DAILY_MODE) dailyRng = seededRng(dailySeed());
     state = {
       score: 0, blockedGates: [], animating: false,
       gameOver: false, hintUsed: false, currentSetEl: null, worldOffset: 0,
@@ -1523,27 +1510,21 @@
 
   // ---- Boot --------------------------------------------------------------
   if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
-  if (SPORT_MODE) $('sport-badge').style.display = 'inline-block';
-  if (DAILY_MODE) $('daily-badge').style.display = 'inline-block';
-  if (SPORT_MODE || DAILY_MODE) syncIndicator.style.display = 'none';
+  if (SPORT_MODE) { $('sport-badge').style.display = 'inline-block'; syncIndicator.style.display = 'none'; }
 
-  // Mode selector buttons
+  // Mode toggle
   (function() {
     function setMode(m) {
       const url = new URL(location.href);
-      url.searchParams.delete('daily');
       url.searchParams.delete('sport');
       if (m) url.searchParams.set(m, '');
       location.href = url.toString();
     }
     const btnNormal = document.getElementById('mode-normal');
-    const btnDaily  = document.getElementById('mode-daily');
     const btnSport  = document.getElementById('mode-sport');
-    if (DAILY_MODE)       btnDaily.classList.add('active');
-    else if (SPORT_MODE)  btnSport.classList.add('active');
-    else                  btnNormal.classList.add('active');
+    if (SPORT_MODE) btnSport.classList.add('active');
+    else            btnNormal.classList.add('active');
     btnNormal.onclick = () => setMode('');
-    btnDaily.onclick  = () => setMode('daily');
     btnSport.onclick  = () => setMode('sport');
   })();
 
