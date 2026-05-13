@@ -169,6 +169,7 @@
   #sheep.walking .leg-fr { animation: leg-swing 360ms ease-in-out infinite 180ms; }
   #sheep.walking .leg-bl { animation: leg-swing 360ms ease-in-out infinite 180ms; }
   #sheep.walking .leg-br { animation: leg-swing 360ms ease-in-out infinite; }
+  body.sport-mode #sheep.walking .leg { animation-duration: 180ms; }
   @keyframes leg-swing {
     0%, 100% { transform: rotate(-20deg); }
     50%       { transform: rotate(20deg); }
@@ -795,8 +796,12 @@
   const STATS_KEY           = 'sheepgate:stats';
   const PERSONAL_BEST_KEY   = 'sheepgate:personal-best';
   const ACHIEVEMENTS_KEY    = 'sheepgate:achievements';
-  const SHEEP_TRANSITION = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
-  const WORLD_TRANSITION = 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+  const SHEEP_TRANSITION = SPORT_MODE
+    ? 'left 0.35s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.35s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.15s, opacity 0.15s'
+    : 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
+  const WORLD_TRANSITION = SPORT_MODE
+    ? 'transform 0.8s cubic-bezier(0.4, 0.0, 0.2, 1)'
+    : 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
 
   // ---- Stats persistence -------------------------------------------------
   function loadStats() {
@@ -1541,6 +1546,7 @@
 
   // ---- Walk to next round (shared between success and wolf-fed paths) ----
   function walkToNextRound(wasLevelUp) {
+    const _D = SPORT_MODE ? 0.5 : 1;
     setTimeout(() => {
       statusLabel.textContent = 'Walking on...';
       sheepEl.style.animation = 'sheep-bob 360ms linear infinite';
@@ -1577,7 +1583,7 @@
           worldEl.removeChild(state.currentSetEl);
         state.currentSetEl = nextSet;
         sheepEl.classList.remove('walking');
-        sheepEl.style.transition = 'bottom 0.5s ease, transform 0.3s, opacity 0.3s';
+        sheepEl.style.transition = `bottom ${0.5 * _D}s ease, transform ${0.3 * _D}s, opacity ${0.3 * _D}s`;
         sheepEl.style.bottom = '24px';
         setTimeout(() => {
           sheepEl.style.transition = SHEEP_TRANSITION;
@@ -1588,9 +1594,9 @@
           statusLabel.textContent = 'Pick the open gate';
           if (wasLevelUp) showLevelUp(getLevel());
           if (SPORT_MODE) startSportTimer();
-        }, 550);
-      }, 1500);
-    }, 500);
+        }, 550 * _D);
+      }, 1500 * _D);
+    }, 500 * _D);
   }
 
   // ---- Feed the wolf (survive using chicken leg) -------------------------
@@ -1913,7 +1919,7 @@
 
   // ---- Boot --------------------------------------------------------------
   if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
-  if (SPORT_MODE) { $('sport-badge').style.display = 'inline-block'; syncIndicator.style.display = 'none'; }
+  if (SPORT_MODE) { $('sport-badge').style.display = 'inline-block'; syncIndicator.style.display = 'none'; document.body.classList.add('sport-mode'); }
 
   // Mode toggle
   (function() {
