@@ -743,7 +743,8 @@
 
 <script>
 (function() {
-  const WORKER_URL = 'https://sheep-score.oren-agassy.workers.dev';
+  const WORKER_URL     = 'https://sheep-score.oren-agassy.workers.dev';
+  const FIREBASE_DB_URL = 'https://sheep-game-4852f-default-rtdb.firebaseio.com';
   const TEST_MODE  = new URLSearchParams(location.search).has('test');
   const SPORT_MODE = new URLSearchParams(location.search).has('sport');
 
@@ -982,19 +983,15 @@
     try { localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(leaderboard)); } catch (_) {}
   }
   function extractScores(data) {
-    // handle both { scores: [...] } and JSONBin raw { record: { scores: [...] } }
-    const arr = data?.scores ?? data?.record?.scores;
+    if (!data) return [];
+    const arr = data.scores ?? (Array.isArray(data) ? data : []);
     return sanitizeLeaderboard(arr);
   }
   async function loadLeaderboard() {
-    if (SPORT_MODE) {
-      loadLocalLeaderboard();
-      renderLeaderboard();
-      return;
-    }
+    if (SPORT_MODE) { loadLocalLeaderboard(); renderLeaderboard(); return; }
     setSyncStatus('Syncing...', 'syncing');
     try {
-      const res = await fetch(`${WORKER_URL}/scores`);
+      const res = await fetch(`${FIREBASE_DB_URL}/leaderboard.json`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       leaderboard = extractScores(await res.json());
       setSyncStatus('Synced', '');
@@ -1002,7 +999,6 @@
       console.error('Failed to load leaderboard', e);
       setSyncStatus('Offline', 'error');
     }
-    // fall back to localStorage if server returned nothing usable
     if (leaderboard.length === 0) loadLocalLeaderboard();
     renderLeaderboard();
   }
@@ -1010,13 +1006,11 @@
     if (SPORT_MODE) {
       leaderboard.sort((a, b) => b.score - a.score);
       leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
-      saveLocalLeaderboard();
-      renderLeaderboard();
-      return true;
+      saveLocalLeaderboard(); renderLeaderboard(); return true;
     }
     setSyncStatus('Saving...', 'syncing');
     try {
-      const latestRes = await fetch(`${WORKER_URL}/scores`);
+      const latestRes = await fetch(`${FIREBASE_DB_URL}/leaderboard.json`);
       let serverScores = [];
       if (latestRes.ok) serverScores = extractScores(await latestRes.json());
       const combined = [...serverScores, ...leaderboard];
@@ -1028,21 +1022,19 @@
       }
       merged.sort((a, b) => b.score - a.score);
       const trimmed = merged.slice(0, MAX_LEADERBOARD);
-      const putRes = await fetch(`${WORKER_URL}/scores`, {
+      const putRes = await fetch(`${FIREBASE_DB_URL}/leaderboard.json`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scores: trimmed })
       });
       if (!putRes.ok) throw new Error('HTTP ' + putRes.status);
       leaderboard = trimmed;
-      // keep localStorage in sync with the authoritative merged result
       try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
       setSyncStatus('Synced', '');
       return true;
     } catch (e) {
       console.error('Failed to save leaderboard', e);
       setSyncStatus('Save failed', 'error');
-      // persist locally so data survives if server is temporarily down
       try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
       return false;
     }
