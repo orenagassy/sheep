@@ -246,6 +246,23 @@
     0%, 100% { transform: scale(1) rotate(-12deg); }
     50%       { transform: scale(1.18) rotate(10deg); }
   }
+  /* ---- Lucky Clover HUD ---- */
+  #lucky-clover-hud {
+    position: absolute; top: 10px; left: 10px; z-index: 8;
+    font-size: 28px; line-height: 1; display: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+    animation: clover-bounce 2.2s ease-in-out infinite;
+    cursor: pointer; user-select: none;
+  }
+  @keyframes clover-bounce {
+    0%, 100% { transform: scale(1) rotate(-8deg); }
+    50%       { transform: scale(1.22) rotate(8deg); }
+  }
+  .flying-clover {
+    position: absolute; font-size: 26px; line-height: 1;
+    z-index: 20; pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
   /* devilish sheep face */
   @keyframes devious-appear {
     from { opacity: 0; }
@@ -585,6 +602,7 @@
 
     <div id="field">
       <div id="chicken-leg-hud" title="You have a chicken leg! The wolf will eat it instead of you.">🍗</div>
+      <div id="lucky-clover-hud" title="Lucky Clover! Click to scare away one wolf.">🍀</div>
       <div id="sport-timer"><div id="sport-timer-bar"></div></div>
       <div id="field-overlay"></div>
       <div id="stars"></div>
@@ -861,8 +879,8 @@
   // ---- State --------------------------------------------------------------
   let state = {
     score: 0, blockedGates: [], animating: false,
-    gameOver: false, hasChickenLeg: false, currentSetEl: null, worldOffset: 0,
-    hintGateIdx: -1, streak: 0, roundStartTime: 0
+    gameOver: false, hasChickenLeg: false, hasLuckyClover: false, currentSetEl: null, worldOffset: 0,
+    hintGateIdx: -1, hintCloverIdx: -1, streak: 0, roundStartTime: 0
   };
 
   let leaderboard = [];
@@ -885,6 +903,7 @@
   const levelProgressBar    = $('level-progress-bar');
   const streakRowEl         = $('streak-row');
   const chickenLegHudEl     = $('chicken-leg-hud');
+  const luckyCloverHudEl    = $('lucky-clover-hud');
   const restartBtn          = $('restart-btn');
   const hiscoreEntry        = $('hiscore-entry');
   const hiscoreName         = $('hiscore-name');
@@ -1099,14 +1118,24 @@
   }
 
   // ---- HUD ----------------------------------------------------------------
+  function stampTestMark(gates, idx, emoji) {
+    const m = document.createElement('div');
+    m.className = emoji === '🐺' ? 'test-mark test-mark-wolf' : 'test-mark';
+    m.textContent = emoji;
+    gates[idx].parentNode.appendChild(m);
+  }
   function newRound() {
     state.blockedGates = pickBlockedIndices(getBlockedCount());
     if (TEST_MODE) {
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
-      state.hintGateIdx = openGates[Math.floor(Math.random() * openGates.length)];
+      state.hintGateIdx   = openGates[Math.floor(Math.random() * openGates.length)];
+      const openForClover = openGates.filter(i => i !== state.hintGateIdx);
+      state.hintCloverIdx = openForClover.length > 0
+        ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1;
     } else {
-      state.hintGateIdx = -1;
+      state.hintGateIdx   = -1;
+      state.hintCloverIdx = -1;
     }
     state.animating = false;
     messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
@@ -1118,18 +1147,9 @@
     worldEl.appendChild(newSet);
     if (TEST_MODE) {
       const gates = newSet.querySelectorAll('.gate');
-      state.blockedGates.forEach(idx => {
-        const ind = document.createElement('div');
-        ind.className = 'test-mark';
-        ind.textContent = '🐺';
-        gates[idx].parentNode.appendChild(ind);
-      });
-      if (state.hintGateIdx >= 0 && !state.hasChickenLeg) {
-        const ind = document.createElement('div');
-        ind.className = 'test-mark';
-        ind.textContent = '🍗';
-        gates[state.hintGateIdx].parentNode.appendChild(ind);
-      }
+      state.blockedGates.forEach(idx => stampTestMark(gates, idx, '🐺'));
+      if (state.hintGateIdx >= 0 && !state.hasChickenLeg)  stampTestMark(gates, state.hintGateIdx, '🍗');
+      if (state.hintCloverIdx >= 0 && !state.hasLuckyClover) stampTestMark(gates, state.hintCloverIdx, '🍀');
     }
     state.currentSetEl = newSet;
     if (SPORT_MODE) startSportTimer();
@@ -1394,31 +1414,130 @@
     _tone(988,  'sine', 0.10, 0.1, 0.3);
     _tone(1175, 'sine', 0.08, 0.2, 0.35);
   }
+  function playCloverFound() {
+    _tone(523,  'sine', 0.11, 0,    0.25);
+    _tone(659,  'sine', 0.10, 0.08, 0.25);
+    _tone(784,  'sine', 0.09, 0.16, 0.25);
+    _tone(1047, 'sine', 0.08, 0.26, 0.38);
+  }
+  function playCloverActivate() {
+    _tone(392,  'sine', 0.10, 0,    0.18);
+    _tone(523,  'sine', 0.12, 0.09, 0.18);
+    _tone(659,  'sine', 0.11, 0.18, 0.18);
+    _tone(784,  'sine', 0.10, 0.27, 0.22);
+    _tone(1047, 'sine', 0.08, 0.38, 0.40);
+  }
 
-  // ---- Chicken leg discovery ---------------------------------------------
+  // ---- Pickup discovery (shared by chicken leg & lucky clover) -----------
   function updateChickenLegHud() {
     chickenLegHudEl.style.display = state.hasChickenLeg ? 'block' : 'none';
   }
-  function tryGrantChickenLeg(gateEl, index) {
-    if (state.hasChickenLeg) return;
-    const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < _cfg._b);
-    if (!shouldGrant) return;
-    stats.hintsFound++;
-    state.hasChickenLeg = true;
-    updateChickenLegHud();
+  function updateLuckyCloverHud() {
+    luckyCloverHudEl.style.display = state.hasLuckyClover ? 'block' : 'none';
+  }
+  const PICKUP_POP_CSS = 'position:absolute;top:50%;left:50%;font-size:30px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
+  function tryGrantPickup(gateEl, index, stateKey, hintKey, hudUpdate, emoji, sound, onGrant) {
+    if (state[stateKey]) return false;
+    if (TEST_MODE && index !== state[hintKey]) return false;
+    if (Math.random() >= _cfg._b) return false;
+    if (onGrant) onGrant();
+    state[stateKey] = true;
+    hudUpdate();
     const pop = document.createElement('div');
-    pop.textContent = '🍗';
-    pop.style.cssText = 'position:absolute;top:50%;left:50%;font-size:30px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
+    pop.textContent = emoji;
+    pop.style.cssText = PICKUP_POP_CSS;
     gateEl.parentNode.appendChild(pop);
     requestAnimationFrame(() => requestAnimationFrame(() => {
       pop.style.transform = 'translate(-50%,-50%) scale(1)';
       pop.style.opacity = '1';
     }));
     setTimeout(() => {
-      playHintFound();
+      sound();
       setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
     }, 350);
+    return true;
   }
+  function tryGrantChickenLeg(gateEl, index) {
+    return tryGrantPickup(gateEl, index, 'hasChickenLeg', 'hintGateIdx', updateChickenLegHud, '🍗', playHintFound, () => stats.hintsFound++);
+  }
+  function tryGrantLuckyClover(gateEl, index) {
+    return tryGrantPickup(gateEl, index, 'hasLuckyClover', 'hintCloverIdx', updateLuckyCloverHud, '🍀', playCloverFound, null);
+  }
+
+  // ---- Lucky Clover activation --------------------------------------------
+  function activateLuckyClover() {
+    if (!state.hasLuckyClover || state.gameOver || state.animating) return;
+    if (state.blockedGates.length === 0) return;
+
+    state.hasLuckyClover = false;
+    updateLuckyCloverHud();
+
+    // Pick a random blocked gate to remove
+    const targetGateIdx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
+    const gates     = state.currentSetEl.querySelectorAll('.gate');
+    const targetEl  = gates[targetGateIdx];
+    const wrapEl    = targetEl.parentNode;
+
+    const fieldRect  = fieldEl.getBoundingClientRect();
+    const cloverRect = luckyCloverHudEl.getBoundingClientRect();
+    const gateRect   = targetEl.getBoundingClientRect();
+    const endX   = gateRect.left  - fieldRect.left + gateRect.width  / 2;
+    const endY   = gateRect.top   - fieldRect.top  + gateRect.height / 2;
+    const startX = cloverRect.left - fieldRect.left + cloverRect.width  / 2;
+    const startY = cloverRect.top  - fieldRect.top  + cloverRect.height / 2;
+
+    statusLabel.textContent = '🍀 Chasing away a wolf…';
+    playCloverActivate();
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:absolute;inset:0;background:rgba(100,18,18,0.80);z-index:6;display:flex;align-items:center;justify-content:center;font-size:24px;pointer-events:none;border-radius:0 4px 4px 0;transform:scale(0);opacity:0;transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
+    overlay.textContent = '🐺';
+    targetEl.appendChild(overlay);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      overlay.style.transform = 'scale(1)';
+      overlay.style.opacity   = '1';
+    }));
+
+    setTimeout(() => {
+      const fly = document.createElement('div');
+      fly.className = 'flying-clover';
+      fly.textContent = '🍀';
+      fly.style.left       = startX + 'px';
+      fly.style.top        = startY + 'px';
+      fly.style.transition = 'left 0.46s cubic-bezier(0.4,0,0.2,1), top 0.46s cubic-bezier(0.4,0,0.2,1), transform 0.46s';
+      fieldEl.appendChild(fly);
+      fly.getBoundingClientRect(); // force reflow
+      fly.style.left      = endX + 'px';
+      fly.style.top       = endY + 'px';
+      fly.style.transform = 'translate(-50%,-50%) rotate(360deg) scale(1.3)';
+
+      setTimeout(() => {
+        overlay.style.transition = 'transform 0.32s ease-in, opacity 0.32s ease-in';
+        overlay.style.transform  = 'scale(0)';
+        overlay.style.opacity    = '0';
+        fly.style.transition     = 'transform 0.32s ease-in, opacity 0.32s ease-in';
+        fly.style.transform      = 'translate(-50%,-50%) scale(0) rotate(180deg)';
+        fly.style.opacity        = '0';
+
+        setTimeout(() => {
+          fly.remove();
+          overlay.remove();
+
+          const idx = state.blockedGates.indexOf(targetGateIdx);
+          if (idx !== -1) state.blockedGates.splice(idx, 1);
+
+          wrapEl.querySelectorAll('.test-mark-wolf').forEach(m => m.remove());
+
+          spawnFloatingScore(targetEl, '🍀');
+          statusLabel.textContent = '🍀 Wolf scared away!';
+          setTimeout(() => {
+            if (!state.gameOver) statusLabel.textContent = 'Pick the open gate';
+          }, 1800);
+        }, 340);
+      }, 480);
+    }, 300);
+  }
+  luckyCloverHudEl.onclick = activateLuckyClover;
 
   // ---- Walk to next round (shared between success and wolf-fed paths) ----
   function walkToNextRound(wasLevelUp) {
@@ -1432,11 +1551,14 @@
 
       // Pick next round's layout before building so test markers can be stamped immediately
       const nextBlocked = pickBlockedIndices(getBlockedCount());
-      let nextHintIdx = -1;
+      let nextHintIdx = -1, nextCloverIdx = -1;
       if (TEST_MODE) {
         const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
           .filter(i => !nextBlocked.includes(i));
         nextHintIdx = open[Math.floor(Math.random() * open.length)];
+        const openForClover = open.filter(i => i !== nextHintIdx);
+        nextCloverIdx = openForClover.length > 0
+          ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1;
       }
 
       const nextSet = buildGateSet(95 - state.worldOffset);
@@ -1444,16 +1566,9 @@
 
       if (TEST_MODE) {
         const gates = nextSet.querySelectorAll('.gate');
-        nextBlocked.forEach(idx => {
-          const m = document.createElement('div');
-          m.className = 'test-mark'; m.textContent = '🐺';
-          gates[idx].parentNode.appendChild(m);
-        });
-        if (nextHintIdx >= 0 && !state.hasChickenLeg) {
-          const m = document.createElement('div');
-          m.className = 'test-mark'; m.textContent = '🍗';
-          gates[nextHintIdx].parentNode.appendChild(m);
-        }
+        nextBlocked.forEach(idx => stampTestMark(gates, idx, '🐺'));
+        if (nextHintIdx >= 0 && !state.hasChickenLeg)   stampTestMark(gates, nextHintIdx, '🍗');
+        if (nextCloverIdx >= 0 && !state.hasLuckyClover) stampTestMark(gates, nextCloverIdx, '🍀');
       }
 
       setTimeout(() => {
@@ -1467,8 +1582,9 @@
         sheepEl.style.bottom = '24px';
         setTimeout(() => {
           sheepEl.style.transition = SHEEP_TRANSITION;
-          state.blockedGates = nextBlocked;
-          state.hintGateIdx  = nextHintIdx;
+          state.blockedGates  = nextBlocked;
+          state.hintGateIdx   = nextHintIdx;
+          state.hintCloverIdx = nextCloverIdx;
           state.animating = false;
           statusLabel.textContent = 'Pick the open gate';
           if (wasLevelUp) showLevelUp(getLevel());
@@ -1627,6 +1743,7 @@
       playGateOpen();
       navigator.vibrate && navigator.vibrate(25);
       tryGrantChickenLeg(gateEl, index);
+      tryGrantLuckyClover(gateEl, index);
       state.score++;
       state.streak++;
 
@@ -1745,10 +1862,11 @@
     showSheep();
     state = {
       score: 0, blockedGates: [], animating: false,
-      gameOver: false, hasChickenLeg: false, currentSetEl: null, worldOffset: 0,
-      hintGateIdx: -1, streak: 0, roundStartTime: 0
+      gameOver: false, hasChickenLeg: false, hasLuckyClover: false, currentSetEl: null, worldOffset: 0,
+      hintGateIdx: -1, hintCloverIdx: -1, streak: 0, roundStartTime: 0
     };
     updateChickenLegHud();
+    updateLuckyCloverHud();
     sheepDeviousEl.setAttribute('display', 'none');
     worldEl.innerHTML = '';
     fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
