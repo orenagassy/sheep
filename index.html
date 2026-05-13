@@ -755,8 +755,9 @@
   // Game mechanics loaded from Cloudflare Worker at boot — not stored here
   let _cfg = null;
   async function loadConfig() {
+    const CFG_KEY = 'sheepgate:cfg:v2';
     try {
-      const hit = sessionStorage.getItem('sheepgate:cfg');
+      const hit = sessionStorage.getItem(CFG_KEY);
       if (hit) { _cfg = Object.freeze(JSON.parse(hit)); return; }
     } catch(_) {}
     try {
@@ -774,7 +775,7 @@
         _h: d.chickenLegChance ?? 2/7,
         _i: d.cloverChance     ?? 2/7,
       });
-      try { sessionStorage.setItem('sheepgate:cfg', JSON.stringify(_cfg)); } catch(_) {}
+      try { sessionStorage.setItem(CFG_KEY, JSON.stringify(_cfg)); } catch(_) {}
     } catch(e) {
       console.warn('Config unavailable, using offline defaults');
       const _u = n => n ^ 7;
@@ -1131,10 +1132,11 @@
     {
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
-      state.hintGateIdx = (!state.hasChickenLeg && Math.random() < _cfg._h)
+      const legChance = _cfg._h ?? 2/7, clovChance = _cfg._i ?? 2/7;
+      state.hintGateIdx = (!state.hasChickenLeg && Math.random() < legChance)
         ? openGates[Math.floor(Math.random() * openGates.length)] : -1;
       const openForClover = state.hintGateIdx >= 0 ? openGates.filter(i => i !== state.hintGateIdx) : openGates;
-      state.hintCloverIdx = (!state.hasLuckyClover && Math.random() < _cfg._i)
+      state.hintCloverIdx = (!state.hasLuckyClover && Math.random() < clovChance)
         ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
     }
     state.animating = false;
@@ -1552,10 +1554,11 @@
       const nextBlocked = pickBlockedIndices(getBlockedCount());
       const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !nextBlocked.includes(i));
-      const nextHintIdx = (!state.hasChickenLeg && Math.random() < _cfg._h)
+      const legChance = _cfg._h ?? 2/7, clovChance = _cfg._i ?? 2/7;
+      const nextHintIdx = (!state.hasChickenLeg && Math.random() < legChance)
         ? open[Math.floor(Math.random() * open.length)] : -1;
       const openForClover = nextHintIdx >= 0 ? open.filter(i => i !== nextHintIdx) : open;
-      const nextCloverIdx = (!state.hasLuckyClover && Math.random() < _cfg._i)
+      const nextCloverIdx = (!state.hasLuckyClover && Math.random() < clovChance)
         ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
 
       const nextSet = buildGateSet(95 - state.worldOffset);
