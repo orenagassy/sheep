@@ -1,13 +1,1829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sheep Gates</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5105009779643901"
+     crossorigin="anonymous"></script>
+<style>
+  :root {
+    --bg-page: #f5f1e8;
+    --bg-card: #ffffff;
+    --bg-soft: #efeadd;
+    --text-primary: #2c2c2a;
+    --text-secondary: #6b6961;
+    --text-muted: #94918a;
+    --border: rgba(0, 0, 0, 0.1);
+    --info: #185fa5;
+    --info-soft: #e6f1fb;
+    --success: #0f6e56;
+    --danger: #a32d2d;
+    --gate-wood: #8b6f47;
+    --gate-wood-dark: #5d4a30;
+    --grass: #c8e6a0;
+    --grass-dark: #a8cf7a;
+    --sky: #b8dcf0;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: var(--bg-page);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+    color: var(--text-primary);
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 24px 16px;
+  }
+  .app { width: 100%; max-width: 720px; }
+  h1 { text-align: center; font-size: 28px; font-weight: 500; margin: 0 0 4px; }
+  .tagline { text-align: center; font-size: 14px; color: var(--text-secondary); margin: 0 0 24px; }
+  #game-container { background: var(--bg-soft); border-radius: 12px; padding: 20px; }
+  .topbar {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px; flex-wrap: wrap; gap: 8px;
+  }
+  .topbar-left { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hud-title { font-size: 16px; font-weight: 500; }
+  .hud-subtitle { font-size: 13px; color: var(--text-secondary); }
+  .stat-group { display: flex; gap: 8px; flex-wrap: wrap; }
+  .stat {
+    background: var(--bg-card); padding: 6px 12px;
+    border-radius: 8px; border: 0.5px solid var(--border);
+  }
+  .stat-label { font-size: 11px; color: var(--text-secondary); }
+  .stat-value { font-size: 14px; font-weight: 500; }
+  .level-bar-wrap { background: var(--bg-card); border-radius: 8px; padding: 8px; margin-bottom: 16px; }
+  .level-bar-text {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--text-secondary); margin-bottom: 6px;
+  }
+  .level-bar-track { height: 8px; background: var(--bg-soft); border-radius: 4px; overflow: hidden; }
+  .level-bar-fill { height: 100%; width: 0%; background: #639922; transition: width 0.4s; }
 
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <title>Oren Agassy</title>
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5105009779643901"
-       crossorigin="anonymous"></script>
-  </head>
-  <body>
-  <p><a href="/sheep/">Sheep Gates</a></p>
-  </body>
-  </html>
+  /* ---- Field ---- */
+  #field {
+    background: linear-gradient(to bottom,
+      #8ec8e8 0%, var(--sky) 20%, var(--sky) 25%,
+      #b0d870 25%, var(--grass) 35%, var(--grass) 100%);
+    border-radius: 8px;
+    height: 320px;
+    position: relative;
+    overflow: hidden;
+  }
+  #field-overlay {
+    position: absolute; inset: 0; z-index: 0;
+    pointer-events: none;
+    transition: background 3s ease;
+  }
+  /* Stars */
+  #stars {
+    position: absolute; left: 0; right: 0; top: 0; height: 80px;
+    z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 3s ease;
+  }
+  .star {
+    position: absolute; width: 2px; height: 2px;
+    background: white; border-radius: 50%;
+    animation: twinkle 2s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.2; transform: scale(1); }
+    50%       { opacity: 1;   transform: scale(1.4); }
+  }
+  /* Clouds */
+  #clouds {
+    position: absolute; left: 0; right: 0; top: 0; height: 80px;
+    z-index: 0; pointer-events: none; overflow: hidden;
+  }
+  .cloud {
+    position: absolute;
+    background: rgba(255,255,255,0.88);
+    border-radius: 30px;
+  }
+  .cloud::before, .cloud::after {
+    content: ''; position: absolute;
+    background: rgba(255,255,255,0.88); border-radius: 50%;
+  }
+  .c1 { width: 88px; height: 24px; top: 16px; animation: cloud-drift 38s linear infinite; }
+  .c1::before { width: 38px; height: 38px; top: -22px; left: 14px; }
+  .c1::after  { width: 26px; height: 26px; top: -12px; left: 48px; }
+  .c2 { width: 58px; height: 18px; top: 44px; animation: cloud-drift 58s linear infinite -22s; }
+  .c2::before { width: 26px; height: 26px; top: -15px; left: 8px; }
+  .c2::after  { width: 20px; height: 20px; top: -8px;  left: 32px; }
+  .c3 { width: 110px; height: 28px; top: 8px; animation: cloud-drift 48s linear infinite -36s; }
+  .c3::before { width: 46px; height: 46px; top: -28px; left: 16px; }
+  .c3::after  { width: 32px; height: 32px; top: -16px; left: 62px; }
+  @keyframes cloud-drift {
+    from { transform: translateX(-180px); }
+    to   { transform: translateX(760px); }
+  }
+
+  #world {
+    position: absolute; inset: 0;
+    transition: transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    z-index: 1; will-change: transform;
+  }
+
+  /* Grass blades */
+  #grass-blades {
+    position: absolute; bottom: 18px; left: 0; right: 0;
+    height: 22px; z-index: 2; pointer-events: none;
+  }
+  .grass-blade {
+    position: absolute; bottom: 0; width: 3px;
+    background: linear-gradient(to top, #6aaa3e, #90cc55);
+    border-radius: 2px 2px 0 0;
+    transform-origin: bottom center;
+    animation: blade-sway 2s ease-in-out infinite;
+  }
+  @keyframes blade-sway {
+    0%, 100% { transform: rotate(-7deg); }
+    50%       { transform: rotate(7deg); }
+  }
+
+  /* ---- Sheep ---- */
+  #sheep {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%);
+    transition: left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95),
+                transform 0.3s, opacity 0.3s;
+    z-index: 3;
+  }
+  #sheep-dead { display: none; font-size: 44px; line-height: 1; }
+  .leg { transform-box: fill-box; transform-origin: 50% 0%; }
+  #sheep.walking .leg-fl { animation: leg-swing 360ms ease-in-out infinite; }
+  #sheep.walking .leg-fr { animation: leg-swing 360ms ease-in-out infinite 180ms; }
+  #sheep.walking .leg-bl { animation: leg-swing 360ms ease-in-out infinite 180ms; }
+  #sheep.walking .leg-br { animation: leg-swing 360ms ease-in-out infinite; }
+  @keyframes leg-swing {
+    0%, 100% { transform: rotate(-20deg); }
+    50%       { transform: rotate(20deg); }
+  }
+
+  #grass-front {
+    position: absolute; bottom: 0; left: 0; right: 0; height: 18px;
+    background: linear-gradient(to bottom, #9acc6a, #88bb55);
+    z-index: 2;
+  }
+  #message {
+    position: absolute; bottom: 28px; left: 0; right: 0;
+    text-align: center; font-size: 14px; font-weight: 500;
+    min-height: 20px; z-index: 4; pointer-events: none;
+  }
+  #level-up-banner {
+    position: absolute; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    background: rgba(15, 110, 86, 0.95); color: #fff;
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 16px; font-weight: 500;
+    z-index: 5; pointer-events: none;
+    transition: transform 0.4s, opacity 0.4s; text-align: center;
+  }
+
+  /* ---- Buttons ---- */
+  button {
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 8px 16px; font-size: 14px;
+    cursor: pointer; font-family: inherit;
+    transition: background 0.15s, transform 0.1s;
+    touch-action: manipulation;
+  }
+  button:hover { background: var(--bg-soft); }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.45; cursor: default; }
+  /* chicken-leg styles below */
+  input[type="text"] { border: 0.5px solid var(--border); border-radius: 8px; padding: 8px; font-family: inherit; }
+  input[type="text"]:focus { outline: none; border-color: var(--info); box-shadow: 0 0 0 2px var(--info-soft); }
+
+  /* ---- Panels ---- */
+  #hiscore-entry, #leaderboard {
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 14px;
+  }
+  #hiscore-entry { margin-top: 16px; text-align: center; }
+  #hiscore-entry .entry-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
+  #hiscore-entry .entry-subtitle { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+  #hiscore-entry .entry-row { display: flex; gap: 8px; justify-content: center; align-items: center; }
+  #leaderboard { margin-top: 16px; font-size: 13px; }
+  .leaderboard-title {
+    font-weight: 500; margin-bottom: 8px; color: var(--text-secondary);
+    font-size: 12px; display: flex; justify-content: space-between; align-items: center;
+  }
+  .leaderboard-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 6px 0; border-bottom: 0.5px solid var(--border);
+  }
+  .leaderboard-row:last-child { border-bottom: none; }
+  .lb-name { font-family: ui-monospace, "SF Mono", Menlo, monospace; letter-spacing: 2px; font-weight: 500; }
+  .lb-rank { color: var(--text-muted); margin-right: 8px; font-family: ui-monospace, "SF Mono", Menlo, monospace; }
+  .lb-score { font-weight: 500; }
+  .action-bar { display: flex; gap: 8px; margin-top: 16px; justify-content: center; min-height: 36px; flex-wrap: wrap; }
+
+  /* ---- Gates ---- */
+  .gate-plank {
+    height: 8px;
+    background: linear-gradient(to bottom, #7a5c38, #4e3b22, #3a2c18);
+    border-radius: 2px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.08);
+  }
+  /* ---- Chicken leg HUD ---- */
+  #chicken-leg-hud {
+    position: absolute; top: 10px; right: 10px; z-index: 8;
+    font-size: 28px; line-height: 1; display: none;
+    filter: drop-shadow(0 2px 6px rgba(0,0,0,0.35));
+    animation: drumstick-bounce 1.8s ease-in-out infinite;
+    cursor: default; user-select: none;
+  }
+  @keyframes drumstick-bounce {
+    0%, 100% { transform: scale(1) rotate(-12deg); }
+    50%       { transform: scale(1.18) rotate(10deg); }
+  }
+  /* devilish sheep face */
+  @keyframes devious-appear {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  #sheep-devious-face path, #sheep-devious-face circle, #sheep-devious-face polygon {
+    animation: devious-appear 0.25s ease-out both;
+  }
+  /* flying drumstick → wolf animation */
+  .flying-drumstick {
+    position: absolute; font-size: 26px; line-height: 1;
+    z-index: 20; pointer-events: none;
+    transform: translate(-50%, -50%);
+  }
+  @keyframes wolf-snap {
+    0%   { opacity: 0; transform: scale(0.2) rotate(-20deg); }
+    20%  { opacity: 1; transform: scale(1.6) rotate(10deg); }
+    50%  { transform: scale(0.85) rotate(-5deg); }
+    70%  { transform: scale(1.2); opacity: 1; }
+    100% { opacity: 0; transform: scale(0.9); }
+  }
+  .wolf-snap-anim {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 42px; z-index: 15; pointer-events: none;
+    animation: wolf-snap 0.5s ease-out forwards;
+  }
+  .horn-hint {
+    position: absolute; top: -14px; left: 50%;
+    transform: translateX(-50%); font-size: 18px; line-height: 1;
+    pointer-events: none; z-index: 5;
+    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+  }
+
+  /* ---- Mode toggle ---- */
+  .mode-toggle-wrap {
+    display: flex; justify-content: center; margin-bottom: 16px;
+  }
+  .mode-toggle {
+    display: inline-flex; background: var(--bg-soft);
+    border: 1px solid var(--border); border-radius: 24px; padding: 3px;
+  }
+  .toggle-opt {
+    padding: 6px 22px; border-radius: 20px; border: none;
+    background: transparent; color: var(--text-secondary);
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  }
+  .toggle-opt:hover { color: var(--text-primary); }
+  .toggle-opt.active {
+    background: var(--bg-card); color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.13);
+  }
+  .toggle-opt.sport-opt.active { background: #b71c1c; color: #fff; }
+
+  /* ---- Mode badges ---- */
+  #test-badge, #sport-badge {
+    display: none;
+    border-radius: 6px; padding: 3px 8px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
+  }
+  #test-badge  { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
+  #sport-badge { background: #fde8e8; border: 1px solid #ef9a9a; color: #b71c1c; }
+
+  /* ---- Test mode markups ---- */
+  .test-mark {
+    position: absolute; top: -22px; left: 50%;
+    transform: translateX(-50%); font-size: 15px; line-height: 1;
+    pointer-events: none; z-index: 5;
+    animation: hint-pulse 1.2s ease-in-out infinite;
+  }
+  @keyframes hint-pulse {
+    0%, 100% { opacity: 0.65; transform: translateX(-50%) scale(1); }
+    50%       { opacity: 1;   transform: translateX(-50%) scale(1.2); }
+  }
+
+  /* ---- Bad wolf ---- */
+  .funny-skull {
+    position: absolute; pointer-events: none; z-index: 10;
+    transform: translate(-50%, -50%) scale(0) rotate(-30deg);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.34,1.56,0.64,1), opacity 0.2s;
+  }
+  .funny-skull.pop {
+    transform: translate(-50%, -50%) scale(1) rotate(5deg);
+    opacity: 1;
+  }
+
+  /* ---- Particle effects ---- */
+  .crash-particle {
+    position: absolute; pointer-events: none; z-index: 10;
+    border-radius: 2px;
+    animation: particle-fly 0.55s ease-out forwards;
+  }
+  @keyframes particle-fly {
+    0%   { transform: translate(0, 0) rotate(0deg);   opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) rotate(540deg); opacity: 0; }
+  }
+  .confetti-piece {
+    position: absolute; pointer-events: none; z-index: 10;
+    border-radius: 2px;
+    animation: confetti-fall var(--dur) ease-in forwards;
+  }
+  @keyframes confetti-fall {
+    0%   { transform: translateY(0)     rotate(0deg);   opacity: 1; }
+    100% { transform: translateY(220px) rotate(var(--rot)); opacity: 0; }
+  }
+  .floating-score {
+    position: absolute; pointer-events: none; z-index: 10;
+    color: #1a8a60; font-weight: 700; font-size: 17px;
+    transform: translateX(-50%);
+    animation: score-float 0.85s ease-out forwards;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .floating-score.fast-bonus {
+    font-size: 26px; color: #e65c00;
+    text-shadow: 0 0 12px rgba(255,160,0,0.7), 0 2px 4px rgba(0,0,0,0.3);
+    animation: fast-float 1.1s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  .floating-score.turbo-bonus {
+    font-size: 32px; color: #f59e0b;
+    text-shadow: 0 0 18px rgba(251,191,36,0.9), 0 0 6px rgba(255,255,255,0.6), 0 2px 4px rgba(0,0,0,0.4);
+    animation: fast-float 1.3s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  @keyframes score-float {
+    0%   { transform: translateX(-50%) translateY(0);     opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-44px); opacity: 0; }
+  }
+  @keyframes fast-float {
+    0%   { transform: translateX(-50%) translateY(0)     scale(0.5); opacity: 1; }
+    20%  { transform: translateX(-50%) translateY(-10px) scale(1.2); opacity: 1; }
+    100% { transform: translateX(-50%) translateY(-60px) scale(1);   opacity: 0; }
+  }
+  .hoof-print {
+    position: absolute; pointer-events: none; z-index: 1;
+    animation: print-fade 2.2s ease-out forwards;
+  }
+  @keyframes print-fade {
+    0%   { opacity: 0; transform: translateX(-50%) scale(0.4); }
+    15%  { opacity: 0.45; transform: translateX(-50%) scale(1); }
+    100% { opacity: 0;   transform: translateX(-50%) scale(1); }
+  }
+
+  /* ---- Screen shake ---- */
+  @keyframes screen-shake {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    12%  { transform: translate(-5px, -2px) rotate(-0.6deg); }
+    25%  { transform: translate(5px, 1px)  rotate(0.6deg); }
+    37%  { transform: translate(-4px, 2px) rotate(-0.4deg); }
+    50%  { transform: translate(4px, -1px) rotate(0.4deg); }
+    62%  { transform: translate(-2px, 1px) rotate(-0.2deg); }
+    75%  { transform: translate(2px, -1px) rotate(0.2deg); }
+  }
+  #field.shaking { animation: screen-shake 0.5s ease-out; }
+
+  /* ---- Bob animation ---- */
+  @keyframes sheep-bob {
+    0%, 100% { transform: translateX(-50%) translateY(-2px); }
+    50%       { transform: translateX(-50%) translateY(2px); }
+  }
+
+  /* ---- Streak ---- */
+  #streak-row {
+    text-align: center; font-size: 12px; font-weight: 600;
+    color: #e65100; min-height: 16px; margin-top: 4px;
+  }
+
+  /* ---- Achievement toast ---- */
+  .achievement-toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(90px);
+    background: #1c1c1c; color: #fff; border-radius: 10px;
+    padding: 10px 16px; font-size: 13px; z-index: 1000;
+    display: flex; align-items: center; gap: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+    pointer-events: none; white-space: nowrap;
+    max-width: calc(100vw - 32px);
+  }
+  .achievement-toast.show { transform: translateX(-50%) translateY(0); }
+  .ach-label { font-weight: 600; }
+  .ach-desc  { color: rgba(255,255,255,0.65); font-size: 12px; }
+
+  /* ---- Sport timer bar ---- */
+  #sport-timer {
+    position: absolute; top: 0; left: 0; right: 0;
+    height: 5px; z-index: 6; display: none;
+  }
+  #sport-timer-bar {
+    height: 100%; width: 100%;
+    background: linear-gradient(to right, #43a047, #fdd835, #e53935);
+    transform-origin: left center;
+  }
+
+  /* ---- Near-miss markers ---- */
+  .near-miss-x {
+    position: absolute; inset: 0; display: flex;
+    align-items: center; justify-content: center;
+    pointer-events: none; z-index: 3;
+    animation: miss-flash 0.85s ease-out forwards;
+  }
+  .near-miss-x svg { opacity: 0.52; }
+  @keyframes miss-flash {
+    0%   { opacity: 0; transform: scale(0.4); }
+    20%  { opacity: 1; transform: scale(1.05); }
+    65%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1); }
+  }
+
+  /* ---- Stats panel (inside drawer) ---- */
+  #stats-panel { margin-top: 20px; }
+  .stats-title {
+    font-weight: 500; font-size: 12px; color: var(--text-secondary);
+    margin-bottom: 10px;
+  }
+  .stats-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px 6px;
+  }
+  .stat-item-label { font-size: 11px; color: var(--text-muted); }
+  .stat-item-value { font-weight: 500; font-size: 14px; }
+
+  /* ---- Ad containers ---- */
+  .ad-wrap {
+    width: 100%; overflow: hidden;
+    display: flex; justify-content: center;
+  }
+  .ad-wrap--top    { margin: 8px 0 4px; min-height: 0; }
+  .ad-wrap--drawer { margin-top: 20px; min-height: 0; }
+  .ad-wrap:empty, .ad-wrap:has(ins:only-child) { display: none; }
+
+  /* ---- Info drawer ---- */
+  #info-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 200; display: none;
+  }
+  #info-overlay.open { display: block; }
+  #info-drawer {
+    position: fixed; right: 0; top: 0; bottom: 0;
+    width: min(340px, 92vw); background: var(--bg-page);
+    z-index: 201; overflow-y: auto; padding: 20px;
+    box-shadow: -4px 0 28px rgba(0,0,0,0.18);
+    transform: translateX(100%);
+    transition: transform 0.28s cubic-bezier(0.4,0,0.2,1);
+  }
+  #info-drawer.open { transform: translateX(0); }
+  #info-drawer-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  #info-drawer-header span { font-size: 15px; font-weight: 500; }
+  #info-close {
+    background: none; border: none; cursor: pointer; padding: 4px 8px;
+    font-size: 18px; color: var(--text-secondary); line-height: 1;
+  }
+  #info-close:hover { color: var(--text-primary); }
+  /* leaderboard styles when inside drawer */
+  #leaderboard { border: none; padding: 0; }
+  /* hamburger button — fixed top-right, aligned with page title */
+  #stats-btn {
+    position: fixed; top: 24px; right: 16px; z-index: 199;
+    background: var(--bg-card); border: 0.5px solid var(--border);
+    border-radius: 8px; padding: 7px 12px; font-size: 17px;
+    cursor: pointer; line-height: 1; color: var(--text-primary);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+  }
+  #stats-btn:hover { background: var(--bg-soft); }
+
+  /* ---- Misc ---- */
+  details { margin-top: 16px; font-size: 13px; color: var(--text-secondary); }
+  details summary { cursor: pointer; }
+  details p { margin: 8px 0 0; line-height: 1.6; }
+  .sync-indicator { font-size: 11px; color: var(--text-muted); }
+  .sync-indicator.syncing { color: var(--info); }
+  .sync-indicator.error { color: var(--danger); }
+  @media (max-width: 480px) {
+    body { padding: 12px 8px; }
+    h1 { font-size: 22px; }
+    .tagline { margin-bottom: 16px; }
+    #game-container { padding: 14px; }
+    .topbar { flex-direction: column; align-items: flex-start; gap: 4px; }
+    .stat-group { align-self: flex-end; }
+    .stat { padding: 5px 10px; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    #stats-btn { top: 12px; right: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>🐑 Sheep Gates</h1>
+  <p class="tagline">Bet on the open gate. Survive as long as you can.</p>
+
+  <div class="mode-toggle-wrap">
+    <div class="mode-toggle">
+      <button class="toggle-opt" id="mode-normal">Normal</button>
+      <button class="toggle-opt sport-opt" id="mode-sport">⚡ Sport</button>
+    </div>
+  </div>
+
+  <div class="ad-wrap ad-wrap--top">
+    <!-- Ad unit loads here after AdSense approval -->
+  </div>
+
+  <div id="game-container">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <span id="test-badge">🧪 TEST</span>
+        <span id="sport-badge">⚡ SPORT</span>
+        <div>
+          <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
+          <div class="hud-subtitle" id="status-label">Pick the open gate</div>
+        </div>
+      </div>
+      <div class="stat-group">
+        <div class="stat">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="score">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Your best</div>
+          <div class="stat-value" id="personal-best-display">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="level-bar-wrap">
+      <div class="level-bar-text">
+        <span id="level-label">Level 1 · 6 of 7 open</span>
+        <span id="level-progress-text">0 / 7</span>
+      </div>
+      <div class="level-bar-track">
+        <div class="level-bar-fill" id="level-progress-bar"></div>
+      </div>
+      <div id="streak-row"></div>
+    </div>
+
+    <div id="field">
+      <div id="chicken-leg-hud" title="You have a chicken leg! The wolf will eat it instead of you.">🍗</div>
+      <div id="sport-timer"><div id="sport-timer-bar"></div></div>
+      <div id="field-overlay"></div>
+      <div id="stars"></div>
+      <div id="clouds">
+        <div class="cloud c1"></div>
+        <div class="cloud c2"></div>
+        <div class="cloud c3"></div>
+      </div>
+      <div id="world"></div>
+      <div id="grass-blades"></div>
+      <div id="sheep" aria-hidden="true">
+        <span id="sheep-dead"></span>
+        <svg id="sheep-svg" viewBox="0 0 70 58" width="70" height="58"
+             xmlns="http://www.w3.org/2000/svg" style="overflow:visible;display:block;">
+          <circle cx="38" cy="26" r="17" fill="#eeeae0"/>
+          <circle cx="27" cy="21" r="12" fill="#f3f1e8"/>
+          <circle cx="44" cy="19" r="12" fill="#edeae2"/>
+          <circle cx="51" cy="27" r="10" fill="#e9e6dc"/>
+          <circle cx="28" cy="33" r="10" fill="#e9e6dc"/>
+          <circle cx="41" cy="34" r="8"  fill="#e6e3d9"/>
+          <ellipse cx="13" cy="33" rx="10" ry="9" fill="#d5caaf"/>
+          <ellipse cx="6" cy="37" rx="5" ry="4" fill="#c9bda0"/>
+          <circle cx="4.5" cy="38.5" r="1.1" fill="#9c8c74"/>
+          <circle cx="7.5" cy="38.5" r="1.1" fill="#9c8c74"/>
+          <circle cx="11" cy="30" r="2.2" fill="#1e1810"/>
+          <circle cx="10.2" cy="29.2" r="0.6" fill="white"/>
+          <ellipse cx="18" cy="25" rx="3.5" ry="5.5" fill="#d5caaf" transform="rotate(15,18,25)"/>
+          <ellipse cx="18" cy="25" rx="2"   ry="3.5" fill="#edc0b8" transform="rotate(15,18,25)"/>
+          <g class="leg leg-bl">
+            <rect x="49" y="42" width="6" height="13" rx="3"   fill="#c2b89a"/>
+            <rect x="49" y="51" width="6" height="5"  rx="2"   fill="#3a2e1e"/>
+          </g>
+          <g class="leg leg-br">
+            <rect x="55" y="42" width="5" height="13" rx="2.5" fill="#b4aa8c"/>
+            <rect x="55" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
+          </g>
+          <g class="leg leg-fl">
+            <rect x="26" y="42" width="6" height="13" rx="3"   fill="#cac0a0"/>
+            <rect x="26" y="51" width="6" height="5"  rx="2"   fill="#3a2e1e"/>
+          </g>
+          <g class="leg leg-fr">
+            <rect x="33" y="42" width="5" height="13" rx="2.5" fill="#bcb294"/>
+            <rect x="33" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
+          </g>
+          <!-- devious face (shown only when feeding the wolf) -->
+          <g id="sheep-devious-face" display="none">
+            <path d="M7.5 27.5 Q10.5 24 14 27" fill="none" stroke="#1e1810" stroke-width="1.6" stroke-linecap="round"/>
+            <circle cx="12" cy="30.8" r="0.65" fill="#e53935"/>
+            <path d="M3.5 39 Q6 41.8 10.5 38.5" fill="none" stroke="#6d4c41" stroke-width="1.4" stroke-linecap="round"/>
+            <polygon points="6,39.5 8,39.5 7,42" fill="white"/>
+          </g>
+        </svg>
+      </div>
+      <div id="grass-front"></div>
+      <div id="message"></div>
+      <div id="level-up-banner">Level up!</div>
+    </div>
+
+    <div id="hiscore-entry" style="display: none;">
+      <div class="entry-title">🏅 New world best!</div>
+      <div class="entry-subtitle">Enter your name (up to 10 characters)</div>
+      <div class="entry-row">
+        <input id="hiscore-name" type="text" maxlength="10" autocomplete="off"
+               style="width: 160px; text-align: center; text-transform: uppercase; font-size: 16px; letter-spacing: 2px; font-weight: 500;" />
+        <button id="hiscore-save" style="font-weight: 500;">Save</button>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button id="restart-btn" style="display: none;">Try again</button>
+    </div>
+
+    <details>
+      <summary>How to play</summary>
+      <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
+      Sometimes a 🍗 chicken leg hides behind an open gate — it appears top-right when you find one. If you pick a wolf gate while holding a chicken leg, you feed the wolf and survive!</p>
+    </details>
+  </div>
+
+</div>
+
+<button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
+<div id="info-overlay"></div>
+<div id="info-drawer">
+  <div id="info-drawer-header">
+    <span>Leaderboard &amp; Stats</span>
+    <button id="info-close">✕</button>
+  </div>
+  <div id="leaderboard">
+    <div class="leaderboard-title">
+      <span id="leaderboard-title">Top 10 of all time</span>
+      <span class="sync-indicator" id="sync-indicator"></span>
+    </div>
+    <div id="leaderboard-list"></div>
+  </div>
+  <div id="stats-panel">
+    <div class="stats-title">Your all-time stats</div>
+    <div class="stats-grid">
+      <div>
+        <div class="stat-item-label">Gates cleared</div>
+        <div class="stat-item-value" id="stat-gates">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Games played</div>
+        <div class="stat-item-value" id="stat-games">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Average score</div>
+        <div class="stat-item-value" id="stat-avg">—</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Best level</div>
+        <div class="stat-item-value" id="stat-level">1</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Lives saved 🍗</div>
+        <div class="stat-item-value" id="stat-hints-used">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Drumsticks found</div>
+        <div class="stat-item-value" id="stat-hints-found">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Best streak</div>
+        <div class="stat-item-value" id="stat-streak">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Personal best</div>
+        <div class="stat-item-value" id="stat-personal-best">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-wrap ad-wrap--drawer">
+    <!-- Ad unit loads here after AdSense approval -->
+  </div>
+</div>
+
+<script>
+(function() {
+  const WORKER_URL = 'https://sheep-score.oren-agassy.workers.dev';
+  const TEST_MODE  = new URLSearchParams(location.search).has('test');
+  const SPORT_MODE = new URLSearchParams(location.search).has('sport');
+
+  const GATES_PER_ROUND    = 7;
+  const ROUNDS_PER_LEVEL   = 7;
+  const FIELD_HEIGHT        = 320;
+  const MAX_LEADERBOARD     = 10;
+
+  // Game mechanics loaded from Cloudflare Worker at boot — not stored here
+  let _cfg = null;
+  async function loadConfig() {
+    try {
+      const hit = sessionStorage.getItem('sheepgate:cfg');
+      if (hit) { _cfg = Object.freeze(JSON.parse(hit)); return; }
+    } catch(_) {}
+    try {
+      const res = await fetch(WORKER_URL + '/config');
+      if (!res.ok) throw new Error(res.status);
+      const d = await res.json();
+      _cfg = Object.freeze({
+        _a: d.sportTimerMs,
+        _b: d.hintChance,
+        _c: d.sportTier1Ms,
+        _d: d.sportTier2Ms,
+        _e: d.sportTier3Ms,
+        _f: d.sportTier1Bonus,
+        _g: d.sportTier2Bonus,
+      });
+      try { sessionStorage.setItem('sheepgate:cfg', JSON.stringify(_cfg)); } catch(_) {}
+    } catch(e) {
+      console.warn('Config unavailable, using offline defaults');
+      const _u = n => n ^ 7;
+      _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6) });
+    }
+  }
+  const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
+  const SPORT_LB_KEY        = 'sheepgate:sport-leaderboard';
+  const STATS_KEY           = 'sheepgate:stats';
+  const PERSONAL_BEST_KEY   = 'sheepgate:personal-best';
+  const ACHIEVEMENTS_KEY    = 'sheepgate:achievements';
+  const SHEEP_TRANSITION = 'left 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), bottom 0.7s cubic-bezier(0.45, 0.05, 0.55, 0.95), transform 0.3s, opacity 0.3s';
+  const WORLD_TRANSITION = 'transform 1.6s cubic-bezier(0.4, 0.0, 0.2, 1)';
+
+  // ---- Stats persistence -------------------------------------------------
+  function loadStats() {
+    try {
+      return Object.assign(
+        { gatesCleared:0, gamesPlayed:0, totalScore:0, bestLevel:1, hintsUsed:0, hintsFound:0, streakBest:0 },
+        JSON.parse(localStorage.getItem(STATS_KEY))
+      );
+    } catch(_) {
+      return { gatesCleared:0, gamesPlayed:0, totalScore:0, bestLevel:1, hintsUsed:0, hintsFound:0, streakBest:0 };
+    }
+  }
+  function saveStats() {
+    try { localStorage.setItem(STATS_KEY, JSON.stringify(stats)); } catch(_) {}
+  }
+  let stats = loadStats();
+
+  let personalBest = parseInt(localStorage.getItem(PERSONAL_BEST_KEY)) || 0;
+
+  // ---- Achievements -------------------------------------------------------
+  const ACHIEVEMENTS = [
+    { id: 'gate1',    icon: '🚪', label: 'First Step',       desc: 'Clear your first gate',         check: (s, st) => st.gatesCleared >= 1 },
+    { id: 'level2',   icon: '📈', label: 'Leveling Up',      desc: 'Reach Level 2',                 check: (s, st) => st.bestLevel >= 2 },
+    { id: 'level3',   icon: '🏅', label: 'Getting Serious',  desc: 'Reach Level 3',                 check: (s, st) => st.bestLevel >= 3 },
+    { id: 'level5',   icon: '🌙', label: 'Night Shift',      desc: 'Reach Level 5',                 check: (s, st) => st.bestLevel >= 5 },
+    { id: 'score10',  icon: '🐑', label: 'Ten Gates',        desc: 'Clear 10 gates in one run',     check: (s, st) => s.score >= 10 },
+    { id: 'score25',  icon: '🏆', label: 'Quarter Century',  desc: 'Clear 25 gates in one run',     check: (s, st) => s.score >= 25 },
+    { id: 'hintfound',icon: '🍗', label: 'Drumstick!',        desc: 'Find a chicken leg',            check: (s, st) => st.hintsFound >= 1 },
+    { id: 'streak5',  icon: '🔥', label: 'Hot Streak',       desc: '5 gates in a row',              check: (s, st) => st.streakBest >= 5 },
+    { id: 'games10',  icon: '🎮', label: 'Dedicated',        desc: 'Play 10 games',                 check: (s, st) => st.gamesPlayed >= 10 },
+  ];
+  let unlockedAchievements = new Set(
+    JSON.parse(localStorage.getItem(ACHIEVEMENTS_KEY) || '[]')
+  );
+  function checkAchievements() {
+    ACHIEVEMENTS.forEach(a => {
+      if (!unlockedAchievements.has(a.id) && a.check(state, stats)) {
+        unlockedAchievements.add(a.id);
+        try { localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify([...unlockedAchievements])); } catch(_) {}
+        showAchievementToast(a);
+      }
+    });
+  }
+  let _toastQueue = [], _toastBusy = false;
+  function showAchievementToast(a) {
+    _toastQueue.push(a);
+    if (!_toastBusy) drainToastQueue();
+  }
+  function drainToastQueue() {
+    if (!_toastQueue.length) { _toastBusy = false; return; }
+    _toastBusy = true;
+    const a = _toastQueue.shift();
+    const el = document.createElement('div');
+    el.className = 'achievement-toast';
+    el.innerHTML = '<span style="font-size:20px">' + a.icon + '</span>' +
+      '<div><div class="ach-label">Achievement: ' + a.label + '</div>' +
+      '<div class="ach-desc">' + a.desc + '</div></div>';
+    document.body.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+    setTimeout(() => {
+      el.classList.remove('show');
+      setTimeout(() => { el.remove(); drainToastQueue(); }, 450);
+    }, 3000);
+  }
+
+  // ---- Sport timer --------------------------------------------------------
+  let _sportRaf = null;
+  function startSportTimer() {
+    cancelSportTimer();
+    state.roundStartTime = performance.now();
+    sportTimerEl.style.display = 'block';
+    sportTimerBarEl.style.transform = 'scaleX(1)';
+    (function tick() {
+      const p = Math.max(0, 1 - (performance.now() - state.roundStartTime) / _cfg._a);
+      sportTimerBarEl.style.transform = 'scaleX(' + p + ')';
+      if (p <= 0) { autoKillBySport(); return; }
+      _sportRaf = requestAnimationFrame(tick);
+    })();
+  }
+  function cancelSportTimer() {
+    if (_sportRaf) { cancelAnimationFrame(_sportRaf); _sportRaf = null; }
+    sportTimerEl.style.display = 'none';
+  }
+  function autoKillBySport() {
+    if (state.gameOver || state.animating) return;
+    statusLabel.textContent = "⏱️ Time's up!";
+    const idx = state.blockedGates[Math.floor(Math.random() * state.blockedGates.length)];
+    pickGate(idx);
+  }
+
+  // ---- State --------------------------------------------------------------
+  let state = {
+    score: 0, blockedGates: [], animating: false,
+    gameOver: false, hasChickenLeg: false, currentSetEl: null, worldOffset: 0,
+    hintGateIdx: -1, streak: 0, roundStartTime: 0
+  };
+
+  let leaderboard = [];
+  let sessionName = '';
+  let _wiggleId = null;
+
+  const $ = id => document.getElementById(id);
+  const worldEl             = $('world');
+  const messageEl           = $('message');
+  const sheepEl             = $('sheep');
+  const sheepSvgEl          = $('sheep-svg');
+  const sheepDeadEl         = $('sheep-dead');
+  const sheepDeviousEl      = $('sheep-devious-face');
+  const roundLabel          = $('round-label');
+  const statusLabel         = $('status-label');
+  const scoreEl             = $('score');
+  const personalBestDisplay = $('personal-best-display');
+  const levelLabel          = $('level-label');
+  const levelProgressText   = $('level-progress-text');
+  const levelProgressBar    = $('level-progress-bar');
+  const streakRowEl         = $('streak-row');
+  const chickenLegHudEl     = $('chicken-leg-hud');
+  const restartBtn          = $('restart-btn');
+  const hiscoreEntry        = $('hiscore-entry');
+  const hiscoreName         = $('hiscore-name');
+  const hiscoreSave         = $('hiscore-save');
+  const leaderboardEl       = $('leaderboard');
+  const leaderboardList     = $('leaderboard-list');
+  const fieldEl             = $('field');
+  const levelBanner         = $('level-up-banner');
+  const syncIndicator       = $('sync-indicator');
+  const fieldOverlayEl      = $('field-overlay');
+  const starsEl             = $('stars');
+  const grassBladesEl       = $('grass-blades');
+  const sportTimerEl        = $('sport-timer');
+  const sportTimerBarEl     = $('sport-timer-bar');
+  const statGatesEl         = $('stat-gates');
+  const statGamesEl         = $('stat-games');
+  const statAvgEl           = $('stat-avg');
+  const statLevelEl         = $('stat-level');
+  const statHintsUsedEl     = $('stat-hints-used');
+  const statHintsFoundEl    = $('stat-hints-found');
+  const statStreakEl        = $('stat-streak');
+  const statPersonalBestEl  = $('stat-personal-best');
+
+  // ---- Info drawer --------------------------------------------------------
+  const infoDrawer  = $('info-drawer');
+  const infoOverlay = $('info-overlay');
+  function openDrawer()  { infoDrawer.classList.add('open');    infoOverlay.classList.add('open'); }
+  function closeDrawer() { infoDrawer.classList.remove('open'); infoOverlay.classList.remove('open'); }
+  $('stats-btn').onclick   = openDrawer;
+  $('info-close').onclick  = closeDrawer;
+  infoOverlay.onclick      = closeDrawer;
+
+  function getLevel()        { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
+  function getBlockedCount() { return Math.min(getLevel(), GATES_PER_ROUND - 1); }
+  function getOpenCount()    { return GATES_PER_ROUND - getBlockedCount(); }
+  function getRoundInLevel() { return (state.score % ROUNDS_PER_LEVEL) + 1; }
+
+  function renderStats() {
+    statGatesEl.textContent        = stats.gatesCleared;
+    statGamesEl.textContent        = stats.gamesPlayed;
+    statAvgEl.textContent          = stats.gamesPlayed ? (stats.totalScore / stats.gamesPlayed).toFixed(1) : '—';
+    statLevelEl.textContent        = stats.bestLevel;
+    statHintsUsedEl.textContent    = stats.hintsUsed;
+    statHintsFoundEl.textContent   = stats.hintsFound;
+    statStreakEl.textContent        = stats.streakBest;
+    statPersonalBestEl.textContent = personalBest || '—';
+    personalBestDisplay.textContent = personalBest || '—';
+  }
+
+  // ---- Leaderboard --------------------------------------------------------
+  const LB_LOCAL_KEY = SPORT_MODE ? SPORT_LB_KEY : LOCAL_FALLBACK_KEY;
+  const LB_TITLE = SPORT_MODE ? '⚡ Sport Top 10' : 'Top 10 of all time';
+
+  function setSyncStatus(text, kind) {
+    syncIndicator.textContent = text || '';
+    syncIndicator.className = 'sync-indicator' + (kind ? ' ' + kind : '');
+  }
+  function sanitizeLeaderboard(data) {
+    if (!Array.isArray(data)) return [];
+    return data.filter(entry =>
+      entry &&
+      typeof entry.name === 'string' &&
+      /^[A-Z0-9 ]{1,10}$/.test(entry.name) &&
+      Number.isFinite(entry.score) &&
+      entry.score >= 0
+    ).slice(0, MAX_LEADERBOARD);
+  }
+  function loadLocalLeaderboard() {
+    try { leaderboard = sanitizeLeaderboard(JSON.parse(localStorage.getItem(LB_LOCAL_KEY))); }
+    catch (_) { leaderboard = []; }
+  }
+  function saveLocalLeaderboard() {
+    try { localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(leaderboard)); } catch (_) {}
+  }
+  function extractScores(data) {
+    // handle both { scores: [...] } and JSONBin raw { record: { scores: [...] } }
+    const arr = data?.scores ?? data?.record?.scores;
+    return sanitizeLeaderboard(arr);
+  }
+  async function loadLeaderboard() {
+    if (SPORT_MODE) {
+      loadLocalLeaderboard();
+      renderLeaderboard();
+      return;
+    }
+    setSyncStatus('Syncing...', 'syncing');
+    try {
+      const res = await fetch(`${WORKER_URL}/scores`);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      leaderboard = extractScores(await res.json());
+      setSyncStatus('Synced', '');
+    } catch (e) {
+      console.error('Failed to load leaderboard', e);
+      setSyncStatus('Offline', 'error');
+    }
+    // fall back to localStorage if server returned nothing usable
+    if (leaderboard.length === 0) loadLocalLeaderboard();
+    renderLeaderboard();
+  }
+  async function saveLeaderboard() {
+    if (SPORT_MODE) {
+      leaderboard.sort((a, b) => b.score - a.score);
+      leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
+      saveLocalLeaderboard();
+      renderLeaderboard();
+      return true;
+    }
+    setSyncStatus('Saving...', 'syncing');
+    try {
+      const latestRes = await fetch(`${WORKER_URL}/scores`);
+      let serverScores = [];
+      if (latestRes.ok) serverScores = extractScores(await latestRes.json());
+      const combined = [...serverScores, ...leaderboard];
+      const seen = new Set();
+      const merged = [];
+      for (const entry of combined) {
+        const key = entry.name + '|' + entry.score + '|' + (entry.date || '');
+        if (!seen.has(key)) { seen.add(key); merged.push(entry); }
+      }
+      merged.sort((a, b) => b.score - a.score);
+      const trimmed = merged.slice(0, MAX_LEADERBOARD);
+      const putRes = await fetch(`${WORKER_URL}/scores`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ scores: trimmed })
+      });
+      if (!putRes.ok) throw new Error('HTTP ' + putRes.status);
+      leaderboard = trimmed;
+      // keep localStorage in sync with the authoritative merged result
+      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
+      setSyncStatus('Synced', '');
+      return true;
+    } catch (e) {
+      console.error('Failed to save leaderboard', e);
+      setSyncStatus('Save failed', 'error');
+      // persist locally so data survives if server is temporarily down
+      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
+      return false;
+    }
+  }
+  function isNewBest(score) {
+    if (leaderboard.length < MAX_LEADERBOARD) return score > 0;
+    return score > leaderboard[leaderboard.length - 1].score;
+  }
+  function renderLeaderboard() {
+    document.getElementById('leaderboard-title').textContent = LB_TITLE;
+    if (!leaderboard.length) {
+      const empty = document.createElement('div');
+      empty.style.cssText = 'color: var(--text-muted); font-size: 12px; padding: 4px 0;';
+      empty.textContent = 'No scores yet — be the first!';
+      leaderboardList.replaceChildren(empty);
+      return;
+    }
+    leaderboardList.innerHTML = '';
+    leaderboard.forEach((entry, idx) => {
+      const row  = document.createElement('div');
+      row.className = 'leaderboard-row';
+      const left = document.createElement('div');
+      const rank = document.createElement('span');
+      rank.className = 'lb-rank';
+      rank.textContent = ['🥇', '🥈', '🥉'][idx] || String(idx + 1).padStart(2, '0');
+      const name = document.createElement('span');
+      name.className = 'lb-name';
+      name.textContent = entry.name;
+      left.appendChild(rank); left.appendChild(name);
+      const sc = document.createElement('span');
+      sc.className = 'lb-score'; sc.textContent = entry.score;
+      row.appendChild(left); row.appendChild(sc);
+      leaderboardList.appendChild(row);
+    });
+  }
+
+  // ---- Gate building ------------------------------------------------------
+  function pickBlockedIndices(count, rng) {
+    rng = rng || Math.random;
+    const indices = [], pool = Array.from({ length: GATES_PER_ROUND }, (_, i) => i);
+    for (let n = 0; n < count; n++) {
+      const idx = Math.floor(rng() * pool.length);
+      indices.push(pool[idx]); pool.splice(idx, 1);
+    }
+    return indices;
+  }
+  function buildGateSet(yOffset) {
+    const set = document.createElement('div');
+    set.className = 'gate-set';
+    set.style.cssText = 'position:absolute;left:16px;right:16px;top:' + yOffset + 'px;display:grid;grid-template-columns:repeat(7,1fr);gap:6px;height:95px;';
+    for (let i = 0; i < GATES_PER_ROUND; i++) {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;height:95px;perspective:400px;';
+      const hinge = document.createElement('div');
+      hinge.style.cssText = 'position:absolute;top:0;bottom:0;left:0;width:4px;background:linear-gradient(to right,#3a2a14,#5d4a30);border-radius:2px;z-index:0;box-shadow:2px 0 4px rgba(0,0,0,0.3);';
+      wrap.appendChild(hinge);
+      const gate = document.createElement('button');
+      gate.className = 'gate';
+      gate.dataset.idx = i;
+      gate.style.cssText = 'position:absolute;top:0;left:4px;right:0;bottom:0;background:repeating-linear-gradient(90deg,#9c7b44 0px,#8b6f47 4px,#7a5c35 7px,#8b6f47 10px,#9a7840 14px);border:2px solid #5d4a30;border-left:none;border-radius:0 4px 4px 0;padding:0;cursor:pointer;transform-origin:left center;transform:rotateY(0deg);transition:transform 0.15s,background 0.4s,border-color 0.4s;display:flex;align-items:center;justify-content:center;overflow:hidden;will-change:transform;touch-action:manipulation;box-shadow:inset 0 0 12px rgba(0,0,0,0.15),2px 0 4px rgba(0,0,0,0.2);';
+      const planks = document.createElement('div');
+      planks.className = 'planks';
+      planks.style.cssText = 'width:82%;height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:5px 0;transition:opacity 0.3s;';
+      for (let p = 0; p < 3; p++) {
+        const plank = document.createElement('div');
+        plank.className = 'gate-plank'; planks.appendChild(plank);
+      }
+      gate.appendChild(planks);
+      gate.onmouseover = () => { if (!gate.disabled) gate.style.transform = 'translateY(-3px)'; };
+      gate.onmouseout  = () => { if (!gate.disabled) gate.style.transform = 'translateY(0)'; };
+      gate.onclick = () => pickGate(i);
+      gate.setAttribute('aria-label', 'Gate ' + (i + 1));
+      wrap.appendChild(gate); set.appendChild(wrap);
+    }
+    return set;
+  }
+
+  // ---- HUD ----------------------------------------------------------------
+  function newRound() {
+    state.blockedGates = pickBlockedIndices(getBlockedCount());
+    if (TEST_MODE) {
+      const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
+        .filter(i => !state.blockedGates.includes(i));
+      state.hintGateIdx = openGates[Math.floor(Math.random() * openGates.length)];
+    } else {
+      state.hintGateIdx = -1;
+    }
+    state.animating = false;
+    messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
+    restartBtn.style.display = 'none';
+    statusLabel.textContent = 'Pick the open gate';
+    showSheep();
+    updateHud();
+    const newSet = buildGateSet(95 - state.worldOffset);
+    worldEl.appendChild(newSet);
+    if (TEST_MODE) {
+      const gates = newSet.querySelectorAll('.gate');
+      state.blockedGates.forEach(idx => {
+        const ind = document.createElement('div');
+        ind.className = 'test-mark';
+        ind.textContent = '🐺';
+        gates[idx].parentNode.appendChild(ind);
+      });
+      if (state.hintGateIdx >= 0 && !state.hasChickenLeg) {
+        const ind = document.createElement('div');
+        ind.className = 'test-mark';
+        ind.textContent = '🍗';
+        gates[state.hintGateIdx].parentNode.appendChild(ind);
+      }
+    }
+    state.currentSetEl = newSet;
+    if (SPORT_MODE) startSportTimer();
+  }
+  function showSheep() {
+    sheepDeadEl.style.display = 'none';
+    sheepSvgEl.style.display  = 'block';
+    sheepEl.style.opacity = '1';
+    sheepEl.classList.remove('walking');
+  }
+  function updateHud() {
+    const level = getLevel();
+    const round = getRoundInLevel();
+    const openCount = getOpenCount();
+    roundLabel.innerHTML = 'Gate ' + (state.score + 1) + ' · Level ' + level +
+      ' &nbsp;<span style="color:#2e7d32;font-weight:600">' + openCount + '✓</span>' +
+      ' <span style="color:#a32d2d;font-weight:600">' + getBlockedCount() + '✗</span>';
+    levelLabel.textContent = 'Level ' + level + ' · ' + openCount + ' of ' + GATES_PER_ROUND + ' open';
+    levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
+    levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
+    scoreEl.textContent = state.score;
+    streakRowEl.textContent = state.streak >= 3 ? '🔥 ' + state.streak + ' streak' : '';
+    updateFieldAmbience(level);
+  }
+  function showLevelUp(newLevel) {
+    levelBanner.textContent = 'Level ' + newLevel + ' · ' + (GATES_PER_ROUND - getBlockedCount()) + ' open';
+    levelBanner.style.opacity = '1';
+    levelBanner.style.transform = 'translate(-50%, -50%) scale(1)';
+    setTimeout(() => {
+      levelBanner.style.opacity = '0';
+      levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
+    }, 1200);
+    spawnConfetti();
+  }
+
+  // ---- Ambience (day → dusk → night) -------------------------------------
+  function updateFieldAmbience(level) {
+    const p = Math.min((level - 1) / 6, 1);
+    if (p < 0.35) {
+      fieldOverlayEl.style.background = 'transparent';
+    } else if (p < 0.65) {
+      const a = ((p - 0.35) / 0.3) * 0.28;
+      fieldOverlayEl.style.background =
+        'linear-gradient(to bottom,rgba(255,130,30,' + (a * 0.7) + ') 0%,rgba(200,60,0,' + a + ') 30%,transparent 65%)';
+    } else {
+      const a = ((p - 0.65) / 0.35) * 0.5;
+      fieldOverlayEl.style.background = 'rgba(15,18,55,' + a + ')';
+    }
+    starsEl.style.opacity = p > 0.55 ? Math.min(1, (p - 0.55) / 0.35) : 0;
+  }
+
+  // ---- Near-miss reveal ---------------------------------------------------
+  const _WOLF_SVG = `<svg viewBox="0 0 56 64" width="38" height="43" xmlns="http://www.w3.org/2000/svg">
+    <polygon points="9,24 2,3 21,17" fill="#78716c"/>
+    <polygon points="47,24 54,3 35,17" fill="#78716c"/>
+    <polygon points="10,22 5,7 20,17" fill="#fca5a5"/>
+    <polygon points="46,22 51,7 36,17" fill="#fca5a5"/>
+    <ellipse cx="28" cy="36" rx="22" ry="20" fill="#9ca3af"/>
+    <ellipse cx="28" cy="44" rx="13" ry="10" fill="#d1d5db"/>
+    <ellipse cx="28" cy="37" rx="5" ry="3.5" fill="#1f2937"/>
+    <ellipse cx="18" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+    <ellipse cx="38" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+    <ellipse cx="18" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+    <ellipse cx="38" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+    <line x1="11" y1="24" x2="24" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+    <line x1="45" y1="24" x2="32" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+    <path d="M 18 48 Q 28 55 38 48" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+    <polygon points="22,49 19,57 25,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+    <polygon points="34,49 37,57 31,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+  </svg>`;
+  function showNearMiss(setEl, blockedIndices) {
+    const gates = setEl.querySelectorAll('.gate');
+    blockedIndices.forEach(idx => {
+      const m = document.createElement('div');
+      m.className = 'near-miss-x';
+      m.innerHTML = _WOLF_SVG;
+      gates[idx].parentNode.appendChild(m);
+    });
+  }
+
+  // ---- Particle effects --------------------------------------------------
+  function spawnCrashParticles(gateEl) {
+    const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const cx = gr.left - fr.left + gr.width / 2;
+    const cy = gr.top  - fr.top  + gr.height / 2;
+    const colors = ['#9c7b44','#8b6f47','#7a5c35','#c4a060','#5d4a30'];
+    for (let i = 0; i < 14; i++) {
+      const p = document.createElement('div');
+      p.className = 'crash-particle';
+      const angle = (i / 14) * Math.PI * 2 + Math.random() * 0.4;
+      const speed = 28 + Math.random() * 44;
+      const w = 4 + Math.random() * 6, h = 2 + Math.random() * 4;
+      p.style.cssText = 'width:' + w + 'px;height:' + h + 'px;background:' + colors[i % colors.length] + ';left:' + cx + 'px;top:' + cy + 'px;';
+      p.style.setProperty('--dx', (Math.cos(angle) * speed) + 'px');
+      p.style.setProperty('--dy', (Math.sin(angle) * speed) + 'px');
+      fieldEl.appendChild(p);
+      setTimeout(() => p.remove(), 600);
+    }
+  }
+  function spawnConfetti() {
+    const colors = ['#ff6b6b','#4ecdc4','#45b7d1','#f9ca24','#a29bfe','#fd79a8','#6ab04c'];
+    for (let i = 0; i < 22; i++) {
+      const p = document.createElement('div');
+      p.className = 'confetti-piece';
+      const size = 6 + Math.random() * 6;
+      const dur  = (0.7 + Math.random() * 0.6) + 's';
+      const rot  = (360 + Math.random() * 360) + 'deg';
+      p.style.cssText = 'width:' + size + 'px;height:' + size + 'px;background:' + colors[i % colors.length] + ';left:' + (15 + Math.random() * 70) + '%;top:2px;';
+      p.style.setProperty('--dur', dur);
+      p.style.setProperty('--rot', rot);
+      p.style.animationDelay = (Math.random() * 0.25) + 's';
+      fieldEl.appendChild(p);
+      setTimeout(() => p.remove(), 1600);
+    }
+  }
+  function spawnFloatingScore(gateEl, label) {
+    const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const el = document.createElement('div');
+    const bonus = label && label.includes('⚡⚡') ? ' turbo-bonus' : label && label.includes('⚡') ? ' fast-bonus' : '';
+    el.className = 'floating-score' + bonus;
+    el.textContent = label || '+1';
+    el.style.left = (gr.left - fr.left + gr.width / 2) + 'px';
+    el.style.top  = (gr.top  - fr.top) + 'px';
+    fieldEl.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+  function spawnHoofPrint() {
+    const sr = sheepEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const cx = sr.left - fr.left + sr.width / 2;
+    const el = document.createElement('div');
+    el.className = 'hoof-print';
+    const isLeft = Math.random() < 0.5;
+    el.style.cssText = 'width:8px;height:5px;border-radius:50%;background:rgba(80,55,25,0.28);left:' + (cx + (isLeft ? -8 : 8)) + 'px;bottom:19px;';
+    fieldEl.appendChild(el);
+    setTimeout(() => el.remove(), 2400);
+  }
+  function spawnFunnySkull(gateEl) {
+    const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+    const cx = gr.left - fr.left + gr.width / 2;
+    const cy = gr.top  - fr.top  + gr.height / 2;
+    const el = document.createElement('div');
+    el.className = 'funny-skull';
+    el.style.left = cx + 'px';
+    el.style.top  = cy + 'px';
+    el.innerHTML = `<svg viewBox="0 0 56 64" width="54" height="62" xmlns="http://www.w3.org/2000/svg">
+      <ellipse cx="28" cy="62" rx="14" ry="3" fill="rgba(0,0,0,0.22)"/>
+      <polygon points="9,24 2,3 21,17" fill="#78716c"/>
+      <polygon points="47,24 54,3 35,17" fill="#78716c"/>
+      <polygon points="10,22 5,7 20,17" fill="#fca5a5"/>
+      <polygon points="46,22 51,7 36,17" fill="#fca5a5"/>
+      <ellipse cx="28" cy="36" rx="22" ry="20" fill="#9ca3af"/>
+      <ellipse cx="28" cy="44" rx="13" ry="10" fill="#d1d5db"/>
+      <ellipse cx="28" cy="37" rx="5" ry="3.5" fill="#1f2937"/>
+      <ellipse cx="18" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+      <ellipse cx="38" cy="31" rx="5.5" ry="4.5" fill="#fbbf24"/>
+      <ellipse cx="18" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+      <ellipse cx="38" cy="31" rx="3.5" ry="3.5" fill="#111827"/>
+      <circle cx="20" cy="29" r="1.3" fill="white"/>
+      <circle cx="40" cy="29" r="1.3" fill="white"/>
+      <line x1="11" y1="24" x2="24" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+      <line x1="45" y1="24" x2="32" y2="28" stroke="#374151" stroke-width="3" stroke-linecap="round"/>
+      <path d="M 18 48 Q 28 55 38 48" fill="none" stroke="#374151" stroke-width="2" stroke-linecap="round"/>
+      <polygon points="22,49 19,57 25,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+      <polygon points="34,49 37,57 31,49" fill="white" stroke="#9ca3af" stroke-width="0.5"/>
+    </svg>`;
+    fieldEl.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('pop')));
+  }
+
+  // ---- Web Audio ---------------------------------------------------------
+  let _audioCtx = null;
+  function _audio() {
+    try {
+      if (!_audioCtx || _audioCtx.state === 'closed')
+        _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (_audioCtx.state === 'suspended') _audioCtx.resume();
+      return _audioCtx;
+    } catch (_) { return null; }
+  }
+  function _tone(freq, type, vol, start, dur) {
+    const ctx = _audio(); if (!ctx) return;
+    const t = ctx.currentTime + start;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = type; o.frequency.value = freq;
+    g.gain.setValueAtTime(0, t);
+    g.gain.linearRampToValueAtTime(vol, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.001, t + dur);
+    o.start(t); o.stop(t + dur);
+  }
+  function playGateOpen() {
+    _tone(523, 'triangle', 0.15, 0,    0.3);
+    _tone(659, 'triangle', 0.12, 0.09, 0.3);
+    _tone(784, 'triangle', 0.10, 0.18, 0.4);
+  }
+  function playGateCrash() {
+    const ctx = _audio(); if (!ctx) return;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sawtooth';
+    o.frequency.setValueAtTime(200, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.25);
+    g.gain.setValueAtTime(0.25, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.3);
+    o.start(t); o.stop(t + 0.3);
+    const buf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.18), ctx.sampleRate);
+    const d = buf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / d.length);
+    const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), ng = ctx.createGain();
+    src.buffer = buf; f.type = 'lowpass'; f.frequency.value = 350; ng.gain.value = 0.35;
+    src.connect(f); f.connect(ng); ng.connect(ctx.destination);
+    src.start(t);
+  }
+  function playSheepStep() {
+    const ctx = _audio(); if (!ctx) return;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sine';
+    o.frequency.setValueAtTime(85, t); o.frequency.exponentialRampToValueAtTime(50, t + 0.04);
+    g.gain.setValueAtTime(0.07, t); g.gain.exponentialRampToValueAtTime(0.001, t + 0.07);
+    o.start(t); o.stop(t + 0.07);
+    spawnHoofPrint();
+  }
+  function playWolfGrowl() {
+    const ctx = _audio(); if (!ctx) return;
+    const t = ctx.currentTime;
+    const o = ctx.createOscillator(), g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = 'sawtooth';
+    // jagged frequency = growl texture
+    o.frequency.setValueAtTime(95,  t);
+    o.frequency.setValueAtTime(115, t + 0.07);
+    o.frequency.setValueAtTime(80,  t + 0.15);
+    o.frequency.setValueAtTime(108, t + 0.23);
+    o.frequency.exponentialRampToValueAtTime(70, t + 0.5);
+    g.gain.setValueAtTime(0.001, t);
+    g.gain.linearRampToValueAtTime(0.20,  t + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.001, t + 0.58);
+    o.start(t); o.stop(t + 0.6);
+  }
+  function playWolfChomp() {
+    const ctx = _audio(); if (!ctx) return;
+    const t = ctx.currentTime;
+    // crunch: shaped white-noise burst
+    const bufLen = Math.floor(ctx.sampleRate * 0.11);
+    const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
+    const d   = buf.getChannelData(0);
+    for (let i = 0; i < bufLen; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufLen, 1.4);
+    const src = ctx.createBufferSource(), filt = ctx.createBiquadFilter(), ng = ctx.createGain();
+    src.buffer = buf;
+    filt.type = 'bandpass'; filt.frequency.value = 900; filt.Q.value = 1.2;
+    ng.gain.value = 0.55;
+    src.connect(filt); filt.connect(ng); ng.connect(ctx.destination);
+    src.start(t);
+    // short rising "nom" tones — satisfied munch
+    _tone(280, 'triangle', 0.10, 0.06, 0.11);
+    _tone(370, 'triangle', 0.08, 0.15, 0.11);
+    _tone(460, 'triangle', 0.06, 0.24, 0.13);
+  }
+  function playHintFound() {
+    _tone(784,  'sine', 0.12, 0,   0.3);
+    _tone(988,  'sine', 0.10, 0.1, 0.3);
+    _tone(1175, 'sine', 0.08, 0.2, 0.35);
+  }
+
+  // ---- Chicken leg discovery ---------------------------------------------
+  function updateChickenLegHud() {
+    chickenLegHudEl.style.display = state.hasChickenLeg ? 'block' : 'none';
+  }
+  function tryGrantChickenLeg(gateEl, index) {
+    if (state.hasChickenLeg) return;
+    const shouldGrant = TEST_MODE ? (index === state.hintGateIdx) : (Math.random() < _cfg._b);
+    if (!shouldGrant) return;
+    stats.hintsFound++;
+    state.hasChickenLeg = true;
+    updateChickenLegHud();
+    const pop = document.createElement('div');
+    pop.textContent = '🍗';
+    pop.style.cssText = 'position:absolute;top:50%;left:50%;font-size:30px;z-index:5;pointer-events:none;transform:translate(-50%,-50%) scale(0);opacity:0;transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),opacity 0.2s;';
+    gateEl.parentNode.appendChild(pop);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pop.style.transform = 'translate(-50%,-50%) scale(1)';
+      pop.style.opacity = '1';
+    }));
+    setTimeout(() => {
+      playHintFound();
+      setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
+    }, 350);
+  }
+
+  // ---- Walk to next round (shared between success and wolf-fed paths) ----
+  function walkToNextRound(wasLevelUp) {
+    setTimeout(() => {
+      statusLabel.textContent = 'Walking on...';
+      sheepEl.style.animation = 'sheep-bob 360ms linear infinite';
+      state.currentSetEl.style.transition = 'opacity 0.5s ease-out';
+      state.currentSetEl.style.opacity = '0';
+      state.worldOffset += FIELD_HEIGHT;
+      worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
+
+      // Pick next round's layout before building so test markers can be stamped immediately
+      const nextBlocked = pickBlockedIndices(getBlockedCount());
+      let nextHintIdx = -1;
+      if (TEST_MODE) {
+        const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
+          .filter(i => !nextBlocked.includes(i));
+        nextHintIdx = open[Math.floor(Math.random() * open.length)];
+      }
+
+      const nextSet = buildGateSet(95 - state.worldOffset);
+      worldEl.appendChild(nextSet);
+
+      if (TEST_MODE) {
+        const gates = nextSet.querySelectorAll('.gate');
+        nextBlocked.forEach(idx => {
+          const m = document.createElement('div');
+          m.className = 'test-mark'; m.textContent = '🐺';
+          gates[idx].parentNode.appendChild(m);
+        });
+        if (nextHintIdx >= 0 && !state.hasChickenLeg) {
+          const m = document.createElement('div');
+          m.className = 'test-mark'; m.textContent = '🍗';
+          gates[nextHintIdx].parentNode.appendChild(m);
+        }
+      }
+
+      setTimeout(() => {
+        sheepEl.style.animation = '';
+        sheepEl.style.transform = 'translateX(-50%)';
+        if (state.currentSetEl && state.currentSetEl.parentNode === worldEl)
+          worldEl.removeChild(state.currentSetEl);
+        state.currentSetEl = nextSet;
+        sheepEl.classList.remove('walking');
+        sheepEl.style.transition = 'bottom 0.5s ease, transform 0.3s, opacity 0.3s';
+        sheepEl.style.bottom = '24px';
+        setTimeout(() => {
+          sheepEl.style.transition = SHEEP_TRANSITION;
+          state.blockedGates = nextBlocked;
+          state.hintGateIdx  = nextHintIdx;
+          state.animating = false;
+          statusLabel.textContent = 'Pick the open gate';
+          if (wasLevelUp) showLevelUp(getLevel());
+          if (SPORT_MODE) startSportTimer();
+        }, 550);
+      }, 1500);
+    }, 500);
+  }
+
+  // ---- Feed the wolf (survive using chicken leg) -------------------------
+  function feedWolf(gateEl) {
+    state.hasChickenLeg = false;
+    stats.hintsUsed++;
+    saveStats();
+
+    const fieldRect = fieldEl.getBoundingClientRect();
+    const hudRect   = chickenLegHudEl.getBoundingClientRect();
+    const gateRect  = gateEl.getBoundingClientRect();
+    const gx = gateRect.left - fieldRect.left + gateRect.width  / 2;
+    const gy = gateRect.top  - fieldRect.top  + gateRect.height / 2;
+
+    updateChickenLegHud();
+    statusLabel.textContent = '🐺 The wolf lurks…';
+    navigator.vibrate && navigator.vibrate([30, 20, 60]);
+    playWolfGrowl();
+
+    // Phase 1 (0ms): gate cracks open — dark hint that a wolf is behind it
+    gateEl.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1), background 0.25s';
+    gateEl.style.background = '#7b1a1a';
+    gateEl.style.transform  = 'rotateY(-28deg)';
+
+    // Phase 2 (420ms): wolf pops up from behind the cracked gate
+    setTimeout(() => {
+      const wolfPop = document.createElement('div');
+      wolfPop.className   = 'funny-skull pop';
+      wolfPop.style.left  = gx + 'px';
+      wolfPop.style.top   = gy + 'px';
+      wolfPop.style.zIndex = '12';
+      wolfPop.innerHTML   = _WOLF_SVG;
+      fieldEl.appendChild(wolfPop);
+
+      statusLabel.textContent = '🍗 Feeding the wolf…';
+
+      // Phase 3 (460ms): drumstick lifts off from HUD and flies to the wolf
+      setTimeout(() => {
+        const startX = hudRect.left - fieldRect.left + hudRect.width  / 2;
+        const startY = hudRect.top  - fieldRect.top  + hudRect.height / 2;
+
+        const fly = document.createElement('div');
+        fly.className = 'flying-drumstick';
+        fly.textContent = '🍗';
+        fly.style.left = startX + 'px';
+        fly.style.top  = startY + 'px';
+        fly.style.transition = 'left 0.42s cubic-bezier(0.4,0,0.2,1), top 0.42s cubic-bezier(0.4,0,0.2,1), transform 0.42s';
+        fieldEl.appendChild(fly);
+        fly.getBoundingClientRect(); // force reflow
+        fly.style.left      = gx + 'px';
+        fly.style.top       = gy + 'px';
+        fly.style.transform = 'translate(-50%,-50%) scale(1.3) rotate(40deg)';
+
+        // Phase 4 (460 + 430 = 890ms): wolf snaps — drumstick vanishes
+        setTimeout(() => {
+          fly.style.transition = 'transform 0.1s, opacity 0.1s';
+          fly.style.transform  = 'translate(-50%,-50%) scale(0)';
+          fly.style.opacity    = '0';
+
+          playWolfChomp();
+          const snap = document.createElement('div');
+          snap.className = 'wolf-snap-anim';
+          snap.textContent = '🐺';
+          gateEl.parentNode.appendChild(snap);
+
+          // Phase 5 (890 + 400 = 1290ms): gate fully opens, sheep grins devilishly
+          setTimeout(() => {
+            fly.remove();
+            snap.remove();
+            wolfPop.remove();
+
+            gateEl.style.transition = 'background 0.15s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
+            gateEl.style.background = '#e65100';
+            statusLabel.textContent = '🍗 The wolf is fed — keep going!';
+            playGateOpen();
+            spawnFloatingScore(gateEl, '🍗');
+            setTimeout(() => {
+              gateEl.style.background = '';
+              gateEl.style.transform  = 'rotateY(-110deg)';
+            }, 150);
+
+            sheepDeviousEl.setAttribute('display', 'block');
+            setTimeout(() => sheepDeviousEl.setAttribute('display', 'none'), 3200);
+
+            updateHud();
+            checkAchievements();
+            walkToNextRound(false);
+          }, 400);
+        }, 430);
+      }, 40);
+    }, 420);
+  }
+
+  // ---- Gate interaction --------------------------------------------------
+  function pickGate(index) {
+    if (state.gameOver || state.animating) return;
+    if (SPORT_MODE) cancelSportTimer();
+    state.animating = true;
+
+    const gates = state.currentSetEl.querySelectorAll('.gate');
+    gates.forEach(g => {
+      g.disabled = true;
+      g.onmouseover = null; g.onmouseout = null; g.onclick = null;
+      g.style.cursor = 'default'; g.style.transform = 'translateY(0)';
+    });
+
+    const gateEl = gates[index];
+    const gateRect = gateEl.getBoundingClientRect();
+    const fieldRect = fieldEl.getBoundingClientRect();
+    const leftPct = ((gateRect.left - fieldRect.left + gateRect.width / 2) / fieldRect.width) * 100;
+
+    statusLabel.textContent = 'Trotting over...';
+    sheepEl.style.left = leftPct + '%';
+    sheepEl.classList.add('walking');
+
+    let wiggleCount = 0;
+    _wiggleId = setInterval(() => {
+      sheepEl.style.transform = 'translateX(-50%) rotate(' + (wiggleCount % 2 === 0 ? '-6deg' : '6deg') + ')';
+      if (wiggleCount % 2 === 0) playSheepStep();
+      wiggleCount++;
+    }, 120);
+
+    setTimeout(() => {
+      clearInterval(_wiggleId); _wiggleId = null;
+      sheepEl.style.transform = 'translateX(-50%)';
+      sheepEl.style.bottom = '80px';
+      statusLabel.textContent = 'Nudging the gate...';
+      setTimeout(() => {
+        let bumpCount = 0;
+        const bump = setInterval(() => {
+          sheepEl.style.transform = 'translateX(-50%) translateY(' + (bumpCount % 2 === 0 ? '-3px' : '0') + ')';
+          bumpCount++;
+          if (bumpCount >= 2) {
+            clearInterval(bump);
+            sheepEl.style.transform = 'translateX(-50%)';
+            resolveGate(index, gateEl);
+          }
+        }, 130);
+      }, 650);
+    }, 700);
+  }
+
+  function resolveGate(index, gateEl) {
+    const isBlocked = state.blockedGates.indexOf(index) !== -1;
+    if (!isBlocked) {
+      gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+      gateEl.style.transform = 'rotateY(-110deg)';
+      showNearMiss(state.currentSetEl, state.blockedGates);
+      playGateOpen();
+      navigator.vibrate && navigator.vibrate(25);
+      tryGrantChickenLeg(gateEl, index);
+      state.score++;
+      state.streak++;
+
+      let floatLabel = '+1';
+      if (SPORT_MODE) {
+        const elapsed = performance.now() - state.roundStartTime;
+        if (elapsed < _cfg._c) {
+          state.score += _cfg._f; floatLabel = '+3 ⚡⚡';
+        } else if (elapsed < _cfg._d) {
+          state.score += _cfg._g; floatLabel = '+2 ⚡';
+        }
+      }
+
+      spawnFloatingScore(gateEl, floatLabel);
+      const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
+      updateHud();
+      checkAchievements();
+      walkToNextRound(wasLevelUp);
+
+    } else {
+      if (state.hasChickenLeg) { feedWolf(gateEl); return; }
+      gateEl.style.transformOrigin = 'left bottom';
+      gateEl.style.transition = 'transform 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53), background 0.4s, border-color 0.4s';
+      gateEl.style.background = '#a33c1d';
+      gateEl.style.borderColor = '#712b13';
+      gateEl.style.zIndex = '4';
+      gateEl.style.transform = 'rotate(-3deg)';
+      playGateCrash();
+      navigator.vibrate && navigator.vibrate([70, 40, 70]);
+      spawnCrashParticles(gateEl);
+      fieldEl.classList.add('shaking');
+      setTimeout(() => fieldEl.classList.remove('shaking'), 520);
+      setTimeout(() => { gateEl.style.transform = 'rotate(2deg)'; }, 150);
+      setTimeout(() => { gateEl.style.transform = 'rotate(90deg)'; }, 350);
+      setTimeout(() => {
+        sheepEl.classList.remove('walking');
+        sheepEl.style.transition = 'all 0.4s ease-out';
+        sheepEl.style.transform = 'translateX(-50%) translateY(8px) scaleY(0.4) scaleX(1.4)';
+      }, 700);
+      spawnFunnySkull(gateEl);
+      setTimeout(() => {
+        sheepEl.style.transition = 'opacity 0.4s';
+        sheepEl.style.opacity = '0';
+        handleEndOfGame();
+      }, 1300);
+    }
+  }
+
+  function handleEndOfGame() {
+    cancelSportTimer();
+    state.animating = false; state.gameOver = true;
+
+    stats.gamesPlayed++;
+    stats.totalScore += state.score;
+    stats.gatesCleared += state.score;
+    stats.bestLevel = Math.max(stats.bestLevel, getLevel());
+    stats.streakBest = Math.max(stats.streakBest, state.streak);
+    saveStats();
+
+    if (state.score > personalBest) {
+      personalBest = state.score;
+      try { localStorage.setItem(PERSONAL_BEST_KEY, personalBest); } catch(_) {}
+    }
+
+    renderStats();
+    checkAchievements();
+
+    messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
+    messageEl.style.color = 'var(--danger)';
+    statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
+
+    if (!TEST_MODE && isNewBest(state.score)) {
+      if (sessionName) autoSaveScore(); else showHiscoreEntry();
+    } else {
+      restartBtn.style.display = 'inline-block';
+      restartBtn.textContent = 'Try again';
+    }
+  }
+  function showHiscoreEntry() {
+    hiscoreEntry.style.display = 'block';
+    hiscoreName.value = '';
+    setTimeout(() => hiscoreName.focus(), 100);
+  }
+  async function pushScore(name) {
+    leaderboard.push({ name, score: state.score, date: new Date().toISOString() });
+    leaderboard.sort((a, b) => b.score - a.score);
+    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
+    renderLeaderboard();
+    await saveLeaderboard();
+  }
+  async function autoSaveScore() {
+    await pushScore(sessionName);
+    showAchievementToast({ icon: '🏆', label: 'Score saved', desc: 'as ' + sessionName });
+    restartBtn.style.display = 'inline-block';
+    restartBtn.textContent = 'Try again';
+  }
+  hiscoreSave.onclick = async () => {
+    let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().slice(0, 10);
+    if (name.length === 0) name = 'ANON';
+    sessionName = name;
+    await pushScore(name);
+    hiscoreEntry.style.display = 'none';
+    restartBtn.style.display = 'inline-block';
+    restartBtn.textContent = 'Try again';
+  };
+  hiscoreName.addEventListener('input', e => {
+    e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, 10);
+  });
+  hiscoreName.addEventListener('keydown', e => { if (e.key === 'Enter') hiscoreSave.click(); });
+
+  restartBtn.onclick = () => {
+    cancelSportTimer();
+    clearInterval(_wiggleId); _wiggleId = null;
+    sheepEl.style.animation = '';
+    sheepEl.classList.remove('walking');
+    showSheep();
+    state = {
+      score: 0, blockedGates: [], animating: false,
+      gameOver: false, hasChickenLeg: false, currentSetEl: null, worldOffset: 0,
+      hintGateIdx: -1, streak: 0, roundStartTime: 0
+    };
+    updateChickenLegHud();
+    sheepDeviousEl.setAttribute('display', 'none');
+    worldEl.innerHTML = '';
+    fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
+    worldEl.style.transition = 'none';
+    worldEl.style.transform = 'translateY(0)';
+    sheepEl.style.transition = 'none';
+    sheepEl.style.left = '50%';
+    sheepEl.style.bottom = '24px';
+    sheepEl.style.transform = 'translateX(-50%)';
+    sheepEl.style.opacity = '1';
+    fieldOverlayEl.style.background = 'transparent';
+    starsEl.style.opacity = '0';
+    setTimeout(() => {
+      worldEl.style.transition = WORLD_TRANSITION;
+      sheepEl.style.transition = SHEEP_TRANSITION;
+      loadLeaderboard();
+      newRound();
+    }, 30);
+  };
+
+  // ---- World generation --------------------------------------------------
+  function generateGrassBlades() {
+    for (let i = 0; i < 24; i++) {
+      const b = document.createElement('div');
+      b.className = 'grass-blade';
+      b.style.left = (i / 24 * 100 + Math.random() * 2) + '%';
+      b.style.height = (12 + Math.random() * 10) + 'px';
+      b.style.animationDelay  = (Math.random() * 2) + 's';
+      b.style.animationDuration = (1.4 + Math.random() * 1.2) + 's';
+      grassBladesEl.appendChild(b);
+    }
+  }
+  function generateStars() {
+    for (let i = 0; i < 28; i++) {
+      const s = document.createElement('div');
+      s.className = 'star';
+      s.style.left = (Math.random() * 100) + '%';
+      s.style.top  = (Math.random() * 90)  + '%';
+      s.style.animationDelay = (Math.random() * 3) + 's';
+      s.style.animationDuration = (1.5 + Math.random() * 2) + 's';
+      if (Math.random() < 0.3) { s.style.width = '3px'; s.style.height = '3px'; }
+      starsEl.appendChild(s);
+    }
+  }
+
+  // ---- Boot --------------------------------------------------------------
+  if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
+  if (SPORT_MODE) { $('sport-badge').style.display = 'inline-block'; syncIndicator.style.display = 'none'; }
+
+  // Mode toggle
+  (function() {
+    function setMode(m) {
+      const url = new URL(location.href);
+      url.searchParams.delete('sport');
+      if (m) url.searchParams.set(m, '');
+      location.href = url.toString();
+    }
+    const btnNormal = document.getElementById('mode-normal');
+    const btnSport  = document.getElementById('mode-sport');
+    if (SPORT_MODE) btnSport.classList.add('active');
+    else            btnNormal.classList.add('active');
+    btnNormal.onclick = () => setMode('');
+    btnSport.onclick  = () => setMode('sport');
+  })();
+
+  generateGrassBlades();
+  generateStars();
+  updateFieldAmbience(1);
+  renderStats();
+  statusLabel.textContent = 'Loading...';
+  loadConfig().then(() => {
+    loadLeaderboard();
+    newRound();
+  });
+})();
+</script>
+</body>
+</html>
