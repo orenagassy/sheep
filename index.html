@@ -601,7 +601,7 @@
 
     <div class="topbar">
       <div class="topbar-left">
-        <span id="test-badge">🧪 TEST</span>
+        <span id="test-badge">👁 GOD</span>
         <span id="sport-badge">⚡ SPORT</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
@@ -768,6 +768,16 @@
     </div>
   </div>
 
+  <div id="god-mode-panel" style="margin-top:20px;padding-top:16px;border-top:0.5px solid var(--border)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="stats-title" style="margin-bottom:2px">👁 God Mode</div>
+        <div style="font-size:11px;color:var(--text-muted)">See wolves &amp; bonuses before picking</div>
+      </div>
+      <button id="god-mode-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
+    </div>
+  </div>
+
   <div class="ad-wrap ad-wrap--drawer">
     <!-- Ad unit loads here after AdSense approval -->
   </div>
@@ -777,7 +787,8 @@
 (function() {
   const WORKER_URL     = 'https://sheep-score.oren-agassy.workers.dev';
   const FIREBASE_DB_URL = 'https://sheep-game-4852f-default-rtdb.firebaseio.com';
-  const TEST_MODE  = new URLSearchParams(location.search).has('test');
+  const TEST_MODE  = new URLSearchParams(location.search).has('test')
+                  || localStorage.getItem('sheepgate:god-mode') === '1';
   const SPORT_MODE = new URLSearchParams(location.search).has('sport');
 
   const GATES_PER_ROUND    = 7;
@@ -816,6 +827,7 @@
       _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6), _h:1/10, _i:1/10, _j:1/10 });
     }
   }
+  const GOD_MODE_KEY        = 'sheepgate:god-mode';
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
   const SPORT_LB_KEY        = 'sheepgate:sport-leaderboard';
   const STATS_KEY           = 'sheepgate:stats';
@@ -2008,6 +2020,14 @@
 
   // ---- Boot --------------------------------------------------------------
   if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
+  const godToggleEl = $('god-mode-toggle');
+  godToggleEl.textContent = TEST_MODE ? 'ON' : 'OFF';
+  godToggleEl.style.color = TEST_MODE ? 'var(--success)' : 'var(--text-secondary)';
+  godToggleEl.onclick = () => {
+    if (TEST_MODE) localStorage.removeItem(GOD_MODE_KEY);
+    else           localStorage.setItem(GOD_MODE_KEY, '1');
+    location.reload();
+  };
   if (SPORT_MODE) {
     $('sport-badge').style.display = 'inline-block';
     syncIndicator.style.display = 'none';
