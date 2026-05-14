@@ -805,15 +805,15 @@
         _e: d.sportTier3Ms,
         _f: d.sportTier1Bonus,
         _g: d.sportTier2Bonus,
-        _h: d.chickenLegChance    ?? 1/12,
-        _i: d.cloverChance        ?? 1/12,
-        _j: d.doubleScoreChance   ?? 1/12,
+        _h: d.chickenLegChance    ?? 1/10,
+        _i: d.cloverChance        ?? 1/10,
+        _j: d.doubleScoreChance   ?? 1/10,
       });
       try { sessionStorage.setItem(CFG_KEY, JSON.stringify(_cfg)); } catch(_) {}
     } catch(e) {
       console.warn('Config unavailable, using offline defaults');
       const _u = n => n ^ 7;
-      _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6), _h:1/12, _i:1/12, _j:1/12 });
+      _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6), _h:1/10, _i:1/10, _j:1/10 });
     }
   }
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
@@ -1163,7 +1163,7 @@
     {
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
-      const legChance = _cfg._h ?? 1/12, clovChance = _cfg._i ?? 1/12, dblChance = _cfg._j ?? 1/12;
+      const legChance = _cfg._h ?? 1/10, clovChance = _cfg._i ?? 1/10, dblChance = _cfg._j ?? 1/10;
       state.hintGateIdx = (!state.hasChickenLeg && Math.random() < legChance)
         ? openGates[Math.floor(Math.random() * openGates.length)] : -1;
       const openForClover = state.hintGateIdx >= 0 ? openGates.filter(i => i !== state.hintGateIdx) : openGates;
@@ -1627,7 +1627,7 @@
       const nextBlocked = pickBlockedIndices(getBlockedCount());
       const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !nextBlocked.includes(i));
-      const legChance = _cfg._h ?? 1/12, clovChance = _cfg._i ?? 1/12, dblChance = _cfg._j ?? 1/12;
+      const legChance = _cfg._h ?? 1/10, clovChance = _cfg._i ?? 1/10, dblChance = _cfg._j ?? 1/10;
       const nextHintIdx = (!state.hasChickenLeg && Math.random() < legChance)
         ? open[Math.floor(Math.random() * open.length)] : -1;
       const openForClover = nextHintIdx >= 0 ? open.filter(i => i !== nextHintIdx) : open;
