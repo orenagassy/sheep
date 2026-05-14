@@ -583,7 +583,7 @@
 </head>
 <body>
 <div class="app">
-  <h1>🐑 Sheep Gates</h1>
+  <h1><span id="title-sheep">🐑</span> Sheep Gates</h1>
   <p class="tagline">Bet on the open gate. Survive as long as you can.</p>
 
   <div class="mode-toggle-wrap">
@@ -2008,7 +2008,51 @@
 
   // ---- Boot --------------------------------------------------------------
   if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
-  if (SPORT_MODE) { $('sport-badge').style.display = 'inline-block'; syncIndicator.style.display = 'none'; document.body.classList.add('sport-mode'); }
+  if (SPORT_MODE) {
+    $('sport-badge').style.display = 'inline-block';
+    syncIndicator.style.display = 'none';
+    document.body.classList.add('sport-mode');
+    // Sport-mode sheep: jersey #1 + sweatband + cleats
+    const _sportSheepSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="30" height="30" style="vertical-align:-4px;margin-right:1px">
+      <circle cx="57" cy="46" r="19" fill="#eeeae0"/>
+      <circle cx="45" cy="41" r="14" fill="#f3f1e8"/>
+      <circle cx="66" cy="39" r="13" fill="#edeae2"/>
+      <circle cx="72" cy="48" r="11" fill="#e9e6dc"/>
+      <circle cx="44" cy="52" r="10" fill="#e9e6dc"/>
+      <ellipse cx="58" cy="52" rx="15" ry="10" fill="#b71c1c" opacity="0.92"/>
+      <text x="58" y="58" text-anchor="middle" font-size="12" font-weight="900" fill="white" font-family="Arial,sans-serif">1</text>
+      <ellipse cx="29" cy="49" rx="13" ry="11" fill="#d5caaf"/>
+      <ellipse cx="21" cy="53" rx="6" ry="5" fill="#c9bda0"/>
+      <circle cx="25.5" cy="44.5" r="2.3" fill="#1e1810"/>
+      <circle cx="24.8" cy="43.8" r="0.65" fill="white"/>
+      <ellipse cx="36" cy="38" rx="3.5" ry="5.5" fill="#d5caaf" transform="rotate(-15,36,38)"/>
+      <ellipse cx="36" cy="38" rx="2" ry="3.5" fill="#edc0b8" transform="rotate(-15,36,38)"/>
+      <rect x="20" y="33" width="19" height="5" rx="2.5" fill="#b71c1c"/>
+      <rect x="47" y="63" width="6" height="13" rx="3" fill="#c2b89a"/>
+      <rect x="56" y="63" width="6" height="13" rx="3" fill="#b4aa8c"/>
+      <rect x="65" y="63" width="6" height="13" rx="3" fill="#c2b89a"/>
+      <rect x="74" y="63" width="5" height="13" rx="2.5" fill="#b4aa8c"/>
+      <rect x="47" y="72" width="7" height="4" rx="2" fill="#b71c1c"/>
+      <rect x="56" y="72" width="7" height="4" rx="2" fill="#b71c1c"/>
+      <rect x="65" y="72" width="7" height="4" rx="2" fill="#b71c1c"/>
+      <rect x="74" y="72" width="6" height="4" rx="2" fill="#b71c1c"/>
+    </svg>`;
+    $('title-sheep').innerHTML = _sportSheepSVG;
+    const _favLink = document.querySelector('link[rel="icon"]');
+    if (_favLink) _favLink.href = "data:image/svg+xml," + encodeURIComponent(
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>` +
+      `<circle cx='57' cy='46' r='19' fill='%23eeeae0'/>` +
+      `<circle cx='45' cy='41' r='14' fill='%23f3f1e8'/>` +
+      `<circle cx='66' cy='39' r='13' fill='%23edeae2'/>` +
+      `<circle cx='72' cy='48' r='11' fill='%23e9e6dc'/>` +
+      `<ellipse cx='58' cy='52' rx='15' ry='10' fill='%23b71c1c' opacity='.92'/>` +
+      `<text x='58' y='59' text-anchor='middle' font-size='14' font-weight='900' fill='white' font-family='Arial,sans-serif'>1</text>` +
+      `<ellipse cx='29' cy='49' rx='13' ry='11' fill='%23d5caaf'/>` +
+      `<circle cx='25' cy='44' r='3' fill='%231e1810'/>` +
+      `<rect x='20' y='33' width='19' height='5' rx='2' fill='%23b71c1c'/>` +
+      `</svg>`
+    );
+  }
 
   // Mode toggle
   (function() {
