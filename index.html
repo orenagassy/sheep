@@ -1767,6 +1767,7 @@
   function pickGate(index) {
     if (state.gameOver || state.animating) return;
     if (SPORT_MODE) cancelSportTimer();
+    state.sportClickElapsed = SPORT_MODE ? performance.now() - state.roundStartTime : 0;
     state.animating = true;
 
     const gates = state.currentSetEl.querySelectorAll('.gate');
@@ -1826,7 +1827,7 @@
 
       let floatLabel = '+1';
       if (SPORT_MODE) {
-        const elapsed = performance.now() - state.roundStartTime;
+        const elapsed = state.sportClickElapsed;
         if (elapsed < _cfg._c) {
           state.score += _cfg._f; floatLabel = '+3 ⚡⚡';
         } else if (elapsed < _cfg._d) {
@@ -1955,7 +1956,7 @@
     state = {
       score: 0, blockedGates: [], animating: false,
       gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
-      hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0
+      hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0, sportClickElapsed: 0
     };
     updateChickenLegHud();
     updateLuckyCloverHud();
