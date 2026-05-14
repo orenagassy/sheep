@@ -266,6 +266,29 @@
     0%, 100% { transform: scale(1) rotate(-8deg); }
     50%       { transform: scale(1.22) rotate(8deg); }
   }
+  /* ---- Double Score HUD ---- */
+  #double-score-hud {
+    position: absolute; top: 10px; left: 48px; z-index: 8;
+    font-size: 20px; font-weight: 900; line-height: 1; display: none;
+    color: #ffd700;
+    text-shadow: 0 0 10px rgba(255,200,0,0.85), 0 1px 3px rgba(0,0,0,0.55);
+    animation: double-score-pulse 1.6s ease-in-out infinite;
+    cursor: default; user-select: none; letter-spacing: -0.5px;
+  }
+  @keyframes double-score-pulse {
+    0%, 100% { transform: scale(1) rotate(-6deg); }
+    50%       { transform: scale(1.25) rotate(6deg); }
+  }
+  .floating-score.double-bonus {
+    font-size: 26px; color: #ffd700;
+    text-shadow: 0 0 14px rgba(255,215,0,0.9), 0 0 5px rgba(255,165,0,0.7), 0 2px 4px rgba(0,0,0,0.3);
+    animation: fast-float 1.1s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
+  .floating-score.double-turbo-bonus {
+    font-size: 32px; color: #ffd700;
+    text-shadow: 0 0 18px rgba(255,215,0,0.95), 0 0 8px rgba(255,165,0,0.8), 0 0 3px rgba(255,255,255,0.5), 0 2px 4px rgba(0,0,0,0.4);
+    animation: fast-float 1.3s cubic-bezier(0.22,1,0.36,1) forwards;
+  }
   .flying-clover {
     position: absolute; font-size: 26px; line-height: 1;
     z-index: 20; pointer-events: none;
@@ -611,6 +634,7 @@
     <div id="field">
       <div id="chicken-leg-hud" title="You have a chicken leg! The wolf will eat it instead of you.">🍗</div>
       <div id="lucky-clover-hud" title="Lucky Clover! Click to scare away one wolf.">🍀</div>
+      <div id="double-score-hud" title="2X Score! Your next rounds count double.">2X</div>
       <div id="sport-timer"><div id="sport-timer-bar"></div></div>
       <div id="field-overlay"></div>
       <div id="stars"></div>
@@ -685,8 +709,8 @@
 
     <details>
       <summary>How to play</summary>
-      <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/>
-      Sometimes a 🍗 chicken leg hides behind an open gate — it appears top-right when you find one. If you pick a wolf gate while holding a chicken leg, you feed the wolf and survive!</p>
+      <p>7 gates per row — pick an open one to keep walking. Every 7 gates, one more gate locks: Level 1 is 6 of 7 open, all the way down to 1 of 7.<br/><br/>
+      Some gates hide surprises — discover them as you play!</p>
     </details>
   </div>
 
@@ -781,14 +805,15 @@
         _e: d.sportTier3Ms,
         _f: d.sportTier1Bonus,
         _g: d.sportTier2Bonus,
-        _h: d.chickenLegChance ?? 2/7,
-        _i: d.cloverChance     ?? 2/7,
+        _h: d.chickenLegChance    ?? 1/12,
+        _i: d.cloverChance        ?? 1/12,
+        _j: d.doubleScoreChance   ?? 1/12,
       });
       try { sessionStorage.setItem(CFG_KEY, JSON.stringify(_cfg)); } catch(_) {}
     } catch(e) {
       console.warn('Config unavailable, using offline defaults');
       const _u = n => n ^ 7;
-      _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6), _h:2/7, _i:2/7 });
+      _cfg = Object.freeze({ _a:_u(8007), _b:_u(2)/100, _c:_u(1007), _d:_u(2499), _e:_u(4007), _f:_u(5), _g:_u(6), _h:1/12, _i:1/12, _j:1/12 });
     }
   }
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
@@ -895,8 +920,8 @@
   // ---- State --------------------------------------------------------------
   let state = {
     score: 0, blockedGates: [], animating: false,
-    gameOver: false, hasChickenLeg: false, hasLuckyClover: false, currentSetEl: null, worldOffset: 0,
-    hintGateIdx: -1, hintCloverIdx: -1, streak: 0, roundStartTime: 0
+    gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
+    hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0
   };
 
   let leaderboard = [];
@@ -920,6 +945,7 @@
   const streakRowEl         = $('streak-row');
   const chickenLegHudEl     = $('chicken-leg-hud');
   const luckyCloverHudEl    = $('lucky-clover-hud');
+  const doubleScoreHudEl    = $('double-score-hud');
   const restartBtn          = $('restart-btn');
   const hiscoreEntry        = $('hiscore-entry');
   const hiscoreName         = $('hiscore-name');
@@ -1129,6 +1155,7 @@
     const m = document.createElement('div');
     m.className = emoji === '🐺' ? 'test-mark test-mark-wolf' : 'test-mark';
     m.textContent = emoji;
+    if (emoji === '2X') { m.style.color = '#ffd700'; m.style.fontWeight = '900'; }
     gates[idx].parentNode.appendChild(m);
   }
   function newRound() {
@@ -1136,12 +1163,15 @@
     {
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
-      const legChance = _cfg._h ?? 2/7, clovChance = _cfg._i ?? 2/7;
+      const legChance = _cfg._h ?? 1/12, clovChance = _cfg._i ?? 1/12, dblChance = _cfg._j ?? 1/12;
       state.hintGateIdx = (!state.hasChickenLeg && Math.random() < legChance)
         ? openGates[Math.floor(Math.random() * openGates.length)] : -1;
       const openForClover = state.hintGateIdx >= 0 ? openGates.filter(i => i !== state.hintGateIdx) : openGates;
       state.hintCloverIdx = (!state.hasLuckyClover && Math.random() < clovChance)
         ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
+      const openForDouble = state.hintCloverIdx >= 0 ? openForClover.filter(i => i !== state.hintCloverIdx) : openForClover;
+      state.hintDoubleScoreIdx = (state.doubleScoreRoundsLeft === 0 && Math.random() < dblChance)
+        ? (openForDouble.length > 0 ? openForDouble[Math.floor(Math.random() * openForDouble.length)] : -1) : -1;
     }
     state.animating = false;
     messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
@@ -1154,8 +1184,9 @@
     if (TEST_MODE) {
       const gates = newSet.querySelectorAll('.gate');
       state.blockedGates.forEach(idx => stampTestMark(gates, idx, '🐺'));
-      if (state.hintGateIdx >= 0 && !state.hasChickenLeg)  stampTestMark(gates, state.hintGateIdx, '🍗');
-      if (state.hintCloverIdx >= 0 && !state.hasLuckyClover) stampTestMark(gates, state.hintCloverIdx, '🍀');
+      if (state.hintGateIdx >= 0 && !state.hasChickenLeg)    stampTestMark(gates, state.hintGateIdx, '🍗');
+      if (state.hintCloverIdx >= 0 && !state.hasLuckyClover)  stampTestMark(gates, state.hintCloverIdx, '🍀');
+      if (state.hintDoubleScoreIdx >= 0)                       stampTestMark(gates, state.hintDoubleScoreIdx, '2X');
     }
     state.currentSetEl = newSet;
     if (SPORT_MODE) startSportTimer();
@@ -1274,7 +1305,10 @@
   function spawnFloatingScore(gateEl, label) {
     const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
     const el = document.createElement('div');
-    const bonus = label && label.includes('⚡⚡') ? ' turbo-bonus' : label && label.includes('⚡') ? ' fast-bonus' : '';
+    const bonus = label && label.includes('×2') && label.includes('⚡') ? ' double-turbo-bonus' :
+                  label && label.includes('×2') ? ' double-bonus' :
+                  label && label.includes('⚡⚡') ? ' turbo-bonus' :
+                  label && label.includes('⚡') ? ' fast-bonus' : '';
     el.className = 'floating-score' + bonus;
     el.textContent = label || '+1';
     el.style.left = (gr.left - fr.left + gr.width / 2) + 'px';
@@ -1468,6 +1502,40 @@
   function tryGrantLuckyClover(gateEl, index) {
     return tryGrantPickup(gateEl, index, 'hasLuckyClover', 'hintCloverIdx', updateLuckyCloverHud, '🍀', playCloverFound, null);
   }
+  function updateDoubleScoreHud() {
+    if (state.doubleScoreRoundsLeft > 0) {
+      doubleScoreHudEl.textContent = '2X';
+      doubleScoreHudEl.style.display = 'block';
+    } else {
+      doubleScoreHudEl.style.display = 'none';
+    }
+  }
+  function playDoubleScoreFound() {
+    _tone(523,  'sine', 0.09, 0,    0.15);
+    _tone(784,  'sine', 0.09, 0.08, 0.15);
+    _tone(1047, 'sine', 0.09, 0.16, 0.15);
+    _tone(1319, 'sine', 0.10, 0.26, 0.15);
+    _tone(1568, 'sine', 0.08, 0.38, 0.40);
+  }
+  function tryGrantDoubleScore(gateEl, index) {
+    if (state.doubleScoreRoundsLeft > 0) return false;
+    if (state.hintDoubleScoreIdx < 0 || index !== state.hintDoubleScoreIdx) return false;
+    state.doubleScoreRoundsLeft = 3;
+    updateDoubleScoreHud();
+    const pop = document.createElement('div');
+    pop.textContent = '2X';
+    pop.style.cssText = PICKUP_POP_CSS + 'color:#ffd700;font-weight:900;font-size:24px;text-shadow:0 0 12px rgba(255,200,0,0.9),0 2px 4px rgba(0,0,0,0.5);';
+    gateEl.parentNode.appendChild(pop);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pop.style.transform = 'translate(-50%,-50%) scale(1)';
+      pop.style.opacity = '1';
+    }));
+    setTimeout(() => {
+      playDoubleScoreFound();
+      setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
+    }, 350);
+    return true;
+  }
 
   // ---- Lucky Clover activation --------------------------------------------
   function activateLuckyClover() {
@@ -1559,12 +1627,15 @@
       const nextBlocked = pickBlockedIndices(getBlockedCount());
       const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !nextBlocked.includes(i));
-      const legChance = _cfg._h ?? 2/7, clovChance = _cfg._i ?? 2/7;
+      const legChance = _cfg._h ?? 1/12, clovChance = _cfg._i ?? 1/12, dblChance = _cfg._j ?? 1/12;
       const nextHintIdx = (!state.hasChickenLeg && Math.random() < legChance)
         ? open[Math.floor(Math.random() * open.length)] : -1;
       const openForClover = nextHintIdx >= 0 ? open.filter(i => i !== nextHintIdx) : open;
       const nextCloverIdx = (!state.hasLuckyClover && Math.random() < clovChance)
         ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
+      const openForDouble = nextCloverIdx >= 0 ? openForClover.filter(i => i !== nextCloverIdx) : openForClover;
+      const nextDoubleScoreIdx = (state.doubleScoreRoundsLeft === 0 && Math.random() < dblChance)
+        ? (openForDouble.length > 0 ? openForDouble[Math.floor(Math.random() * openForDouble.length)] : -1) : -1;
 
       const nextSet = buildGateSet(95 - state.worldOffset);
       worldEl.appendChild(nextSet);
@@ -1572,8 +1643,9 @@
       if (TEST_MODE) {
         const gates = nextSet.querySelectorAll('.gate');
         nextBlocked.forEach(idx => stampTestMark(gates, idx, '🐺'));
-        if (nextHintIdx >= 0 && !state.hasChickenLeg)   stampTestMark(gates, nextHintIdx, '🍗');
-        if (nextCloverIdx >= 0 && !state.hasLuckyClover) stampTestMark(gates, nextCloverIdx, '🍀');
+        if (nextHintIdx >= 0 && !state.hasChickenLeg)    stampTestMark(gates, nextHintIdx, '🍗');
+        if (nextCloverIdx >= 0 && !state.hasLuckyClover)  stampTestMark(gates, nextCloverIdx, '🍀');
+        if (nextDoubleScoreIdx >= 0)                       stampTestMark(gates, nextDoubleScoreIdx, '2X');
       }
 
       setTimeout(() => {
@@ -1587,9 +1659,10 @@
         sheepEl.style.bottom = '24px';
         setTimeout(() => {
           sheepEl.style.transition = SHEEP_TRANSITION;
-          state.blockedGates  = nextBlocked;
-          state.hintGateIdx   = nextHintIdx;
-          state.hintCloverIdx = nextCloverIdx;
+          state.blockedGates       = nextBlocked;
+          state.hintGateIdx        = nextHintIdx;
+          state.hintCloverIdx      = nextCloverIdx;
+          state.hintDoubleScoreIdx = nextDoubleScoreIdx;
           state.animating = false;
           statusLabel.textContent = 'Pick the open gate';
           if (wasLevelUp) showLevelUp(getLevel());
@@ -1747,8 +1820,7 @@
       showNearMiss(state.currentSetEl, state.blockedGates);
       playGateOpen();
       navigator.vibrate && navigator.vibrate(25);
-      tryGrantChickenLeg(gateEl, index);
-      tryGrantLuckyClover(gateEl, index);
+      const _scoreBefore = state.score;
       state.score++;
       state.streak++;
 
@@ -1761,6 +1833,21 @@
           state.score += _cfg._g; floatLabel = '+2 ⚡';
         }
       }
+
+      if (state.doubleScoreRoundsLeft > 0) {
+        const gained = state.score - _scoreBefore;
+        state.score += gained;
+        state.doubleScoreRoundsLeft--;
+        const doubled = gained * 2;
+        if (floatLabel.includes('⚡⚡')) floatLabel = '+' + doubled + ' ⚡⚡ ×2';
+        else if (floatLabel.includes('⚡')) floatLabel = '+' + doubled + ' ⚡ ×2';
+        else floatLabel = '+' + doubled + ' ×2';
+        updateDoubleScoreHud();
+      }
+
+      tryGrantChickenLeg(gateEl, index);
+      tryGrantLuckyClover(gateEl, index);
+      tryGrantDoubleScore(gateEl, index);
 
       spawnFloatingScore(gateEl, floatLabel);
       const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
@@ -1867,11 +1954,12 @@
     showSheep();
     state = {
       score: 0, blockedGates: [], animating: false,
-      gameOver: false, hasChickenLeg: false, hasLuckyClover: false, currentSetEl: null, worldOffset: 0,
-      hintGateIdx: -1, hintCloverIdx: -1, streak: 0, roundStartTime: 0
+      gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
+      hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0
     };
     updateChickenLegHud();
     updateLuckyCloverHud();
+    updateDoubleScoreHud();
     sheepDeviousEl.setAttribute('display', 'none');
     worldEl.innerHTML = '';
     fieldEl.querySelectorAll('.funny-skull').forEach(el => el.remove());
