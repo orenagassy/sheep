@@ -931,7 +931,7 @@
 
   // ---- State --------------------------------------------------------------
   let state = {
-    score: 0, blockedGates: [], animating: false,
+    score: 0, gatesCleared: 0, blockedGates: [], animating: false,
     gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
     hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0
   };
@@ -990,10 +990,10 @@
   $('info-close').onclick  = closeDrawer;
   infoOverlay.onclick      = closeDrawer;
 
-  function getLevel()        { return Math.floor(state.score / ROUNDS_PER_LEVEL) + 1; }
+  function getLevel()        { return Math.floor(state.gatesCleared / ROUNDS_PER_LEVEL) + 1; }
   function getBlockedCount() { return Math.min(getLevel(), GATES_PER_ROUND - 1); }
   function getOpenCount()    { return GATES_PER_ROUND - getBlockedCount(); }
-  function getRoundInLevel() { return (state.score % ROUNDS_PER_LEVEL) + 1; }
+  function getRoundInLevel() { return (state.gatesCleared % ROUNDS_PER_LEVEL) + 1; }
 
   function renderStats() {
     statGatesEl.textContent        = stats.gatesCleared;
@@ -1213,7 +1213,7 @@
     const level = getLevel();
     const round = getRoundInLevel();
     const openCount = getOpenCount();
-    roundLabel.innerHTML = 'Gate ' + (state.score + 1) + ' · Level ' + level +
+    roundLabel.innerHTML = 'Gate ' + (state.gatesCleared + 1) + ' · Level ' + level +
       ' &nbsp;<span style="color:#2e7d32;font-weight:600">' + openCount + '✓</span>' +
       ' <span style="color:#a32d2d;font-weight:600">' + getBlockedCount() + '✗</span>';
     levelLabel.textContent = 'Level ' + level + ' · ' + openCount + ' of ' + GATES_PER_ROUND + ' open';
@@ -1758,6 +1758,8 @@
     const leftPct = ((gateRect.left - fieldRect.left + gateRect.width / 2) / fieldRect.width) * 100;
 
     statusLabel.textContent = 'Trotting over...';
+    const _curLeft = parseFloat(sheepEl.style.left) || 50;
+    sheepSvgEl.style.transform = leftPct > _curLeft ? 'scaleX(-1)' : 'scaleX(1)';
     sheepEl.style.left = leftPct + '%';
     sheepEl.classList.add('walking');
 
@@ -1797,16 +1799,19 @@
       playGateOpen();
       navigator.vibrate && navigator.vibrate(25);
       const _scoreBefore = state.score;
-      state.score++;
+      const _level = getLevel();
+      const _basePoints = 8 + _level * 2;
+      state.score += _basePoints;
+      state.gatesCleared++;
       state.streak++;
 
-      let floatLabel = '+1';
+      let floatLabel = '+' + _basePoints;
       if (SPORT_MODE) {
         const elapsed = state.sportClickElapsed;
         if (elapsed < _cfg._c) {
-          state.score += _cfg._f; floatLabel = '+3 ⚡⚡';
+          state.score += _cfg._f; floatLabel = '+' + (_basePoints + _cfg._f) + ' ⚡⚡';
         } else if (elapsed < _cfg._d) {
-          state.score += _cfg._g; floatLabel = '+2 ⚡';
+          state.score += _cfg._g; floatLabel = '+' + (_basePoints + _cfg._g) + ' ⚡';
         }
       }
 
@@ -1826,7 +1831,7 @@
       tryGrantDoubleScore(gateEl, index);
 
       spawnFloatingScore(gateEl, floatLabel);
-      const wasLevelUp = (state.score % ROUNDS_PER_LEVEL === 0);
+      const wasLevelUp = (state.gatesCleared % ROUNDS_PER_LEVEL === 0);
       updateHud();
       checkAchievements();
       walkToNextRound(wasLevelUp);
@@ -1866,7 +1871,7 @@
 
     stats.gamesPlayed++;
     stats.totalScore += state.score;
-    stats.gatesCleared += state.score;
+    stats.gatesCleared += state.gatesCleared;
     stats.bestLevel = Math.max(stats.bestLevel, getLevel());
     stats.streakBest = Math.max(stats.streakBest, state.streak);
     saveStats();
@@ -1879,9 +1884,9 @@
     renderStats();
     checkAchievements();
 
-    messageEl.textContent = 'Squashed at gate ' + (state.score + 1) + '.';
+    messageEl.textContent = 'Squashed at gate ' + (state.gatesCleared + 1) + '.';
     messageEl.style.color = 'var(--danger)';
-    statusLabel.textContent = 'Game over · cleared ' + state.score + ' gate' + (state.score === 1 ? '' : 's');
+    statusLabel.textContent = 'Game over · cleared ' + state.gatesCleared + ' gate' + (state.gatesCleared === 1 ? '' : 's');
 
     if (!TEST_MODE && isNewBest(state.score)) {
       if (sessionName) autoSaveScore(); else showHiscoreEntry();
@@ -1929,7 +1934,7 @@
     sheepEl.classList.remove('walking');
     showSheep();
     state = {
-      score: 0, blockedGates: [], animating: false,
+      score: 0, gatesCleared: 0, blockedGates: [], animating: false,
       gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
       hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0, sportClickElapsed: 0
     };
@@ -1945,6 +1950,7 @@
     sheepEl.style.left = '50%';
     sheepEl.style.bottom = '24px';
     sheepEl.style.transform = 'translateX(-50%)';
+    sheepSvgEl.style.transform = 'scaleX(1)';
     sheepEl.style.opacity = '1';
     fieldOverlayEl.style.background = 'transparent';
     starsEl.style.opacity = '0';
