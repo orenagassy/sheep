@@ -1,17 +1,38 @@
 <svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 826.34 600.74">
   <defs>
     <style>
-      .cls-1 { fill: #6a6d7a; }
-      .cls-2 { fill: #231f20; }
-      .cls-3 { fill: #fff; }
-      .cls-4 { stroke-miterlimit: 10; }
-      .cls-4, .cls-5, .cls-6 { fill: none; stroke: #231f20; stroke-width: 9px; }
-      .cls-5 { stroke-linejoin: round; }
-      .cls-6 { stroke-linejoin: bevel; }
-      .cls-7 { fill: #9398a9; }
-      .cls-8 { fill: #20202b; }
-      .cls-9 { fill: #31343f; }
-      .cls-10 { fill: #b7b7b7; }
+      .cls-1  { fill: #7d5a30; animation: fur-mid   3s ease-in-out infinite; }
+      .cls-2  { fill: #1a0c05; }
+      .cls-3  { fill: #f5f2eb; }
+      .cls-4  { stroke-miterlimit: 10; }
+      .cls-4, .cls-5, .cls-6 { fill: none; stroke-width: 9px; animation: wolf-stroke 2.8s ease-in-out infinite; }
+      .cls-5  { stroke-linejoin: round; }
+      .cls-6  { stroke-linejoin: bevel; }
+      .cls-7  { fill: #a07848; animation: fur-light  3s ease-in-out infinite 0.6s; }
+      .cls-8  { fill: #1f0e04; }
+      .cls-9  { fill: #3c2814; animation: fur-dark   3s ease-in-out infinite 1.2s; }
+      .cls-10 { fill: #c9a070; animation: fur-pale   3s ease-in-out infinite 0.3s; }
+
+      @keyframes wolf-stroke {
+        0%, 100% { stroke: #2a1208; }
+        50%       { stroke: #c44010; }
+      }
+      @keyframes fur-mid {
+        0%, 100% { fill: #7d5a30; }
+        50%       { fill: #a07840; }
+      }
+      @keyframes fur-light {
+        0%, 100% { fill: #a07848; }
+        50%       { fill: #c8a060; }
+      }
+      @keyframes fur-dark {
+        0%, 100% { fill: #3c2814; }
+        50%       { fill: #60402a; }
+      }
+      @keyframes fur-pale {
+        0%, 100% { fill: #c9a070; }
+        50%       { fill: #e8c898; }
+      }
     </style>
   </defs>
   <g>
