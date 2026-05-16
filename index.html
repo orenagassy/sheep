@@ -328,6 +328,19 @@
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 
+  /* ---- Sport bolt badge on sheep ---- */
+  #sheep-bolt {
+    position: absolute; top: -6px; right: 2px;
+    font-size: 15px; line-height: 1; z-index: 5;
+    pointer-events: none;
+    filter: drop-shadow(0 0 4px rgba(255,200,0,0.7));
+    animation: bolt-pop 1s ease-in-out infinite;
+  }
+  @keyframes bolt-pop {
+    0%, 100% { transform: scale(1) rotate(-8deg); }
+    50%       { transform: scale(1.25) rotate(8deg); }
+  }
+
   /* ---- Mode badges ---- */
   #test-badge, #sport-badge {
     display: none;
@@ -1813,6 +1826,8 @@
     const fieldRect = fieldEl.getBoundingClientRect();
     const leftPct = ((gateRect.left - fieldRect.left + gateRect.width / 2) / fieldRect.width) * 100;
 
+    const isBlocked = state.blockedGates.indexOf(index) !== -1;
+
     statusLabel.textContent = 'Trotting over...';
     const _curLeft = parseFloat(sheepEl.style.left) || 50;
     sheepSvgEl.style.transform = leftPct > _curLeft ? 'scaleX(-1)' : 'scaleX(1)';
@@ -1826,33 +1841,52 @@
       wiggleCount++;
     }, 120);
 
-    setTimeout(() => {
-      clearInterval(_wiggleId); _wiggleId = null;
-      sheepEl.style.transform = 'translateX(-50%)';
-      sheepEl.style.bottom = '80px';
-      statusLabel.textContent = 'Nudging the gate...';
+    if (!isBlocked) {
+      // Gate is clear — start opening mid-walk so it's already open on arrival
       setTimeout(() => {
-        let bumpCount = 0;
-        const bump = setInterval(() => {
-          sheepEl.style.transform = 'translateX(-50%) translateY(' + (bumpCount % 2 === 0 ? '-3px' : '0') + ')';
-          bumpCount++;
-          if (bumpCount >= 2) {
-            clearInterval(bump);
-            sheepEl.style.transform = 'translateX(-50%)';
-            resolveGate(index, gateEl);
-          }
-        }, 130);
-      }, 650);
-    }, 700);
+        gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        gateEl.style.transform = 'rotateY(-110deg)';
+        playGateOpen();
+      }, 350);
+      // Sheep arrives: move up, then resolve immediately (no bump)
+      setTimeout(() => {
+        clearInterval(_wiggleId); _wiggleId = null;
+        sheepEl.style.transform = 'translateX(-50%)';
+        sheepEl.style.bottom = '80px';
+        setTimeout(() => resolveGate(index, gateEl, true), SPORT_MODE ? 160 : 460);
+      }, 700);
+    } else {
+      // Gate is blocked — original bump & crash animation
+      setTimeout(() => {
+        clearInterval(_wiggleId); _wiggleId = null;
+        sheepEl.style.transform = 'translateX(-50%)';
+        sheepEl.style.bottom = '80px';
+        statusLabel.textContent = 'Nudging the gate...';
+        setTimeout(() => {
+          let bumpCount = 0;
+          const bump = setInterval(() => {
+            sheepEl.style.transform = 'translateX(-50%) translateY(' + (bumpCount % 2 === 0 ? '-3px' : '0') + ')';
+            bumpCount++;
+            if (bumpCount >= 2) {
+              clearInterval(bump);
+              sheepEl.style.transform = 'translateX(-50%)';
+              resolveGate(index, gateEl, false);
+            }
+          }, 130);
+        }, 650);
+      }, 700);
+    }
   }
 
-  function resolveGate(index, gateEl) {
+  function resolveGate(index, gateEl, alreadyOpened) {
     const isBlocked = state.blockedGates.indexOf(index) !== -1;
     if (!isBlocked) {
-      gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-      gateEl.style.transform = 'rotateY(-110deg)';
+      if (!alreadyOpened) {
+        gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        gateEl.style.transform = 'rotateY(-110deg)';
+        playGateOpen();
+      }
       showNearMiss(state.currentSetEl, state.blockedGates);
-      playGateOpen();
       navigator.vibrate && navigator.vibrate(25);
       const _scoreBefore = state.score;
       const _level = getLevel();
@@ -2136,6 +2170,10 @@
       `<circle cx='11' cy='30' r='2.5' fill='%231e1810'/>` +
       `</svg>`
     );
+    const _bolt = document.createElement('span');
+    _bolt.id = 'sheep-bolt';
+    _bolt.textContent = '⚡';
+    sheepEl.appendChild(_bolt);
   }
 
 
