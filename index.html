@@ -328,19 +328,6 @@
     filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
   }
 
-  /* ---- Sport bolt badge on sheep ---- */
-  #sheep-bolt {
-    position: absolute; top: -6px; right: 2px;
-    font-size: 15px; line-height: 1; z-index: 5;
-    pointer-events: none;
-    filter: drop-shadow(0 0 4px rgba(255,200,0,0.7));
-    animation: bolt-pop 1s ease-in-out infinite;
-  }
-  @keyframes bolt-pop {
-    0%, 100% { transform: scale(1) rotate(-8deg); }
-    50%       { transform: scale(1.25) rotate(8deg); }
-  }
-
   /* ---- Mode badges ---- */
   #test-badge, #sport-badge {
     display: none;
@@ -1717,7 +1704,7 @@
   }
 
   // ---- Feed the wolf (survive using chicken leg) -------------------------
-  function feedWolf(gateEl) {
+  function feedWolf(gateEl, alreadyOpen) {
     state.hasChickenLeg = false;
     stats.hintsUsed++;
     saveStats();
@@ -1733,12 +1720,14 @@
     navigator.vibrate && navigator.vibrate([30, 20, 60]);
     playWolfGrowl();
 
-    // Phase 1 (0ms): gate cracks open — dark hint that a wolf is behind it
-    gateEl.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1), background 0.25s';
-    gateEl.style.background = '#7b1a1a';
-    gateEl.style.transform  = 'rotateY(-28deg)';
+    if (!alreadyOpen) {
+      // Phase 1 (0ms): gate cracks open — dark hint that a wolf is behind it
+      gateEl.style.transition = 'transform 0.4s cubic-bezier(0.4,0,0.2,1), background 0.25s';
+      gateEl.style.background = '#7b1a1a';
+      gateEl.style.transform  = 'rotateY(-28deg)';
+    }
 
-    // Phase 2 (420ms): wolf pops up from behind the cracked gate
+    // Phase 2 (420ms or 0ms if gate already open): wolf pops up
     setTimeout(() => {
       const wolfPop = document.createElement('div');
       wolfPop.className   = 'funny-skull pop';
@@ -1804,7 +1793,7 @@
           }, 400);
         }, 430);
       }, 40);
-    }, 420);
+    }, alreadyOpen ? 0 : 420);
   }
 
   // ---- Gate interaction --------------------------------------------------
@@ -1834,6 +1823,9 @@
     sheepEl.style.left = leftPct + '%';
     sheepEl.classList.add('walking');
 
+    const walkMs = SPORT_MODE ? 175 : 700;
+    const upMs   = SPORT_MODE ? 175 : 700;
+
     let wiggleCount = 0;
     _wiggleId = setInterval(() => {
       sheepEl.style.transform = 'translateX(-50%) rotate(' + (wiggleCount % 2 === 0 ? '-6deg' : '6deg') + ')';
@@ -1841,41 +1833,22 @@
       wiggleCount++;
     }, 120);
 
-    if (!isBlocked) {
-      // Gate is clear — start opening mid-walk so it's already open on arrival
+    // After horizontal walk: start moving up toward gate
+    setTimeout(() => {
+      clearInterval(_wiggleId); _wiggleId = null;
+      sheepEl.style.transform = 'translateX(-50%)';
+      sheepEl.style.bottom = '80px';
+
+      // Halfway up: gate opens — clear or not
       setTimeout(() => {
-        gateEl.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
-        gateEl.style.transform = 'rotateY(-110deg)';
-        playGateOpen();
-      }, 350);
-      // Sheep arrives: move up, then resolve immediately (no bump)
-      setTimeout(() => {
-        clearInterval(_wiggleId); _wiggleId = null;
-        sheepEl.style.transform = 'translateX(-50%)';
-        sheepEl.style.bottom = '80px';
-        setTimeout(() => resolveGate(index, gateEl, true), SPORT_MODE ? 160 : 460);
-      }, 700);
-    } else {
-      // Gate is blocked — original bump & crash animation
-      setTimeout(() => {
-        clearInterval(_wiggleId); _wiggleId = null;
-        sheepEl.style.transform = 'translateX(-50%)';
-        sheepEl.style.bottom = '80px';
-        statusLabel.textContent = 'Nudging the gate...';
-        setTimeout(() => {
-          let bumpCount = 0;
-          const bump = setInterval(() => {
-            sheepEl.style.transform = 'translateX(-50%) translateY(' + (bumpCount % 2 === 0 ? '-3px' : '0') + ')';
-            bumpCount++;
-            if (bumpCount >= 2) {
-              clearInterval(bump);
-              sheepEl.style.transform = 'translateX(-50%)';
-              resolveGate(index, gateEl, false);
-            }
-          }, 130);
-        }, 650);
-      }, 700);
-    }
+        gateEl.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        gateEl.style.transform  = 'rotateY(-110deg)';
+        if (!isBlocked) playGateOpen();
+      }, upMs / 2);
+
+      // Sheep arrives at gate
+      setTimeout(() => resolveGate(index, gateEl, true), upMs + 80);
+    }, walkMs);
   }
 
   function resolveGate(index, gateEl, alreadyOpened) {
@@ -1927,20 +1900,22 @@
       walkToNextRound(wasLevelUp);
 
     } else {
-      if (state.hasChickenLeg) { feedWolf(gateEl); return; }
-      gateEl.style.transformOrigin = 'left bottom';
-      gateEl.style.transition = 'transform 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53), background 0.4s, border-color 0.4s';
-      gateEl.style.background = '#a33c1d';
-      gateEl.style.borderColor = '#712b13';
-      gateEl.style.zIndex = '4';
-      gateEl.style.transform = 'rotate(-3deg)';
+      if (state.hasChickenLeg) { feedWolf(gateEl, alreadyOpened); return; }
       playGateCrash();
       navigator.vibrate && navigator.vibrate([70, 40, 70]);
       spawnCrashParticles(gateEl);
       fieldEl.classList.add('shaking');
       setTimeout(() => fieldEl.classList.remove('shaking'), 520);
-      setTimeout(() => { gateEl.style.transform = 'rotate(2deg)'; }, 150);
-      setTimeout(() => { gateEl.style.transform = 'rotate(90deg)'; }, 350);
+      if (!alreadyOpened) {
+        gateEl.style.transformOrigin = 'left bottom';
+        gateEl.style.transition = 'transform 0.7s cubic-bezier(0.55, 0.085, 0.68, 0.53), background 0.4s, border-color 0.4s';
+        gateEl.style.background = '#a33c1d';
+        gateEl.style.borderColor = '#712b13';
+        gateEl.style.zIndex = '4';
+        gateEl.style.transform = 'rotate(-3deg)';
+        setTimeout(() => { gateEl.style.transform = 'rotate(2deg)'; }, 150);
+        setTimeout(() => { gateEl.style.transform = 'rotate(90deg)'; }, 350);
+      }
       setTimeout(() => {
         sheepEl.classList.remove('walking');
         sheepEl.style.transition = 'all 0.4s ease-out';
@@ -2170,10 +2145,15 @@
       `<circle cx='11' cy='30' r='2.5' fill='%231e1810'/>` +
       `</svg>`
     );
-    const _bolt = document.createElement('span');
-    _bolt.id = 'sheep-bolt';
-    _bolt.textContent = '⚡';
-    sheepEl.appendChild(_bolt);
+    const boltEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    boltEl.setAttribute('x', '48');
+    boltEl.setAttribute('y', '16');
+    boltEl.setAttribute('font-size', '13');
+    boltEl.setAttribute('text-anchor', 'middle');
+    boltEl.setAttribute('dominant-baseline', 'middle');
+    boltEl.id = 'sheep-bolt-svg';
+    boltEl.textContent = '⚡';
+    sheepSvgEl.appendChild(boltEl);
   }
 
 
