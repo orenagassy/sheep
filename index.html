@@ -588,23 +588,22 @@
   #mode-popup-score-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
   #mode-popup-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
   #mode-popup-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
-  #mode-toggle-wrap {
-    display: flex; background: var(--bg-soft);
-    border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 14px;
+  #mode-btn-wrap { display: flex; gap: 10px; margin-bottom: 14px; }
+  .mode-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 16px 8px 12px; border-radius: 14px;
+    border: 2px solid var(--border); background: var(--bg-soft);
+    color: var(--text-secondary); font-size: 14px; font-weight: 600;
+    cursor: pointer; font-family: inherit;
+    transition: border-color 0.15s, background 0.15s, transform 0.12s;
   }
-  .mt-opt {
-    flex: 1; padding: 13px 8px 11px; border-radius: 11px;
-    border: none; background: transparent; color: var(--text-secondary);
-    font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
-    display: flex; flex-direction: column; align-items: center; gap: 4px;
-    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  .mode-btn-icon { font-size: 28px; line-height: 1; }
+  .mode-btn:hover { transform: translateY(-2px); }
+  .mode-btn:active { transform: none; }
+  .mode-btn.selected {
+    border-color: var(--success); color: var(--text-primary); background: var(--bg-card);
   }
-  .mt-icon { font-size: 22px; line-height: 1; }
-  .mt-opt.selected {
-    background: var(--bg-card); color: var(--text-primary);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-  }
-  #mpc-sport.selected { color: #ef5350; }
+  #mpc-sport.selected { border-color: #ef5350; }
   .mpc-disabled {
     width: 100%; display: flex; flex-direction: row; align-items: center;
     gap: 12px; padding: 12px 16px;
@@ -614,6 +613,11 @@
   .mpc-icon { font-size: 20px; line-height: 1; }
   .mpc-name { font-size: 13px; font-weight: 700; color: var(--text-primary); display: block; }
   .mpc-desc { font-size: 11px; color: var(--text-secondary); }
+  #drawer-credits {
+    margin-top: 20px; padding-top: 14px; border-top: 0.5px solid var(--border);
+    display: flex; justify-content: center; gap: 12px;
+    font-size: 22px; opacity: 0.45; letter-spacing: 4px;
+  }
 </style>
 </head>
 <body>
@@ -815,6 +819,7 @@
   <div class="ad-wrap ad-wrap--drawer">
     <!-- Ad unit loads here after AdSense approval -->
   </div>
+  <div id="drawer-credits">⚡🧠🐢</div>
 </div>
 
 <div id="mode-overlay">
@@ -825,12 +830,12 @@
     </div>
     <div id="mode-popup-title">🐑 Sheep Gates</div>
     <div id="mode-popup-sub">Choose your mode</div>
-    <div id="mode-toggle-wrap">
-      <button id="mpc-normal" class="mt-opt">
-        <span class="mt-icon">🐑</span>Normal
+    <div id="mode-btn-wrap">
+      <button id="mpc-normal" class="mode-btn">
+        <span class="mode-btn-icon">🐑</span>Normal
       </button>
-      <button id="mpc-sport" class="mt-opt">
-        <span class="mt-icon">⚡</span>Sport
+      <button id="mpc-sport" class="mode-btn">
+        <span class="mode-btn-icon">⚡</span>Sport
       </button>
     </div>
     <button class="mpc-disabled" disabled>
@@ -2030,7 +2035,7 @@
       modePopupSubEl.textContent = 'Choose your mode';
     }
     document.getElementById('mpc-normal').classList.toggle('selected', !SPORT_MODE);
-    document.getElementById('mpc-sport').classList.toggle('selected', SPORT_MODE);
+    document.getElementById('mpc-sport').classList.toggle('selected',  SPORT_MODE);
     modeOverlayEl.style.display = 'flex';
   }
 
