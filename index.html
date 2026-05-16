@@ -588,31 +588,32 @@
   #mode-popup-score-sub { font-size: 12px; color: var(--text-secondary); margin-top: 2px; }
   #mode-popup-title { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
   #mode-popup-sub { font-size: 13px; color: var(--text-secondary); margin-bottom: 18px; }
-  #mode-popup-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .mpc {
-    background: var(--bg-soft);
-    border: 2px solid var(--border);
-    border-radius: 14px;
-    padding: 18px 8px 14px;
-    cursor: pointer; font-family: inherit;
-    transition: border-color 0.15s, background 0.15s, transform 0.12s;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  #mode-toggle-wrap {
+    display: flex; background: var(--bg-soft);
+    border-radius: 14px; padding: 4px; gap: 4px; margin-bottom: 14px;
   }
-  .mpc:hover { transform: translateY(-3px); }
-  .mpc:active { transform: translateY(0); }
-  .mpc-icon { font-size: 36px; line-height: 1; display: block; }
-  .mpc-name { font-size: 14px; font-weight: 700; color: var(--text-primary); display: block; }
-  .mpc-desc { font-size: 11px; color: var(--text-secondary); line-height: 1.3; display: block; }
-  .mpc.current-mode { border-color: var(--success); }
-  #mpc-sport.current-mode { border-color: #b71c1c; }
+  .mt-opt {
+    flex: 1; padding: 13px 8px 11px; border-radius: 11px;
+    border: none; background: transparent; color: var(--text-secondary);
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+    transition: background 0.18s, color 0.18s, box-shadow 0.18s;
+  }
+  .mt-icon { font-size: 22px; line-height: 1; }
+  .mt-opt.selected {
+    background: var(--bg-card); color: var(--text-primary);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  }
+  #mpc-sport.selected { color: #ef5350; }
   .mpc-disabled {
-    grid-column: 1 / -1;
-    flex-direction: row; gap: 12px; padding: 14px 16px;
-    opacity: 0.45; cursor: not-allowed;
+    width: 100%; display: flex; flex-direction: row; align-items: center;
+    gap: 12px; padding: 12px 16px;
+    background: var(--bg-soft); border: 1.5px solid var(--border); border-radius: 14px;
+    opacity: 0.4; cursor: not-allowed; font-family: inherit;
   }
-  .mpc-disabled .mpc-icon { font-size: 24px; }
-  .mpc-disabled .mpc-name { font-size: 13px; }
-  .mpc-disabled .mpc-desc::before { content: '· '; }
+  .mpc-icon { font-size: 20px; line-height: 1; }
+  .mpc-name { font-size: 13px; font-weight: 700; color: var(--text-primary); display: block; }
+  .mpc-desc { font-size: 11px; color: var(--text-secondary); }
 </style>
 </head>
 <body>
@@ -706,6 +707,11 @@
           <g class="leg leg-fr">
             <rect x="33" y="42" width="5" height="13" rx="2.5" fill="#bcb294"/>
             <rect x="33" y="51" width="5" height="5"  rx="2"   fill="#2e2418"/>
+          </g>
+          <!-- sport bolt badge on wool (shown only in sport mode) -->
+          <g id="sheep-sport-bolt" display="none">
+            <circle cx="45" cy="23" r="7" fill="#ffb300" opacity="0.92"/>
+            <text x="45" y="23" font-size="11" text-anchor="middle" dominant-baseline="middle" fill="#3d1a00">⚡</text>
           </g>
           <!-- devious face (shown only when feeding the wolf) -->
           <g id="sheep-devious-face" display="none">
@@ -819,23 +825,21 @@
     </div>
     <div id="mode-popup-title">🐑 Sheep Gates</div>
     <div id="mode-popup-sub">Choose your mode</div>
-    <div id="mode-popup-cards">
-      <button class="mpc" id="mpc-normal">
-        <span class="mpc-icon">🐑</span>
-        <span class="mpc-name">Normal</span>
-        <span class="mpc-desc">Relaxed pace · no timer</span>
+    <div id="mode-toggle-wrap">
+      <button id="mpc-normal" class="mt-opt">
+        <span class="mt-icon">🐑</span>Normal
       </button>
-      <button class="mpc" id="mpc-sport">
-        <span class="mpc-icon">⚡</span>
-        <span class="mpc-name">Sport</span>
-        <span class="mpc-desc">Beat the clock · speed bonuses</span>
-      </button>
-      <button class="mpc mpc-disabled" disabled>
-        <span class="mpc-icon">👥</span>
-        <span class="mpc-name">Play with Friends</span>
-        <span class="mpc-desc">Coming soon</span>
+      <button id="mpc-sport" class="mt-opt">
+        <span class="mt-icon">⚡</span>Sport
       </button>
     </div>
+    <button class="mpc-disabled" disabled>
+      <span class="mpc-icon">👥</span>
+      <span>
+        <span class="mpc-name">Play with Friends</span>
+        <span class="mpc-desc"> · Coming soon</span>
+      </span>
+    </button>
   </div>
 </div>
 
@@ -1704,7 +1708,7 @@
   }
 
   // ---- Feed the wolf (survive using chicken leg) -------------------------
-  function feedWolf(gateEl, alreadyOpen) {
+  function feedWolf(gateEl, alreadyOpen, wolfRevealEl) {
     state.hasChickenLeg = false;
     stats.hintsUsed++;
     saveStats();
@@ -1729,13 +1733,19 @@
 
     // Phase 2 (420ms or 0ms if gate already open): wolf pops up
     setTimeout(() => {
-      const wolfPop = document.createElement('div');
-      wolfPop.className   = 'funny-skull pop';
-      wolfPop.style.left  = gx + 'px';
-      wolfPop.style.top   = gy + 'px';
-      wolfPop.style.zIndex = '12';
-      wolfPop.innerHTML   = _WOLF_SVG;
-      fieldEl.appendChild(wolfPop);
+      let wolfPop;
+      if (wolfRevealEl) {
+        wolfPop = wolfRevealEl;  // already in the DOM and animated
+        wolfPop.style.zIndex = '12';
+      } else {
+        wolfPop = document.createElement('div');
+        wolfPop.className   = 'funny-skull pop';
+        wolfPop.style.left  = gx + 'px';
+        wolfPop.style.top   = gy + 'px';
+        wolfPop.style.zIndex = '12';
+        wolfPop.innerHTML   = _WOLF_SVG;
+        fieldEl.appendChild(wolfPop);
+      }
 
       statusLabel.textContent = '🍗 Feeding the wolf…';
 
@@ -1839,19 +1849,32 @@
       sheepEl.style.transform = 'translateX(-50%)';
       sheepEl.style.bottom = '80px';
 
-      // Halfway up: gate opens — clear or not
+      let _wolfRevealEl = null;
+
+      // Halfway up: gate swings open, wolf reveals immediately if blocked
       setTimeout(() => {
         gateEl.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
         gateEl.style.transform  = 'rotateY(-110deg)';
-        if (!isBlocked) playGateOpen();
+        if (!isBlocked) {
+          playGateOpen();
+        } else {
+          const gr = gateEl.getBoundingClientRect(), fr = fieldEl.getBoundingClientRect();
+          _wolfRevealEl = document.createElement('div');
+          _wolfRevealEl.className = 'funny-skull';
+          _wolfRevealEl.style.left = (gr.left - fr.left + gr.width  / 2) + 'px';
+          _wolfRevealEl.style.top  = (gr.top  - fr.top  + gr.height / 2) + 'px';
+          _wolfRevealEl.innerHTML  = _WOLF_SVG;
+          fieldEl.appendChild(_wolfRevealEl);
+          requestAnimationFrame(() => requestAnimationFrame(() => _wolfRevealEl.classList.add('pop')));
+        }
       }, upMs / 2);
 
       // Sheep arrives at gate
-      setTimeout(() => resolveGate(index, gateEl, true), upMs + 80);
+      setTimeout(() => resolveGate(index, gateEl, true, _wolfRevealEl), upMs + 80);
     }, walkMs);
   }
 
-  function resolveGate(index, gateEl, alreadyOpened) {
+  function resolveGate(index, gateEl, alreadyOpened, wolfRevealEl) {
     const isBlocked = state.blockedGates.indexOf(index) !== -1;
     if (!isBlocked) {
       if (!alreadyOpened) {
@@ -1900,7 +1923,7 @@
       walkToNextRound(wasLevelUp);
 
     } else {
-      if (state.hasChickenLeg) { feedWolf(gateEl, alreadyOpened); return; }
+      if (state.hasChickenLeg) { feedWolf(gateEl, alreadyOpened, wolfRevealEl); return; }
       playGateCrash();
       navigator.vibrate && navigator.vibrate([70, 40, 70]);
       spawnCrashParticles(gateEl);
@@ -1921,7 +1944,8 @@
         sheepEl.style.transition = 'all 0.4s ease-out';
         sheepEl.style.transform = 'translateX(-50%) translateY(8px) scaleY(0.4) scaleX(1.4)';
       }, 700);
-      spawnFunnySkull(gateEl);
+      // wolf already revealed at gate-open; only spawn skull if not pre-shown
+      if (!wolfRevealEl) spawnFunnySkull(gateEl);
       setTimeout(() => {
         sheepEl.style.transition = 'opacity 0.4s';
         sheepEl.style.opacity = '0';
@@ -2005,8 +2029,8 @@
       modeResultEl.style.display = 'none';
       modePopupSubEl.textContent = 'Choose your mode';
     }
-    document.getElementById('mpc-normal').classList.toggle('current-mode', !SPORT_MODE);
-    document.getElementById('mpc-sport').classList.toggle('current-mode', SPORT_MODE);
+    document.getElementById('mpc-normal').classList.toggle('selected', !SPORT_MODE);
+    document.getElementById('mpc-sport').classList.toggle('selected', SPORT_MODE);
     modeOverlayEl.style.display = 'flex';
   }
 
@@ -2145,15 +2169,7 @@
       `<circle cx='11' cy='30' r='2.5' fill='%231e1810'/>` +
       `</svg>`
     );
-    const boltEl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    boltEl.setAttribute('x', '48');
-    boltEl.setAttribute('y', '16');
-    boltEl.setAttribute('font-size', '13');
-    boltEl.setAttribute('text-anchor', 'middle');
-    boltEl.setAttribute('dominant-baseline', 'middle');
-    boltEl.id = 'sheep-bolt-svg';
-    boltEl.textContent = '⚡';
-    sheepSvgEl.appendChild(boltEl);
+    document.getElementById('sheep-sport-bolt').setAttribute('display', 'block');
   }
 
 
