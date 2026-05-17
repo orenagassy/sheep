@@ -101,6 +101,28 @@
     0%, 100% { opacity: 0.2; transform: scale(1); }
     50%       { opacity: 1;   transform: scale(1.4); }
   }
+  /* Rainbow sky */
+  #rainbow-sky {
+    position: absolute; left: 0; right: 0; top: 0; height: 80px;
+    z-index: 0; pointer-events: none;
+    opacity: 0; transition: opacity 1.2s ease;
+    overflow: visible;
+  }
+  .rainbow-arc {
+    position: absolute;
+    width: 200%; height: 200%;
+    left: -50%; top: -115%;
+    border-radius: 50%;
+    border: 7px solid rgba(255, 50, 50, 0.65);
+    border-bottom: none;
+    box-shadow:
+      0 0 0  8px rgba(255, 160,   0, 0.55),
+      0 0 0 16px rgba(255, 240,   0, 0.50),
+      0 0 0 24px rgba(  0, 200,   0, 0.50),
+      0 0 0 32px rgba(  0, 120, 255, 0.45),
+      0 0 0 40px rgba(160,   0, 220, 0.40);
+    pointer-events: none;
+  }
   /* Clouds */
   #clouds {
     position: absolute; left: 0; right: 0; top: 0; height: 80px;
@@ -671,6 +693,7 @@
       <div id="sport-timer"><div id="sport-timer-bar"></div></div>
       <div id="field-overlay"></div>
       <div id="stars"></div>
+      <div id="rainbow-sky"><div class="rainbow-arc"></div></div>
       <div id="clouds">
         <div class="cloud c1"></div>
         <div class="cloud c2"></div>
@@ -860,6 +883,9 @@
   const ROUNDS_PER_LEVEL   = 7;
   const FIELD_HEIGHT        = 320;
   const MAX_LEADERBOARD     = 10;
+  const RAINBOW_ROUND_CHANCE = 1 / 20;
+  const RAINBOW_GATE_COLORS  = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#e91e8c'];
+  const RAINBOW_BONUS_TYPES  = ['leg', 'clover', 'double'];
 
   // Game mechanics loaded from Cloudflare Worker at boot — not stored here
   let _cfg = null;
@@ -998,7 +1024,8 @@
   let state = {
     score: 0, gatesCleared: 0, blockedGates: [], animating: false,
     gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
-    hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0
+    hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0,
+    rainbowRoundUsed: false, isRainbowRound: false, rainbowGateBonuses: []
   };
 
   let leaderboard = [];
@@ -1034,6 +1061,7 @@
   const syncIndicator       = $('sync-indicator');
   const fieldOverlayEl      = $('field-overlay');
   const starsEl             = $('stars');
+  const rainbowSkyEl        = $('rainbow-sky');
   const grassBladesEl       = $('grass-blades');
   const sportTimerEl        = $('sport-timer');
   const sportTimerBarEl     = $('sport-timer-bar');
@@ -1209,13 +1237,16 @@
       const gate = document.createElement('button');
       gate.className = 'gate';
       gate.dataset.idx = i;
-      gate.style.cssText = 'position:absolute;top:0;left:4px;right:0;bottom:0;background:repeating-linear-gradient(90deg,#9c7b44 0px,#8b6f47 4px,#7a5c35 7px,#8b6f47 10px,#9a7840 14px);border:2px solid #5d4a30;border-left:none;border-radius:0 4px 4px 0;padding:0;cursor:pointer;transform-origin:left center;transform:rotateY(0deg);transition:transform 0.15s,background 0.4s,border-color 0.4s;display:flex;align-items:center;justify-content:center;overflow:hidden;will-change:transform;touch-action:manipulation;box-shadow:inset 0 0 12px rgba(0,0,0,0.15),2px 0 4px rgba(0,0,0,0.2);';
+      const _rc = state.isRainbowRound ? RAINBOW_GATE_COLORS[i] : null;
+      gate.style.cssText = 'position:absolute;top:0;left:4px;right:0;bottom:0;background:' + (_rc || 'repeating-linear-gradient(90deg,#9c7b44 0px,#8b6f47 4px,#7a5c35 7px,#8b6f47 10px,#9a7840 14px)') + ';border:2px solid ' + (_rc || '#5d4a30') + ';border-left:none;border-radius:0 4px 4px 0;padding:0;cursor:pointer;transform-origin:left center;transform:rotateY(0deg);transition:transform 0.15s,background 0.4s,border-color 0.4s;display:flex;align-items:center;justify-content:center;overflow:hidden;will-change:transform;touch-action:manipulation;box-shadow:inset 0 0 12px rgba(0,0,0,0.15),2px 0 4px rgba(0,0,0,0.2);';
       const planks = document.createElement('div');
       planks.className = 'planks';
       planks.style.cssText = 'width:82%;height:100%;display:flex;flex-direction:column;justify-content:space-around;padding:5px 0;transition:opacity 0.3s;';
       for (let p = 0; p < 3; p++) {
         const plank = document.createElement('div');
-        plank.className = 'gate-plank'; planks.appendChild(plank);
+        plank.className = 'gate-plank';
+        if (_rc) plank.style.background = 'rgba(255,255,255,0.20)';
+        planks.appendChild(plank);
       }
       gate.appendChild(planks);
       gate.onmouseover = () => { if (!gate.disabled) gate.style.transform = 'translateY(-3px)'; };
@@ -1236,8 +1267,23 @@
     gates[idx].parentNode.appendChild(m);
   }
   function newRound() {
+    // Rainbow Round check — fires at most once per game
+    state.isRainbowRound = false;
+    state.rainbowGateBonuses = [];
+    if (!state.rainbowRoundUsed && Math.random() < RAINBOW_ROUND_CHANCE) {
+      state.isRainbowRound = true;
+      state.rainbowRoundUsed = true;
+    }
+
     state.blockedGates = pickBlockedIndices(getBlockedCount());
-    {
+    if (state.isRainbowRound) {
+      state.blockedGates = [];
+      state.hintGateIdx = -1; state.hintCloverIdx = -1; state.hintDoubleScoreIdx = -1;
+      state.rainbowGateBonuses = Array.from({length: GATES_PER_ROUND},
+        () => RAINBOW_BONUS_TYPES[Math.floor(Math.random() * RAINBOW_BONUS_TYPES.length)]);
+      rainbowSkyEl.style.opacity = '1';
+    } else {
+      rainbowSkyEl.style.opacity = '0';
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
       const legChance = _cfg._h ?? 1/10, clovChance = _cfg._i ?? 1/10, dblChance = _cfg._j ?? 1/10;
@@ -1253,7 +1299,7 @@
     state.animating = false;
     messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
     restartBtn.style.display = 'none';
-    statusLabel.textContent = 'Pick the open gate';
+    statusLabel.textContent = state.isRainbowRound ? '🌈 Rainbow Round — every gate hides a bonus!' : 'Pick the open gate';
     showSheep();
     updateHud();
     const newSet = buildGateSet(95 - state.worldOffset);
@@ -1261,10 +1307,16 @@
     if (TEST_MODE) {
       const gates = newSet.querySelectorAll('.gate');
       state.blockedGates.forEach(idx => stampTestMark(gates, idx, '🐺'));
-      if (state.hintGateIdx >= 0 && !state.hasChickenLeg)    stampTestMark(gates, state.hintGateIdx, '🍗');
-      if (state.hintCloverIdx >= 0 && !state.hasLuckyClover)  stampTestMark(gates, state.hintCloverIdx, '🍀');
-      if (state.hintDoubleScoreIdx >= 0)                       stampTestMark(gates, state.hintDoubleScoreIdx, '2X');
+      if (state.isRainbowRound) {
+        const emojiMap = { leg: '🍗', clover: '🍀', double: '2X' };
+        state.rainbowGateBonuses.forEach((type, idx) => stampTestMark(gates, idx, emojiMap[type]));
+      } else {
+        if (state.hintGateIdx >= 0 && !state.hasChickenLeg)    stampTestMark(gates, state.hintGateIdx, '🍗');
+        if (state.hintCloverIdx >= 0 && !state.hasLuckyClover)  stampTestMark(gates, state.hintCloverIdx, '🍀');
+        if (state.hintDoubleScoreIdx >= 0)                       stampTestMark(gates, state.hintDoubleScoreIdx, '2X');
+      }
     }
+    if (state.isRainbowRound) showRainbowBanner();
     state.currentSetEl = newSet;
     if (SPORT_MODE) startSportTimer();
   }
@@ -1280,7 +1332,8 @@
     const openCount = getOpenCount();
     roundLabel.innerHTML = 'Gate ' + (state.gatesCleared + 1) + ' · Level ' + level +
       ' &nbsp;<span style="color:#2e7d32;font-weight:600">' + openCount + '✓</span>' +
-      ' <span style="color:#a32d2d;font-weight:600">' + getBlockedCount() + '✗</span>';
+      ' <span style="color:#a32d2d;font-weight:600">' + getBlockedCount() + '✗</span>' +
+      (state.isRainbowRound ? ' 🌈' : '');
     levelLabel.textContent = 'Level ' + level + ' · ' + openCount + ' of ' + GATES_PER_ROUND + ' open';
     levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
     levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
@@ -1297,6 +1350,48 @@
       levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
     }, 1200);
     spawnConfetti();
+  }
+  function showRainbowBanner() {
+    levelBanner.textContent = '🌈 Rainbow Round!';
+    levelBanner.style.opacity = '1';
+    levelBanner.style.transform = 'translate(-50%, -50%) scale(1)';
+    setTimeout(() => {
+      levelBanner.style.opacity = '0';
+      levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
+    }, 1600);
+    spawnConfetti();
+  }
+  function showPickupPop(gateEl, emoji, sound, extraStyle) {
+    const pop = document.createElement('div');
+    pop.textContent = emoji;
+    pop.style.cssText = PICKUP_POP_CSS + (extraStyle || '');
+    gateEl.parentNode.appendChild(pop);
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      pop.style.transform = 'translate(-50%,-50%) scale(1)';
+      pop.style.opacity = '1';
+    }));
+    setTimeout(() => {
+      sound();
+      setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
+    }, 350);
+  }
+  function grantRainbowBonus(gateEl, index) {
+    const type = state.rainbowGateBonuses[index];
+    if (type === 'leg') {
+      state.hasChickenLeg = true;
+      updateChickenLegHud();
+      showPickupPop(gateEl, '🍗', playHintFound);
+      stats.hintsFound++;
+    } else if (type === 'clover') {
+      state.hasLuckyClover = true;
+      updateLuckyCloverHud();
+      showPickupPop(gateEl, '🍀', playCloverFound);
+    } else if (type === 'double') {
+      state.doubleScoreRoundsLeft = 3;
+      updateDoubleScoreHud();
+      showPickupPop(gateEl, '2X', playDoubleScoreFound,
+        'color:#ffd700;font-weight:900;font-size:24px;text-shadow:0 0 12px rgba(255,200,0,0.9),0 2px 4px rgba(0,0,0,0.5);');
+    }
   }
 
   // ---- Ambience (day → dusk → night) -------------------------------------
@@ -1917,9 +2012,13 @@
         updateDoubleScoreHud();
       }
 
-      tryGrantChickenLeg(gateEl, index);
-      tryGrantLuckyClover(gateEl, index);
-      tryGrantDoubleScore(gateEl, index);
+      if (state.isRainbowRound) {
+        grantRainbowBonus(gateEl, index);
+      } else {
+        tryGrantChickenLeg(gateEl, index);
+        tryGrantLuckyClover(gateEl, index);
+        tryGrantDoubleScore(gateEl, index);
+      }
 
       spawnFloatingScore(gateEl, floatLabel);
       const wasLevelUp = (state.gatesCleared % ROUNDS_PER_LEVEL === 0);
@@ -2064,7 +2163,8 @@
     state = {
       score: 0, gatesCleared: 0, blockedGates: [], animating: false,
       gameOver: false, hasChickenLeg: false, hasLuckyClover: false, doubleScoreRoundsLeft: 0, currentSetEl: null, worldOffset: 0,
-      hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0, sportClickElapsed: 0
+      hintGateIdx: -1, hintCloverIdx: -1, hintDoubleScoreIdx: -1, streak: 0, roundStartTime: 0, sportClickElapsed: 0,
+      rainbowRoundUsed: false, isRainbowRound: false, rainbowGateBonuses: []
     };
     updateChickenLegHud();
     updateLuckyCloverHud();
@@ -2082,6 +2182,7 @@
     sheepEl.style.opacity = '1';
     fieldOverlayEl.style.background = 'transparent';
     starsEl.style.opacity = '0';
+    rainbowSkyEl.style.opacity = '0';
     setTimeout(() => {
       worldEl.style.transition = WORLD_TRANSITION;
       sheepEl.style.transition = SHEEP_TRANSITION;
