@@ -622,10 +622,6 @@
   .mode-btn-icon { font-size: 28px; line-height: 1; }
   .mode-btn:hover { transform: translateY(-2px); }
   .mode-btn:active { transform: none; }
-  .mode-btn.selected {
-    border-color: var(--success); color: var(--text-primary); background: var(--bg-card);
-  }
-  #mpc-sport.selected { border-color: #ef5350; }
   .mpc-disabled {
     width: 100%; display: flex; flex-direction: row; align-items: center;
     gap: 12px; padding: 12px 16px;
@@ -2133,14 +2129,13 @@
       modeResultEl.style.display = 'none';
       modePopupSubEl.textContent = 'Choose your mode';
     }
-    document.getElementById('mpc-normal').classList.toggle('selected', !SPORT_MODE);
-    document.getElementById('mpc-sport').classList.toggle('selected',  SPORT_MODE);
     modeOverlayEl.style.display = 'flex';
   }
 
   function hideModePopup() { modeOverlayEl.style.display = 'none'; }
 
   function switchMode(toSport) {
+    sessionStorage.setItem('sheepgate:autostart', '1');
     const url = new URL(location.href);
     url.searchParams.delete('sport');
     if (toSport) url.searchParams.set('sport', '');
@@ -2287,7 +2282,12 @@
   statusLabel.textContent = 'Loading...';
   loadConfig().then(() => {
     loadLeaderboard();
-    showModePopup(false);
+    if (sessionStorage.getItem('sheepgate:autostart')) {
+      sessionStorage.removeItem('sheepgate:autostart');
+      doRestart();
+    } else {
+      showModePopup(false);
+    }
   });
 })();
 </script>
