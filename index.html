@@ -1263,15 +1263,12 @@
     gates[idx].parentNode.appendChild(m);
   }
   function newRound() {
-    // Rainbow Round check — fires at most once per game
     state.isRainbowRound = false;
-    state.rainbowGateBonuses = [];
     if (!state.rainbowRoundUsed && Math.random() < RAINBOW_ROUND_CHANCE) {
       state.isRainbowRound = true;
       state.rainbowRoundUsed = true;
     }
 
-    state.blockedGates = pickBlockedIndices(getBlockedCount());
     if (state.isRainbowRound) {
       state.blockedGates = [];
       state.hintGateIdx = -1; state.hintCloverIdx = -1; state.hintDoubleScoreIdx = -1;
@@ -1279,6 +1276,7 @@
         () => RAINBOW_BONUS_TYPES[Math.floor(Math.random() * RAINBOW_BONUS_TYPES.length)]);
       rainbowSkyEl.style.opacity = '1';
     } else {
+      state.blockedGates = pickBlockedIndices(getBlockedCount());
       rainbowSkyEl.style.opacity = '0';
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
@@ -1337,26 +1335,20 @@
     streakRowEl.textContent = state.streak >= 3 ? '🔥 ' + state.streak + ' streak' : '';
     updateFieldAmbience(level);
   }
+  function showBanner(text, duration) {
+    levelBanner.textContent = text;
+    levelBanner.style.opacity = '1';
+    levelBanner.style.transform = 'translate(-50%, -50%) scale(1)';
+    setTimeout(() => {
+      levelBanner.style.opacity = '0';
+      levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
+    }, duration);
+    spawnConfetti();
+  }
   function showLevelUp(newLevel) {
-    levelBanner.textContent = 'Level ' + newLevel + ' · ' + (GATES_PER_ROUND - getBlockedCount()) + ' open';
-    levelBanner.style.opacity = '1';
-    levelBanner.style.transform = 'translate(-50%, -50%) scale(1)';
-    setTimeout(() => {
-      levelBanner.style.opacity = '0';
-      levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
-    }, 1200);
-    spawnConfetti();
+    showBanner('Level ' + newLevel + ' · ' + (GATES_PER_ROUND - getBlockedCount()) + ' open', 1200);
   }
-  function showRainbowBanner() {
-    levelBanner.textContent = '🌈 Rainbow Round!';
-    levelBanner.style.opacity = '1';
-    levelBanner.style.transform = 'translate(-50%, -50%) scale(1)';
-    setTimeout(() => {
-      levelBanner.style.opacity = '0';
-      levelBanner.style.transform = 'translate(-50%, -50%) scale(0.5)';
-    }, 1600);
-    spawnConfetti();
-  }
+  function showRainbowBanner() { showBanner('🌈 Rainbow Round!', 1600); }
   function showPickupPop(gateEl, emoji, sound, extraStyle) {
     const pop = document.createElement('div');
     pop.textContent = emoji;
@@ -1385,8 +1377,7 @@
     } else if (type === 'double') {
       state.doubleScoreRoundsLeft = 3;
       updateDoubleScoreHud();
-      showPickupPop(gateEl, '2X', playDoubleScoreFound,
-        'color:#ffd700;font-weight:900;font-size:24px;text-shadow:0 0 12px rgba(255,200,0,0.9),0 2px 4px rgba(0,0,0,0.5);');
+      showPickupPop(gateEl, '2X', playDoubleScoreFound, DOUBLE_SCORE_POP_STYLE);
     }
   }
 
@@ -1613,18 +1604,7 @@
     if (onGrant) onGrant();
     state[stateKey] = true;
     hudUpdate();
-    const pop = document.createElement('div');
-    pop.textContent = emoji;
-    pop.style.cssText = PICKUP_POP_CSS;
-    gateEl.parentNode.appendChild(pop);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      pop.style.transform = 'translate(-50%,-50%) scale(1)';
-      pop.style.opacity = '1';
-    }));
-    setTimeout(() => {
-      sound();
-      setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
-    }, 350);
+    showPickupPop(gateEl, emoji, sound);
     return true;
   }
   function tryGrantChickenLeg(gateEl, index) {
@@ -1648,23 +1628,13 @@
     _tone(1319, 'sine', 0.10, 0.26, 0.15);
     _tone(1568, 'sine', 0.08, 0.38, 0.40);
   }
+  const DOUBLE_SCORE_POP_STYLE = 'color:#ffd700;font-weight:900;font-size:24px;text-shadow:0 0 12px rgba(255,200,0,0.9),0 2px 4px rgba(0,0,0,0.5);';
   function tryGrantDoubleScore(gateEl, index) {
     if (state.doubleScoreRoundsLeft > 0) return false;
     if (state.hintDoubleScoreIdx < 0 || index !== state.hintDoubleScoreIdx) return false;
     state.doubleScoreRoundsLeft = 3;
     updateDoubleScoreHud();
-    const pop = document.createElement('div');
-    pop.textContent = '2X';
-    pop.style.cssText = PICKUP_POP_CSS + 'color:#ffd700;font-weight:900;font-size:24px;text-shadow:0 0 12px rgba(255,200,0,0.9),0 2px 4px rgba(0,0,0,0.5);';
-    gateEl.parentNode.appendChild(pop);
-    requestAnimationFrame(() => requestAnimationFrame(() => {
-      pop.style.transform = 'translate(-50%,-50%) scale(1)';
-      pop.style.opacity = '1';
-    }));
-    setTimeout(() => {
-      playDoubleScoreFound();
-      setTimeout(() => { pop.style.opacity = '0'; setTimeout(() => pop.remove(), 250); }, 900);
-    }, 350);
+    showPickupPop(gateEl, '2X', playDoubleScoreFound, DOUBLE_SCORE_POP_STYLE);
     return true;
   }
 
