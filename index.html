@@ -899,11 +899,6 @@
   // Game mechanics loaded from Firebase at boot — edit at firebase.google.com → your project → Realtime Database → /config
   let _cfg = null;
   async function loadConfig() {
-    const CFG_KEY = 'sheepgate:cfg:v3';
-    try {
-      const hit = sessionStorage.getItem(CFG_KEY);
-      if (hit) { _cfg = Object.freeze(JSON.parse(hit)); return; }
-    } catch(_) {}
     try {
       const res = await fetch(`${FIREBASE_DB_URL}/config.json`);
       if (!res.ok) throw new Error(res.status);
@@ -924,7 +919,6 @@
         _m: d.basePoints          ?? 8,
         _n: d.basePointsPerLevel  ?? 2,
       });
-      try { sessionStorage.setItem(CFG_KEY, JSON.stringify(_cfg)); } catch(_) {}
     } catch(e) {
       console.warn('Config unavailable, using offline defaults');
       _cfg = Object.freeze({ _a:8000, _b:0.02, _c:1000, _d:2500, _e:4000, _f:5, _g:3, _h:0.1, _i:0.1, _j:0.1, _k:0.05, _l:3, _m:8, _n:2 });
