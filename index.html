@@ -449,6 +449,13 @@
     75%  { transform: translate(2px, -1px) rotate(0.2deg); }
   }
   #field.shaking { animation: screen-shake 0.5s ease-out; }
+  @keyframes screen-shake-small {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25%  { transform: translate(-2px, -1px) rotate(-0.2deg); }
+    50%  { transform: translate(2px,  1px) rotate( 0.2deg); }
+    75%  { transform: translate(-1px, 1px) rotate(-0.1deg); }
+  }
+  #field.shaking-small { animation: screen-shake-small 0.3s ease-out; }
 
   /* ---- Bob animation ---- */
   @keyframes sheep-bob {
@@ -1616,6 +1623,8 @@
     state[stateKey] = true;
     hudUpdate();
     showPickupPop(gateEl, emoji, sound);
+    fieldEl.classList.add('shaking-small');
+    setTimeout(() => fieldEl.classList.remove('shaking-small'), 320);
     return true;
   }
   function tryGrantChickenLeg(gateEl, index) {
@@ -1646,6 +1655,8 @@
     state.doubleScoreRoundsLeft = 3;
     updateDoubleScoreHud();
     showPickupPop(gateEl, '2X', playDoubleScoreFound, DOUBLE_SCORE_POP_STYLE);
+    fieldEl.classList.add('shaking-small');
+    setTimeout(() => fieldEl.classList.remove('shaking-small'), 320);
     return true;
   }
 
