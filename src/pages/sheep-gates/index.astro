@@ -1106,30 +1106,50 @@ import '../../styles/sheep-gates.css';
       state.worldOffset += FIELD_HEIGHT;
       worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
 
-      const nextBlocked = pickBlockedIndices(getBlockedCount());
-      const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
-        .filter(i => !nextBlocked.includes(i));
-      const legChance = TEST_MODE ? 1 : (_cfg._h ?? 1/10);
-      const clovChance = TEST_MODE ? 1 : (_cfg._i ?? 1/10);
-      const dblChance  = TEST_MODE ? 1 : (_cfg._j ?? 1/10);
-      const nextHintIdx = (Math.random() < legChance)
-        ? open[Math.floor(Math.random() * open.length)] : -1;
-      const openForClover = nextHintIdx >= 0 ? open.filter(i => i !== nextHintIdx) : open;
-      const nextCloverIdx = (Math.random() < clovChance)
-        ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
-      const openForDouble = nextCloverIdx >= 0 ? openForClover.filter(i => i !== nextCloverIdx) : openForClover;
-      const nextDoubleScoreIdx = (Math.random() < dblChance)
-        ? (openForDouble.length > 0 ? openForDouble[Math.floor(Math.random() * openForDouble.length)] : -1) : -1;
+      // Determine next round type (rainbow or normal)
+      const rainbowChance = TEST_MODE ? 0.25 : (_cfg._k ?? 0.05);
+      const nextIsRainbow = Math.random() < rainbowChance;
+      let nextBlocked, nextHintIdx, nextCloverIdx, nextDoubleScoreIdx, nextRainbowBonuses;
 
+      if (nextIsRainbow) {
+        nextBlocked = []; nextHintIdx = -1; nextCloverIdx = -1; nextDoubleScoreIdx = -1;
+        nextRainbowBonuses = Array.from({length: GATES_PER_ROUND},
+          () => RAINBOW_BONUS_TYPES[Math.floor(Math.random() * RAINBOW_BONUS_TYPES.length)]);
+      } else {
+        nextRainbowBonuses = [];
+        nextBlocked = pickBlockedIndices(getBlockedCount());
+        const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
+          .filter(i => !nextBlocked.includes(i));
+        const legChance = TEST_MODE ? 1 : (_cfg._h ?? 1/10);
+        const clovChance = TEST_MODE ? 1 : (_cfg._i ?? 1/10);
+        const dblChance  = TEST_MODE ? 1 : (_cfg._j ?? 1/10);
+        nextHintIdx = (Math.random() < legChance)
+          ? open[Math.floor(Math.random() * open.length)] : -1;
+        const openForClover = nextHintIdx >= 0 ? open.filter(i => i !== nextHintIdx) : open;
+        nextCloverIdx = (Math.random() < clovChance)
+          ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
+        const openForDouble = nextCloverIdx >= 0 ? openForClover.filter(i => i !== nextCloverIdx) : openForClover;
+        nextDoubleScoreIdx = (Math.random() < dblChance)
+          ? (openForDouble.length > 0 ? openForDouble[Math.floor(Math.random() * openForDouble.length)] : -1) : -1;
+      }
+
+      // Update state before buildGateSet so gate colors render correctly
+      state.isRainbowRound = nextIsRainbow;
+      state.rainbowGateBonuses = nextRainbowBonuses;
       const nextSet = buildGateSet(95 - state.worldOffset);
       worldEl.appendChild(nextSet);
 
       if (TEST_MODE) {
         const gates = nextSet.querySelectorAll('.gate');
         nextBlocked.forEach(idx => stampTestMark(gates, idx, '🐺'));
-        if (nextHintIdx >= 0)    stampTestMark(gates, nextHintIdx, '🍗');
-        if (nextCloverIdx >= 0)  stampTestMark(gates, nextCloverIdx, '🍀');
-        if (nextDoubleScoreIdx >= 0)                       stampTestMark(gates, nextDoubleScoreIdx, '2X');
+        if (nextIsRainbow) {
+          const emojiMap = { leg: '🍗', clover: '🍀', double: '2X' };
+          nextRainbowBonuses.forEach((type, idx) => stampTestMark(gates, idx, emojiMap[type]));
+        } else {
+          if (nextHintIdx >= 0)         stampTestMark(gates, nextHintIdx, '🍗');
+          if (nextCloverIdx >= 0)       stampTestMark(gates, nextCloverIdx, '🍀');
+          if (nextDoubleScoreIdx >= 0)  stampTestMark(gates, nextDoubleScoreIdx, '2X');
+        }
       }
 
       setTimeout(() => {
@@ -1147,9 +1167,11 @@ import '../../styles/sheep-gates.css';
           state.hintGateIdx        = nextHintIdx;
           state.hintCloverIdx      = nextCloverIdx;
           state.hintDoubleScoreIdx = nextDoubleScoreIdx;
+          rainbowSkyEl.style.opacity = nextIsRainbow ? '1' : '0';
           state.animating = false;
-          statusLabel.textContent = 'Pick the open gate';
+          statusLabel.textContent = nextIsRainbow ? '🌈 Rainbow Round — every gate hides a bonus!' : 'Pick the open gate';
           if (wasLevelUp) showLevelUp(getLevel());
+          if (nextIsRainbow) showRainbowBanner();
           if (SPORT_MODE) startSportTimer();
         }, 550 * _D);
       }, 1500 * _D);
