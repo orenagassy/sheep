@@ -72,7 +72,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     <h1>Games</h1>
     <p class="subtitle">Free games. Pick one and play.</p>
     <div class="games-grid">
-      <a class="game-card" href="/sheep-gates/">
+      <a class="game-card" href={import.meta.env.BASE_URL + '/sheep-gates/'}>
         <div class="game-card-icon">🐑</div>
         <div class="game-card-title">Sheep Gates</div>
         <p class="game-card-desc">Pick the open gate. Dodge the wolves. Survive as long as you can.</p>
