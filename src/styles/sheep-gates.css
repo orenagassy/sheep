@@ -334,13 +334,14 @@
   }
 
   /* ---- Mode badges ---- */
-  #test-badge, #sport-badge {
+  #test-badge, #sport-badge, #mute-badge {
     display: none;
     border-radius: 6px; padding: 3px 8px;
     font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
   }
   #test-badge  { background: #fff3cd; border: 1px solid #ffc107; color: #856404; }
   #sport-badge { background: #fde8e8; border: 1px solid #ef9a9a; color: #b71c1c; }
+  #mute-badge  { background: #e8e8e8; border: 1px solid #aaa;    color: #444;    }
 
   /* ---- Test mode markups ---- */
   .test-mark {

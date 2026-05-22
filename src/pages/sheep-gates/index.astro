@@ -17,6 +17,7 @@ import '../../styles/sheep-gates.css';
     <div class="topbar">
       <div class="topbar-left">
         <span id="test-badge">👁 GOD</span>
+        <span id="mute-badge">🔇 MUTE</span>
         <span id="sport-badge">⚡ SPORT</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
@@ -198,6 +199,16 @@ import '../../styles/sheep-gates.css';
     </div>
   </div>
 
+  <div id="mute-panel" style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border)">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div class="stats-title" style="margin-bottom:2px">🔇 Mute</div>
+        <div style="font-size:11px;color:var(--text-muted)">Turn off all game sounds</div>
+      </div>
+      <button id="mute-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
+    </div>
+  </div>
+
   <div class="ad-wrap ad-wrap--drawer">
     <!-- Ad unit loads here after AdSense approval -->
   </div>
@@ -279,6 +290,7 @@ import '../../styles/sheep-gates.css';
     }
   }
   const GOD_MODE_KEY        = 'sheepgate:god-mode';
+  const MUTE_KEY            = 'sheepgate:mute';
   const LOCAL_FALLBACK_KEY  = 'sheepgate:local-leaderboard';
   const SPORT_LB_KEY        = 'sheepgate:sport-leaderboard';
   const STATS_KEY           = 'sheepgate:stats';
@@ -848,7 +860,9 @@ import '../../styles/sheep-gates.css';
 
   // ---- Web Audio ---------------------------------------------------------
   let _audioCtx = null;
+  let MUTED = localStorage.getItem(MUTE_KEY) === '1';
   function _audio() {
+    if (MUTED) return null;
     try {
       if (!_audioCtx || _audioCtx.state === 'closed')
         _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -1540,6 +1554,7 @@ import '../../styles/sheep-gates.css';
 
   // ---- Boot --------------------------------------------------------------
   if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
+  if (MUTED)      $('mute-badge').style.display  = 'inline-block';
   const godToggleEl = $('god-mode-toggle');
   godToggleEl.textContent = TEST_MODE ? 'ON' : 'OFF';
   godToggleEl.style.color = TEST_MODE ? 'var(--success)' : 'var(--text-secondary)';
@@ -1547,6 +1562,17 @@ import '../../styles/sheep-gates.css';
     if (TEST_MODE) localStorage.removeItem(GOD_MODE_KEY);
     else           localStorage.setItem(GOD_MODE_KEY, '1');
     location.reload();
+  };
+  const muteToggleEl = $('mute-toggle');
+  muteToggleEl.textContent = MUTED ? 'ON' : 'OFF';
+  muteToggleEl.style.color = MUTED ? 'var(--success)' : 'var(--text-secondary)';
+  muteToggleEl.onclick = () => {
+    MUTED = !MUTED;
+    if (MUTED) localStorage.setItem(MUTE_KEY, '1');
+    else       localStorage.removeItem(MUTE_KEY);
+    muteToggleEl.textContent = MUTED ? 'ON' : 'OFF';
+    muteToggleEl.style.color = MUTED ? 'var(--success)' : 'var(--text-secondary)';
+    $('mute-badge').style.display = MUTED ? 'inline-block' : 'none';
   };
   if (SPORT_MODE) {
     $('sport-badge').style.display = 'inline-block';
