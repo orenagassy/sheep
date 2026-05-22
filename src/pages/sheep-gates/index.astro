@@ -393,7 +393,8 @@ import '../../styles/sheep-gates.css';
   };
 
   let leaderboard = [];
-  let sessionName = '';
+  const PLAYER_NAME_KEY = 'sheepgate:player-name';
+  let sessionName = localStorage.getItem(PLAYER_NAME_KEY) || '';
   let _wiggleId = null;
 
   const $ = id => document.getElementById(id);
@@ -1416,7 +1417,8 @@ import '../../styles/sheep-gates.css';
   }
   function showHiscoreEntry() {
     hiscoreEntry.style.display = 'block';
-    hiscoreName.value = '';
+    hiscoreName.value = sessionName;
+    hiscoreName.select();
     setTimeout(() => hiscoreName.focus(), 100);
   }
   async function pushScore(name) {
@@ -1435,6 +1437,7 @@ import '../../styles/sheep-gates.css';
     let name = (hiscoreName.value || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').trim().slice(0, 10);
     if (name.length === 0) name = 'ANON';
     sessionName = name;
+    localStorage.setItem(PLAYER_NAME_KEY, name);
     await pushScore(name);
     hiscoreEntry.style.display = 'none';
     showModePopup(true);
