@@ -144,9 +144,21 @@ import '../../styles/sheep-gates.css';
     <span>Leaderboard &amp; Stats</span>
     <button id="info-close">✕</button>
   </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <div style="flex:1;display:flex;justify-content:space-between;align-items:center;background:var(--bg-soft);border-radius:8px;padding:8px 12px">
+      <span style="font-size:13px;font-weight:500">👁 God Mode</span>
+      <button id="god-mode-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
+    </div>
+    <div style="flex:1;display:flex;justify-content:space-between;align-items:center;background:var(--bg-soft);border-radius:8px;padding:8px 12px">
+      <span style="font-size:13px;font-weight:500">🔇 Mute</span>
+      <button id="mute-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
+    </div>
+  </div>
+
   <div id="leaderboard">
     <div class="leaderboard-title">
-      <span id="leaderboard-title">Top 10 of all time</span>
+      <span id="leaderboard-title">Top 5 of all time</span>
       <span class="sync-indicator" id="sync-indicator"></span>
     </div>
     <div id="leaderboard-list"></div>
@@ -186,26 +198,6 @@ import '../../styles/sheep-gates.css';
         <div class="stat-item-label">Personal best</div>
         <div class="stat-item-value" id="stat-personal-best">—</div>
       </div>
-    </div>
-  </div>
-
-  <div id="god-mode-panel" style="margin-top:20px;padding-top:16px;border-top:0.5px solid var(--border)">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div class="stats-title" style="margin-bottom:2px">👁 God Mode</div>
-        <div style="font-size:11px;color:var(--text-muted)">See wolves &amp; bonuses before picking</div>
-      </div>
-      <button id="god-mode-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
-    </div>
-  </div>
-
-  <div id="mute-panel" style="margin-top:12px;padding-top:12px;border-top:0.5px solid var(--border)">
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div>
-        <div class="stats-title" style="margin-bottom:2px">🔇 Mute</div>
-        <div style="font-size:11px;color:var(--text-muted)">Turn off all game sounds</div>
-      </div>
-      <button id="mute-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
     </div>
   </div>
 
@@ -256,7 +248,7 @@ import '../../styles/sheep-gates.css';
   const GATES_PER_ROUND    = 7;
   const ROUNDS_PER_LEVEL   = 7;
   const FIELD_HEIGHT        = 320;
-  const MAX_LEADERBOARD     = 10;
+  const MAX_LEADERBOARD     = 5;
   // rainbowRoundChance loaded from Firebase config (_cfg._k)
   const RAINBOW_GATE_COLORS  = ['#e74c3c','#e67e22','#f1c40f','#2ecc71','#3498db','#9b59b6','#e91e8c'];
   const RAINBOW_BONUS_TYPES  = ['leg', 'clover', 'double'];
@@ -475,7 +467,7 @@ import '../../styles/sheep-gates.css';
 
   // ---- Leaderboard --------------------------------------------------------
   const LB_LOCAL_KEY = SPORT_MODE ? SPORT_LB_KEY : LOCAL_FALLBACK_KEY;
-  const LB_TITLE = SPORT_MODE ? '⚡ Sport Top 10' : 'Top 10 of all time';
+  const LB_TITLE = SPORT_MODE ? '⚡ Sport Top 5' : 'Top 5 of all time';
 
   function setSyncStatus(text, kind) {
     syncIndicator.textContent = text || '';
