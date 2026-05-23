@@ -701,10 +701,10 @@
   }
   .friends-share-btn {
     width: 52px; height: 52px; border-radius: 14px;
-    border: none; cursor: pointer; font-size: 15px; font-weight: 800;
+    border: none; cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: transform 0.12s, opacity 0.12s;
-    font-family: inherit;
+    flex-shrink: 0;
   }
   .friends-share-btn:hover { transform: translateY(-2px); opacity: 0.88; }
   .friends-share-btn:active { transform: none; }
@@ -714,7 +714,7 @@
     color: #fff;
   }
   .share-tiktok { background: #010101; color: #fff; border: 1.5px solid #69c9d0; }
-  .share-copy { background: var(--bg-soft); color: var(--text-primary); border: 1.5px solid var(--border); font-size: 20px; }
+  .share-copy { background: var(--bg-soft); color: var(--text-primary); border: 1.5px solid var(--border); }
 
   /* ---- Friends action buttons ---- */
   #friends-play-btn {
@@ -731,6 +731,16 @@
     font-size: 13px; cursor: pointer; font-family: inherit; padding: 4px 8px;
   }
   #friends-close-btn:hover { color: var(--text-primary); }
+
+  /* ---- Leave group button ---- */
+  .mpc-leave-group-btn {
+    display: block; width: 100%; padding: 10px;
+    background: none; border: 1.5px solid #dc2626; color: #dc2626;
+    border-radius: 10px; font-size: 13px; font-weight: 600; font-family: inherit;
+    cursor: pointer; margin-top: 8px;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mpc-leave-group-btn:hover { background: #dc2626; color: #fff; }
 
   /* ---- Copy toast ---- */
   .friends-toast {
