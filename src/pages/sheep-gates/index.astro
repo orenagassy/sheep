@@ -263,7 +263,11 @@ import '../../styles/sheep-gates.css';
   const TEST_MODE  = new URLSearchParams(location.search).has('test')
                   || localStorage.getItem('sheepgate:god-mode') === '1';
   const SPORT_MODE = new URLSearchParams(location.search).has('sport');
-  const GROUP_ID   = new URLSearchParams(location.search).get('g') ?? null;
+  // Save group ID to sessionStorage when entering via group URL, and read it back
+  // as a fallback so group mode survives any URL change within the same tab.
+  const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
+  if (_urlGroupId) sessionStorage.setItem('sheepgate:active-group', _urlGroupId);
+  const GROUP_ID   = _urlGroupId ?? sessionStorage.getItem('sheepgate:active-group') ?? null;
   const GROUP_MODE = !!GROUP_ID;
   const GROUP_STORAGE_KEY = 'sheepgate:group';
   const GROUP_TTL_MS = 864_000_000; // 10 days
