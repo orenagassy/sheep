@@ -1667,7 +1667,10 @@ import '../../styles/sheep-gates.css';
     hiscoreEntry.style.display = 'block';
     hiscoreName.value = sessionName;
     hiscoreName.select();
-    setTimeout(() => hiscoreName.focus(), 100);
+    setTimeout(() => {
+      hiscoreEntry.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      hiscoreName.focus();
+    }, 100);
   }
   async function pushScore(name) {
     leaderboard.push({ name, score: state.score, date: new Date().toISOString() });
