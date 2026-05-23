@@ -267,7 +267,9 @@ import '../../styles/sheep-gates.css';
 
 <script is:inline>
 (function() {
-  const FIREBASE_DB_URL = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/sheep-gates';
+  const FIREBASE_DB_URL  = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/sheep-gates';
+  const FIREBASE_API_KEY = 'AIzaSyDopQnGZgxpRlY-t3yzlM-ks5eX5x3XoQ8';
+  let firebaseToken = null;
   const TEST_MODE  = new URLSearchParams(location.search).has('test')
                   || localStorage.getItem('sheepgate:god-mode') === '1';
   const SPORT_MODE = new URLSearchParams(location.search).has('sport');
@@ -575,7 +577,7 @@ import '../../styles/sheep-gates.css';
       }
       merged.sort((a, b) => b.score - a.score);
       const trimmed = merged.slice(0, MAX_LEADERBOARD);
-      const putRes = await fetch(`${FIREBASE_DB_URL}/leaderboard.json`, {
+      const putRes = await fetch(authUrl(`${FIREBASE_DB_URL}/leaderboard.json`), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scores: trimmed })
@@ -592,6 +594,21 @@ import '../../styles/sheep-gates.css';
       return false;
     }
   }
+  // ---- Auth ---------------------------------------------------------------
+  async function signInAnonymously() {
+    try {
+      const res = await fetch(
+        `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`,
+        { method: 'POST', headers: {'Content-Type':'application/json'}, body: '{"returnSecureToken":true}' }
+      );
+      if (!res.ok) return null;
+      return (await res.json()).idToken;
+    } catch (_) { return null; }
+  }
+  function authUrl(url) {
+    return firebaseToken ? `${url}?auth=${firebaseToken}` : url;
+  }
+
   // ---- Group / Play-with-Friends ------------------------------------------
   function generateGroupId() {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
@@ -603,7 +620,7 @@ import '../../styles/sheep-gates.css';
   async function createGroupInFirebase(id) {
     const now = Date.now();
     // Write meta and leaderboard in a single PUT to the group node — atomic, one request.
-    const res = await fetch(`${FIREBASE_DB_URL}/groups/${id}.json`, {
+    const res = await fetch(authUrl(`${FIREBASE_DB_URL}/groups/${id}.json`), {
       method: 'PUT', headers: {'Content-Type':'application/json'},
       body: JSON.stringify({ meta: { created: now, lastActive: now }, normal: { scores: [] }, sport: { scores: [] } })
     });
@@ -640,7 +657,7 @@ import '../../styles/sheep-gates.css';
       }
       merged.sort((a, b) => b.score - a.score);
       const trimmed = merged.slice(0, MAX_LEADERBOARD);
-      const putRes = await fetch(path, {
+      const putRes = await fetch(authUrl(path), {
         method: 'PUT', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ scores: trimmed })
       });
@@ -661,11 +678,11 @@ import '../../styles/sheep-gates.css';
       const meta = await res.json();
       if (!meta) { showGroupExpiredMessage(); return false; }
       if (Date.now() - meta.lastActive > GROUP_TTL_MS) {
-        fetch(`${FIREBASE_DB_URL}/groups/${GROUP_ID}.json`, { method: 'DELETE' }).catch(() => {});
+        fetch(authUrl(`${FIREBASE_DB_URL}/groups/${GROUP_ID}.json`), { method: 'DELETE' }).catch(() => {});
         showGroupExpiredMessage(); return false;
       }
       // Touch lastActive — fire-and-forget, non-critical
-      fetch(`${FIREBASE_DB_URL}/groups/${GROUP_ID}/meta.json`, {
+      fetch(authUrl(`${FIREBASE_DB_URL}/groups/${GROUP_ID}/meta.json`), {
         method: 'PATCH', headers: {'Content-Type':'application/json'},
         body: JSON.stringify({ lastActive: Date.now() })
       }).catch(() => {});
@@ -1864,7 +1881,8 @@ import '../../styles/sheep-gates.css';
   updateFieldAmbience(1);
   renderStats();
   statusLabel.textContent = 'Loading...';
-  loadConfig().then(async () => {
+  Promise.all([signInAnonymously(), loadConfig()]).then(async ([token]) => {
+    firebaseToken = token;
     if (GROUP_MODE) {
       const valid = await checkGroupExpiry();
       if (!valid) {
