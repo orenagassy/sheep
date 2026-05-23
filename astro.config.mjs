@@ -1,8 +1,7 @@
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: 'https://orenagassy.github.io',
-  base: '/sheep',
+  site: 'https://sheeps.online',
   output: 'static',
   build: { format: 'directory' },
 });
