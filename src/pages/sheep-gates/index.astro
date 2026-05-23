@@ -651,17 +651,18 @@ import '../../styles/sheep-gates.css';
       rainbowSkyEl.style.opacity = '0';
       const openGates = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
         .filter(i => !state.blockedGates.includes(i));
-      const legChance = TEST_MODE ? 1 : (_cfg._h ?? 1/10);
-      const clovChance = TEST_MODE ? 1 : (_cfg._i ?? 1/10);
-      const dblChance  = TEST_MODE ? 1 : (_cfg._j ?? 1/10);
-      state.hintGateIdx = (Math.random() < legChance)
-        ? openGates[Math.floor(Math.random() * openGates.length)] : -1;
-      const openForClover = state.hintGateIdx >= 0 ? openGates.filter(i => i !== state.hintGateIdx) : openGates;
-      state.hintCloverIdx = (Math.random() < clovChance)
-        ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
-      const openForDouble = state.hintCloverIdx >= 0 ? openForClover.filter(i => i !== state.hintCloverIdx) : openForClover;
-      state.hintDoubleScoreIdx = (Math.random() < dblChance)
-        ? (openForDouble.length > 0 ? openForDouble[Math.floor(Math.random() * openForDouble.length)] : -1) : -1;
+      const legChance = _cfg._h ?? 1/10;
+      const clovChance = _cfg._i ?? 1/10;
+      const dblChance  = _cfg._j ?? 1/10;
+      // Each open gate rolls independently — 10% per gate per bonus type
+      const legPool  = openGates.filter(() => Math.random() < legChance);
+      state.hintGateIdx = legPool.length  ? legPool[Math.floor(Math.random()  * legPool.length)]  : -1;
+      const openForClover = openGates.filter(i => i !== state.hintGateIdx);
+      const clovPool = openForClover.filter(() => Math.random() < clovChance);
+      state.hintCloverIdx = clovPool.length ? clovPool[Math.floor(Math.random() * clovPool.length)] : -1;
+      const openForDouble = openForClover.filter(i => i !== state.hintCloverIdx);
+      const dblPool  = openForDouble.filter(() => Math.random() < dblChance);
+      state.hintDoubleScoreIdx = dblPool.length ? dblPool[Math.floor(Math.random()  * dblPool.length)]  : -1;
     }
     state.animating = false;
     messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
@@ -1120,17 +1121,18 @@ import '../../styles/sheep-gates.css';
         nextBlocked = pickBlockedIndices(getBlockedCount());
         const open = Array.from({length: GATES_PER_ROUND}, (_, i) => i)
           .filter(i => !nextBlocked.includes(i));
-        const legChance = TEST_MODE ? 1 : (_cfg._h ?? 1/10);
-        const clovChance = TEST_MODE ? 1 : (_cfg._i ?? 1/10);
-        const dblChance  = TEST_MODE ? 1 : (_cfg._j ?? 1/10);
-        nextHintIdx = (Math.random() < legChance)
-          ? open[Math.floor(Math.random() * open.length)] : -1;
-        const openForClover = nextHintIdx >= 0 ? open.filter(i => i !== nextHintIdx) : open;
-        nextCloverIdx = (Math.random() < clovChance)
-          ? (openForClover.length > 0 ? openForClover[Math.floor(Math.random() * openForClover.length)] : -1) : -1;
-        const openForDouble = nextCloverIdx >= 0 ? openForClover.filter(i => i !== nextCloverIdx) : openForClover;
-        nextDoubleScoreIdx = (Math.random() < dblChance)
-          ? (openForDouble.length > 0 ? openForDouble[Math.floor(Math.random() * openForDouble.length)] : -1) : -1;
+        const legChance = _cfg._h ?? 1/10;
+        const clovChance = _cfg._i ?? 1/10;
+        const dblChance  = _cfg._j ?? 1/10;
+        // Each open gate rolls independently — 10% per gate per bonus type
+        const legPool  = open.filter(() => Math.random() < legChance);
+        nextHintIdx = legPool.length ? legPool[Math.floor(Math.random() * legPool.length)] : -1;
+        const openForClover = open.filter(i => i !== nextHintIdx);
+        const clovPool = openForClover.filter(() => Math.random() < clovChance);
+        nextCloverIdx = clovPool.length ? clovPool[Math.floor(Math.random() * clovPool.length)] : -1;
+        const openForDouble = openForClover.filter(i => i !== nextCloverIdx);
+        const dblPool  = openForDouble.filter(() => Math.random() < dblChance);
+        nextDoubleScoreIdx = dblPool.length ? dblPool[Math.floor(Math.random() * dblPool.length)] : -1;
       }
 
       // Update state before buildGateSet so gate colors render correctly
