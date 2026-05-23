@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import '../../styles/sheep-gates.css';
+const firebaseApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
 ---
 <BaseLayout title="Sheep Gates">
 <div class="app">
@@ -265,10 +266,11 @@ import '../../styles/sheep-gates.css';
 
 <button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
 
+<script define:vars={{ firebaseApiKey }}> window.__FB_KEY__ = firebaseApiKey; </script>
 <script is:inline>
 (function() {
   const FIREBASE_DB_URL  = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/sheep-gates';
-  const FIREBASE_API_KEY = 'AIzaSyDopQnGZgxpRlY-t3yzlM-ks5eX5x3XoQ8';
+  const FIREBASE_API_KEY = window.__FB_KEY__;
   let firebaseToken = null;
   const TEST_MODE  = new URLSearchParams(location.search).has('test')
                   || localStorage.getItem('sheepgate:god-mode') === '1';
