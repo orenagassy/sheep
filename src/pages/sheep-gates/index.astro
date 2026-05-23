@@ -1674,13 +1674,12 @@ import '../../styles/sheep-gates.css';
     sessionStorage.setItem('sheepgate:autostart', '1');
     const url = new URL(location.href);
     url.searchParams.delete('sport');
-    url.searchParams.delete('g');
     if (toSport) url.searchParams.set('sport', '');
     location.href = url.toString();
   }
 
   document.getElementById('mpc-normal').addEventListener('click', () => {
-    if (SPORT_MODE || GROUP_MODE) switchMode(false); else { hideModePopup(); doRestart(); }
+    if (SPORT_MODE) switchMode(false); else { hideModePopup(); doRestart(); }
   });
   document.getElementById('mpc-sport').addEventListener('click', () => {
     if (!SPORT_MODE) switchMode(true); else { hideModePopup(); doRestart(); }
