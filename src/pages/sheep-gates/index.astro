@@ -16,10 +16,7 @@ import '../../styles/sheep-gates.css';
 
     <div class="topbar">
       <div class="topbar-left">
-        <span id="test-badge">👁 GOD</span>
-        <span id="mute-badge">🔇 MUTE</span>
-        <span id="sport-badge">⚡ SPORT</span>
-        <span id="group-badge">👥 <span id="group-id-label"></span></span>
+        <span id="group-badge">👥 Group Mode</span>
         <div>
           <div class="hud-title" id="round-label">Gate 1 · Level 1</div>
           <div class="hud-subtitle" id="status-label">Pick the open gate</div>
@@ -234,6 +231,9 @@ import '../../styles/sheep-gates.css';
         <span class="mpc-desc">Share a link · Group Top 5</span>
       </span>
     </button>
+    <button id="mpc-leave-group" class="mpc-leave-group-btn" style="display:none">
+      ✕ Stop Group Mode
+    </button>
   </div>
 </div>
 
@@ -245,10 +245,18 @@ import '../../styles/sheep-gates.css';
       <input id="friends-link-input" type="text" readonly />
     </div>
     <div id="friends-share-row">
-      <button id="friends-share-twitter" class="friends-share-btn share-twitter" title="Share on X / Twitter">𝕏</button>
-      <button id="friends-share-ig"      class="friends-share-btn share-ig"      title="Share on Instagram">IG</button>
-      <button id="friends-share-tiktok"  class="friends-share-btn share-tiktok"  title="Share on TikTok">TT</button>
-      <button id="friends-share-copy"    class="friends-share-btn share-copy"    title="Copy link">📋</button>
+      <button id="friends-share-twitter" class="friends-share-btn share-twitter" title="Share on X / Twitter">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </button>
+      <button id="friends-share-ig" class="friends-share-btn share-ig" title="Share on Instagram">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </button>
+      <button id="friends-share-tiktok" class="friends-share-btn share-tiktok" title="Share on TikTok">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.67a8.27 8.27 0 004.84 1.56V6.78a4.85 4.85 0 01-1.07-.09z"/></svg>
+      </button>
+      <button id="friends-share-copy" class="friends-share-btn share-copy" title="Copy link">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </button>
     </div>
     <button id="friends-play-btn">▶ Play in Group Mode</button>
     <button id="friends-close-btn">✕ Close</button>
@@ -500,7 +508,9 @@ import '../../styles/sheep-gates.css';
 
   // ---- Leaderboard --------------------------------------------------------
   const LB_LOCAL_KEY = SPORT_MODE ? SPORT_LB_KEY : LOCAL_FALLBACK_KEY;
-  const LB_TITLE = GROUP_MODE ? '👥 Group Top 5' : SPORT_MODE ? '⚡ Sport Top 5' : 'Top 5 of all time';
+  const LB_TITLE = GROUP_MODE
+    ? (SPORT_MODE ? '👥 Group Sport Top 5' : '👥 Group Top 5')
+    : SPORT_MODE ? '⚡ Sport Top 5' : 'Top 5 of all time';
 
   function setSyncStatus(text, kind) {
     syncIndicator.textContent = text || '';
@@ -595,14 +605,15 @@ import '../../styles/sheep-gates.css';
     // Write meta and leaderboard in a single PUT to the group node — atomic, one request.
     const res = await fetch(`${FIREBASE_DB_URL}/groups/${id}.json`, {
       method: 'PUT', headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({ meta: { created: now, lastActive: now }, leaderboard: { scores: [] } })
+      body: JSON.stringify({ meta: { created: now, lastActive: now }, normal: { scores: [] }, sport: { scores: [] } })
     });
     if (!res.ok) throw new Error('createGroup HTTP ' + res.status);
   }
   async function loadGroupLeaderboard() {
     setSyncStatus('Syncing...', 'syncing');
+    const subPath = SPORT_MODE ? 'sport' : 'normal';
     try {
-      const res = await fetch(`${FIREBASE_DB_URL}/groups/${GROUP_ID}/leaderboard.json`);
+      const res = await fetch(`${FIREBASE_DB_URL}/groups/${GROUP_ID}/${subPath}.json`);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       leaderboard = extractScores(await res.json());
       setSyncStatus('Synced', '');
@@ -614,7 +625,8 @@ import '../../styles/sheep-gates.css';
   }
   async function saveGroupLeaderboard() {
     setSyncStatus('Saving...', 'syncing');
-    const path = `${FIREBASE_DB_URL}/groups/${GROUP_ID}/leaderboard.json`;
+    const subPath = SPORT_MODE ? 'sport' : 'normal';
+    const path = `${FIREBASE_DB_URL}/groups/${GROUP_ID}/${subPath}.json`;
     try {
       const latestRes = await fetch(path);
       let serverScores = [];
@@ -817,7 +829,7 @@ import '../../styles/sheep-gates.css';
   }
   function newRound() {
     state.isRainbowRound = false;
-    const rainbowChance = TEST_MODE ? 0.25 : (_cfg._k ?? 0.05);
+    const rainbowChance = _cfg._k ?? 0.05;
     if (Math.random() < rainbowChance) {
       state.isRainbowRound = true;
       state.rainbowRoundUsed = true;
@@ -1291,7 +1303,7 @@ import '../../styles/sheep-gates.css';
       worldEl.style.transform = 'translateY(' + state.worldOffset + 'px)';
 
       // Determine next round type (rainbow or normal)
-      const rainbowChance = TEST_MODE ? 0.25 : (_cfg._k ?? 0.05);
+      const rainbowChance = _cfg._k ?? 0.05;
       const nextIsRainbow = Math.random() < rainbowChance;
       let nextBlocked, nextHintIdx, nextCloverIdx, nextDoubleScoreIdx, nextRainbowBonuses;
 
@@ -1775,8 +1787,6 @@ import '../../styles/sheep-gates.css';
   }
 
   // ---- Boot --------------------------------------------------------------
-  if (TEST_MODE)  $('test-badge').style.display  = 'inline-block';
-  if (MUTED)      $('mute-badge').style.display  = 'inline-block';
   const godToggleEl = $('god-mode-toggle');
   godToggleEl.textContent = TEST_MODE ? 'ON' : 'OFF';
   godToggleEl.style.color = TEST_MODE ? 'var(--success)' : 'var(--text-secondary)';
@@ -1794,10 +1804,14 @@ import '../../styles/sheep-gates.css';
     else       localStorage.removeItem(MUTE_KEY);
     muteToggleEl.textContent = MUTED ? 'ON' : 'OFF';
     muteToggleEl.style.color = MUTED ? 'var(--success)' : 'var(--text-secondary)';
-    $('mute-badge').style.display = MUTED ? 'inline-block' : 'none';
+  };
+  document.getElementById('mpc-leave-group').onclick = () => {
+    sessionStorage.removeItem('sheepgate:active-group');
+    const url = new URL(location.href);
+    url.searchParams.delete('g');
+    location.href = url.toString();
   };
   if (SPORT_MODE) {
-    $('sport-badge').style.display = 'inline-block';
     syncIndicator.style.display = 'none';
     document.body.classList.add('sport-mode');
     const _sportSheepSVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 58" width="35" height="29" style="vertical-align:-3px;margin-right:1px">
@@ -1858,9 +1872,8 @@ import '../../styles/sheep-gates.css';
         showModePopup(false);
         return;
       }
-      const badge = document.getElementById('group-badge');
-      badge.style.display = 'inline';
-      document.getElementById('group-id-label').textContent = GROUP_ID;
+      document.getElementById('group-badge').style.display = 'inline';
+      document.getElementById('mpc-leave-group').style.display = 'block';
     }
     await loadLeaderboard();
     if (sessionStorage.getItem('sheepgate:autostart')) {
