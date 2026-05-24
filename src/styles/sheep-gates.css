@@ -742,6 +742,18 @@
   }
   .mpc-leave-group-btn:hover { background: #dc2626; color: #fff; }
 
+  /* ---- More games portal link ---- */
+  .more-games-link {
+    display: block; text-align: center;
+    margin-top: 14px; padding: 2px 0;
+    font-size: 13px; font-weight: 500;
+    color: var(--text-secondary);
+    text-decoration: none;
+    opacity: 0.75;
+    transition: opacity 0.15s, color 0.15s;
+  }
+  .more-games-link:hover { opacity: 1; color: #2c7a4b; }
+
   /* ---- Copy toast ---- */
   .friends-toast {
     position: fixed; bottom: 28px; left: 50%;
