@@ -2,8 +2,53 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import '../../styles/sheep-gates.css';
 const firebaseApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "VideoGame",
+      "@id": "https://sheeps.online/sheep-gates/#game",
+      "name": "Sheep Gates",
+      "url": "https://sheeps.online/sheep-gates/",
+      "description": "Pick the open gate, dodge the wolves, and survive as long as you can. A fast-paced casual browser game for kids and adults. Features a global leaderboard, friend groups, bonus power-ups, and escalating difficulty.",
+      "genre": ["Casual", "Arcade", "Action", "Kids"],
+      "playMode": "SinglePlayer",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "gamePlatform": "Web Browser",
+      "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "image": "https://sheeps.online/og-image.svg",
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://sheeps.online/#organization",
+        "name": "Sheeps.online",
+        "url": "https://sheeps.online/"
+      },
+      "audience": {
+        "@type": "PeopleAudience",
+        "suggestedMinAge": 5
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Free Games", "item": "https://sheeps.online/" },
+        { "@type": "ListItem", "position": 2, "name": "Sheep Gates", "item": "https://sheeps.online/sheep-gates/" }
+      ]
+    }
+  ]
+});
 ---
-<BaseLayout title="Sheep Gates">
+<BaseLayout
+  title="Sheep Gates — Free Online Casual Game | Sheeps.online"
+  description="Play Sheep Gates free in your browser! Pick the open gate, dodge the wolves, and survive as long as you can. Casual arcade game for kids and adults. No download."
+>
+  <Fragment slot="head">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
+    <script type="application/ld+json" set:html={schema} />
+  </Fragment>
 <div class="app">
   <h1><span id="title-sheep">🐑</span> Sheep Gates</h1>
   <p class="tagline">Bet on the open gate. Survive as long as you can.</p>
@@ -136,6 +181,18 @@ const firebaseApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
   </div>
 
 </div>
+
+<section class="game-seo-footer">
+  <h2>About Sheep Gates</h2>
+  <p>Sheep Gates is a free casual browser game for kids and adults. Each round presents 7 gates — pick the open one to advance. With every level, another gate locks, ramping up the tension from 6-of-7 open down to 1-of-7. Dodge the wolves, collect power-ups like lucky clovers, chicken legs, and double score, then climb the global leaderboard. No download or sign-up required — just click and play.</p>
+  <ul>
+    <li>Free to play in any web browser — desktop, tablet, or mobile</li>
+    <li>Normal mode and timed Sport mode</li>
+    <li>Global leaderboard synced in real time</li>
+    <li>Play with friends — share a link for private group competition</li>
+    <li>Escalating difficulty across 7 levels</li>
+  </ul>
+</section>
 
 <div id="info-overlay"></div>
 <div id="info-drawer">
