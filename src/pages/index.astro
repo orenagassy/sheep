@@ -1,9 +1,111 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Free Online Games for Kids & Adults | Casual Browser Games | Sheeps.online';
+const description = 'Play free online games at Sheeps.online! Fun casual games for kids and adults — no download, no signup. Pick a game and play instantly in your browser.';
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://sheeps.online/#website",
+      "url": "https://sheeps.online/",
+      "name": "Sheeps.online",
+      "description": "Free online casual games for kids and adults. Play browser games instantly — no download required.",
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://sheeps.online/?q={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://sheeps.online/#organization",
+      "name": "Sheeps.online",
+      "url": "https://sheeps.online/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://sheeps.online/og-image.svg"
+      }
+    },
+    {
+      "@type": "ItemList",
+      "@id": "https://sheeps.online/#gamelist",
+      "name": "Free Online Games",
+      "description": "A collection of free casual web games playable directly in any browser.",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "item": {
+            "@type": "VideoGame",
+            "@id": "https://sheeps.online/sheep-gates/#game",
+            "name": "Sheep Gates",
+            "url": "https://sheeps.online/sheep-gates/",
+            "description": "Pick the open gate, dodge the wolves, and survive as long as you can. A fast-paced casual browser game perfect for kids and adults.",
+            "genre": ["Casual", "Action", "Arcade", "Kids"],
+            "playMode": "SinglePlayer",
+            "applicationCategory": "Game",
+            "operatingSystem": "Any",
+            "gamePlatform": "Web Browser",
+            "isAccessibleForFree": true,
+            "image": "https://sheeps.online/og-image.svg",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            }
+          }
+        }
+      ]
+    },
+    {
+      "@type": "FAQPage",
+      "mainEntity": [
+        {
+          "@type": "Question",
+          "name": "Are the games free to play?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! All games on Sheeps.online are completely free to play. No registration or payment required."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Do I need to download anything to play?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "No. All games run directly in your web browser — on desktop, tablet, or mobile. Nothing to install."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "Are these games suitable for kids?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Yes! Our games are designed to be fun and safe for kids of all ages, as well as casual adult gamers."
+          }
+        },
+        {
+          "@type": "Question",
+          "name": "What devices can I play on?",
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": "Sheeps.online games work on any modern device — PC, Mac, smartphone, or tablet. Just open your browser and play."
+          }
+        }
+      ]
+    }
+  ]
+});
 ---
-<BaseLayout title="Games Portal">
+<BaseLayout {title} {description}>
   <Fragment slot="head">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>">
+    <script type="application/ld+json" set:html={schema} />
   </Fragment>
   <style>
     body {
@@ -16,12 +118,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
     main {
       max-width: 900px;
       margin: 0 auto;
-      padding: 48px 24px;
+      padding: 48px 24px 64px;
     }
     h1 {
       font-size: 32px;
-      font-weight: 600;
+      font-weight: 700;
       margin: 0 0 8px;
+      line-height: 1.2;
+    }
+    h2 {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0 0 12px;
+      color: #2c2c2a;
     }
     .subtitle {
       color: #6b6961;
@@ -32,6 +141,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
       gap: 24px;
+      margin-bottom: 56px;
     }
     .game-card {
       background: #fff;
@@ -63,20 +173,158 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       margin: 0;
       line-height: 1.5;
     }
+    .game-card-meta {
+      margin-top: 14px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 11px;
+      font-weight: 600;
+      background: #f5f1e8;
+      color: #6b6961;
+      border-radius: 20px;
+      padding: 3px 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .about {
+      background: #fff;
+      border-radius: 12px;
+      padding: 28px 28px 24px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      margin-bottom: 32px;
+    }
+    .about p {
+      font-size: 15px;
+      color: #4a4a48;
+      line-height: 1.65;
+      margin: 0;
+    }
+    .features {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 16px;
+      margin: 20px 0 0;
+    }
+    .feature {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 14px;
+      color: #4a4a48;
+    }
+    .feature-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .faq {
+      margin-bottom: 0;
+    }
+    .faq details {
+      background: #fff;
+      border-radius: 10px;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      margin-bottom: 10px;
+      overflow: hidden;
+    }
+    .faq details summary {
+      padding: 16px 20px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 600;
+      list-style: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+    }
+    .faq details summary::-webkit-details-marker { display: none; }
+    .faq details summary::after {
+      content: '+';
+      font-size: 20px;
+      font-weight: 300;
+      color: #6b6961;
+      transition: transform 0.2s;
+      flex-shrink: 0;
+    }
+    .faq details[open] summary::after {
+      transform: rotate(45deg);
+    }
+    .faq details p {
+      padding: 0 20px 16px;
+      font-size: 14px;
+      color: #4a4a48;
+      line-height: 1.6;
+      margin: 0;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4a9e6b;
+      margin: 0 0 12px;
+    }
     @media (max-width: 480px) {
-      main { padding: 32px 16px; }
+      main { padding: 32px 16px 48px; }
       h1 { font-size: 26px; }
+      .about { padding: 20px 18px; }
     }
   </style>
   <main>
-    <h1>Games</h1>
-    <p class="subtitle">Free games. Pick one and play.</p>
+    <p class="section-label">Free Online Games</p>
+    <h1>Casual Games for Kids &amp; Adults</h1>
+    <p class="subtitle">No download. No signup. Pick a game and play free in your browser.</p>
+
     <div class="games-grid">
-      <a class="game-card" href="/sheep-gates/">
+      <a class="game-card" href="/sheep-gates/" aria-label="Play Sheep Gates — casual arcade game">
         <div class="game-card-icon">🐑</div>
         <div class="game-card-title">Sheep Gates</div>
         <p class="game-card-desc">Pick the open gate. Dodge the wolves. Survive as long as you can.</p>
+        <div class="game-card-meta">
+          <span class="tag">Casual</span>
+          <span class="tag">Arcade</span>
+          <span class="tag">Kids</span>
+          <span class="tag">Free</span>
+        </div>
       </a>
     </div>
+
+    <section class="about" aria-label="About Sheeps.online">
+      <h2>Play Free Casual Web Games — Instantly</h2>
+      <p>Sheeps.online is a collection of fun, free browser games for kids and casual players. Every game runs right in your browser — no app to download, no account to create. Whether you have two minutes or two hours, jump in and play. We add new casual games regularly, so check back often.</p>
+      <div class="features">
+        <div class="feature"><span class="feature-icon">🆓</span><span>100% free to play</span></div>
+        <div class="feature"><span class="feature-icon">⚡</span><span>Instant — no install</span></div>
+        <div class="feature"><span class="feature-icon">📱</span><span>Works on any device</span></div>
+        <div class="feature"><span class="feature-icon">👨‍👩‍👧</span><span>Safe for kids</span></div>
+        <div class="feature"><span class="feature-icon">🏆</span><span>Global leaderboards</span></div>
+        <div class="feature"><span class="feature-icon">👥</span><span>Play with friends</span></div>
+      </div>
+    </section>
+
+    <section class="faq" aria-label="Frequently asked questions">
+      <p class="section-label" style="margin-top:32px">FAQ</p>
+      <h2>Common Questions</h2>
+      <details>
+        <summary>Are the games free to play?</summary>
+        <p>Yes — every game on Sheeps.online is completely free. No payment, no premium tier, no hidden fees.</p>
+      </details>
+      <details>
+        <summary>Do I need to download or install anything?</summary>
+        <p>Nothing to install. All games run directly in your web browser on desktop, tablet, or mobile. Just click and play.</p>
+      </details>
+      <details>
+        <summary>Are these games suitable for kids?</summary>
+        <p>Yes. Our games are designed to be fun and safe for kids of all ages, as well as casual adult players looking for a quick break.</p>
+      </details>
+      <details>
+        <summary>What devices are supported?</summary>
+        <p>Any modern device with a browser works — PC, Mac, iPhone, Android phone, tablet. No special hardware needed.</p>
+      </details>
+    </section>
   </main>
 </BaseLayout>

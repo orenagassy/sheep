@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#f5f1e8"/>
+  <rect x="0" y="0" width="1200" height="8" fill="#4a9e6b"/>
+  <rect x="0" y="622" width="1200" height="8" fill="#4a9e6b"/>
+  <text x="600" y="220" font-family="system-ui,-apple-system,sans-serif" font-size="130" text-anchor="middle">🎮</text>
+  <text x="600" y="345" font-family="system-ui,-apple-system,sans-serif" font-size="76" font-weight="700" text-anchor="middle" fill="#2c2c2a">Sheeps.online</text>
+  <text x="600" y="420" font-family="system-ui,-apple-system,sans-serif" font-size="34" text-anchor="middle" fill="#6b6961">Free Online Games · No Download · Play Now</text>
+  <text x="600" y="475" font-family="system-ui,-apple-system,sans-serif" font-size="28" text-anchor="middle" fill="#4a9e6b">Casual Games for Kids &amp; Adults</text>
+</svg>
