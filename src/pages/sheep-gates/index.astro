@@ -931,7 +931,7 @@ const schema = JSON.stringify({
     state.animating = false;
     messageEl.textContent = ''; messageEl.style.color = 'var(--text-primary)';
     restartBtn.style.display = 'none';
-    statusLabel.textContent = state.isRainbowRound ? '🌈 Rainbow Round — every gate hides a bonus!' : 'Pick the open gate';
+    statusLabel.textContent = 'Pick the open gate';
     showSheep();
     updateHud();
     const newSet = buildGateSet(95 - state.worldOffset);
@@ -948,7 +948,6 @@ const schema = JSON.stringify({
         if (state.hintDoubleScoreIdx >= 0)                       stampTestMark(gates, state.hintDoubleScoreIdx, '2X');
       }
     }
-    if (state.isRainbowRound) showRainbowBanner();
     state.currentSetEl = newSet;
     if (SPORT_MODE) startSportTimer();
   }
@@ -965,12 +964,12 @@ const schema = JSON.stringify({
     roundLabel.innerHTML = 'Gate ' + (state.gatesCleared + 1) + ' · Level ' + level +
       ' &nbsp;<span style="color:#2e7d32;font-weight:600">' + openCount + '✓</span>' +
       ' <span style="color:#a32d2d;font-weight:600">' + getBlockedCount() + '✗</span>' +
-      (state.isRainbowRound ? ' 🌈' : '');
+      '';
     levelLabel.textContent = 'Level ' + level + ' · ' + openCount + ' of ' + GATES_PER_ROUND + ' open';
     levelProgressText.textContent = (round - 1) + ' / ' + ROUNDS_PER_LEVEL;
     levelProgressBar.style.width = (((round - 1) / ROUNDS_PER_LEVEL) * 100) + '%';
     scoreEl.textContent = state.score;
-    streakRowEl.textContent = state.streak >= 3 ? '🔥 ' + state.streak + ' streak' : '';
+    streakRowEl.textContent = '';
     updateFieldAmbience(level);
   }
   function showBanner(text, duration) {
@@ -1435,9 +1434,8 @@ const schema = JSON.stringify({
           state.hintDoubleScoreIdx = nextDoubleScoreIdx;
           rainbowSkyEl.style.opacity = nextIsRainbow ? '1' : '0';
           state.animating = false;
-          statusLabel.textContent = nextIsRainbow ? '🌈 Rainbow Round — every gate hides a bonus!' : 'Pick the open gate';
+          statusLabel.textContent = 'Pick the open gate';
           if (wasLevelUp) showLevelUp(getLevel());
-          if (nextIsRainbow) showRainbowBanner();
           if (SPORT_MODE) startSportTimer();
         }, 550 * _D);
       }, 1500 * _D);
