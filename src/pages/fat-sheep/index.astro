@@ -46,6 +46,7 @@ const schema = JSON.stringify({
   <Fragment slot="head">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
     <script type="application/ld+json" set:html={schema} />
+    <script is:inline src="/scripts/game-framework.js"></script>
   </Fragment>
 
 <div class="app">
@@ -90,7 +91,7 @@ const schema = JSON.stringify({
     </div>
 
     <div id="grazing-field">
-      <div id="sheep-entity">🐑</div>
+      <div id="sheep-entity" style="display:none">🐑</div>
       <div id="level-up-banner"></div>
       <div id="sport-timer"><div id="sport-timer-bar"></div></div>
     </div>
