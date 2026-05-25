@@ -59,6 +59,28 @@ const schema = JSON.stringify({
               "suggestedMinAge": 5
             }
           }
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "item": {
+            "@type": "VideoGame",
+            "@id": "https://sheeps.online/fat-sheep/#game",
+            "name": "Fat Grazing Sheep",
+            "url": "https://sheeps.online/fat-sheep/",
+            "description": "Guide your sheep around a pasture, eat food, grow enormous, and dodge the sheepdogs. A casual browser game with 6 fat stages and power-ups.",
+            "genre": ["Casual", "Kids"],
+            "playMode": "SinglePlayer",
+            "applicationCategory": "Game",
+            "operatingSystem": "Any",
+            "gamePlatform": "Web Browser",
+            "isAccessibleForFree": true,
+            "image": "https://sheeps.online/og-image.svg",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            }
+          }
         }
       ]
     },
@@ -287,6 +309,17 @@ const schema = JSON.stringify({
         <div class="game-card-meta">
           <span class="tag">Casual</span>
           <span class="tag">Arcade</span>
+          <span class="tag">Kids</span>
+          <span class="tag">Free</span>
+        </div>
+      </a>
+      <a class="game-card" href="/fat-sheep/" aria-label="Play Fat Grazing Sheep — casual movement game">
+        <div class="game-card-icon">🐑</div>
+        <div class="game-card-title">Fat Grazing Sheep</div>
+        <p class="game-card-desc">Guide your sheep, eat everything, grow enormous, and dodge the sheepdogs. How fat can you get?</p>
+        <div class="game-card-meta">
+          <span class="tag">Casual</span>
+          <span class="tag">Movement</span>
           <span class="tag">Kids</span>
           <span class="tag">Free</span>
         </div>
