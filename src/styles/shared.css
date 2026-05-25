@@ -70,10 +70,12 @@ input[type="text"]:focus { outline: none; border-color: var(--info); box-shadow:
   background: var(--bg-card); border: 0.5px solid var(--border);
   border-radius: 8px; padding: 14px;
 }
-#hiscore-entry { margin-bottom: 16px; text-align: center; }
-#hiscore-entry .entry-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
-#hiscore-entry .entry-subtitle { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
+#hiscore-entry { margin-bottom: 16px; text-align: center; background: #fffbe6; border: 2px solid #f0b429; border-radius: 10px; padding: 14px 16px; }
+#hiscore-entry .entry-title { font-size: 15px; font-weight: 700; margin-bottom: 4px; color: #b07b00; }
+#hiscore-entry .entry-subtitle { font-size: 12px; color: #8a6200; margin-bottom: 10px; }
 #hiscore-entry .entry-row { display: flex; gap: 8px; justify-content: center; align-items: center; }
+#hiscore-entry #hiscore-name { border: 2px solid #f0b429 !important; border-radius: 6px; background: #fff; padding: 6px 10px; outline: none; }
+#hiscore-entry #hiscore-name:focus { border-color: #d49a00 !important; box-shadow: 0 0 0 3px rgba(240,180,41,0.25); }
 #leaderboard { margin-top: 16px; font-size: 13px; }
 .leaderboard-title {
   font-weight: 500; margin-bottom: 8px; color: var(--text-secondary);

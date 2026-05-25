@@ -799,16 +799,12 @@ const schema = JSON.stringify({
     resultScore.textContent  = score;
     resultSub.textContent    = STAGES[stageIdx].name + ' sheep · ' + (sportMode ? 'Sport' : 'Normal') + ' mode';
     modTitleEl.textContent   = score === 0 ? 'Caught immediately!' : 'Game Over!';
-    modSubEl.textContent     = score >= 200 ? 'Proper blob material. 🐑' : score >= 50 ? 'Keep eating!' : 'Faster next time!';
 
     const currentLb = sportMode ? sportLb : lb;
     if (isNewBest(currentLb, score, LB_MAX) && score > 0) hiscoreEl.style.display = '';
 
     actionBar.innerHTML = '';
-    const btn = document.createElement('button');
-    btn.textContent = '↩ Try again'; btn.style.fontWeight = '500';
-    btn.onclick = () => { resultEl.style.display = 'none'; hiscoreEl.style.display = 'none'; actionBar.innerHTML = ''; modSubEl.textContent = 'Choose your mode'; };
-    actionBar.appendChild(btn);
+    modSubEl.textContent = 'Choose your mode';
 
     modOvEl.style.display = 'flex';
     if (score > 0) pushScore(score);
