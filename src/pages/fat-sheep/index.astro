@@ -91,6 +91,7 @@ const schema = JSON.stringify({
     </div>
 
     <div id="grazing-field">
+      <canvas id="grass-canvas" style="position:absolute;top:0;left:0;pointer-events:none;z-index:0;border-radius:8px;"></canvas>
       <div id="sheep-entity" style="display:none">🐑</div>
       <div id="move-target" style="display:none"></div>
       <div id="level-up-banner"></div>
@@ -250,6 +251,9 @@ const schema = JSON.stringify({
   const MUTE_KEY   = 'fatgraze:mute';
   const LB_MAX = 5;
   const SPORT_SECONDS = 90;
+  const GRASS_CELL         = 35;
+  const GRASS_EAT_RATE     = 0.35;
+  const GRASS_RECOVER_RATE = 0.04;
 
   const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
   if (_urlGroupId) sessionStorage.setItem('fatgraze:active-group', _urlGroupId);
@@ -314,6 +318,9 @@ const schema = JSON.stringify({
   // Sport
   let sportEnd = 0;
 
+  // Grass grid
+  let grassGrid = [], grassCols = 0, grassRows = 0;
+
   // Keys
   const keys = {};
 
@@ -347,6 +354,8 @@ const schema = JSON.stringify({
   const lvlBanner   = document.getElementById('level-up-banner');
   const sportTimEl  = document.getElementById('sport-timer');
   const sportBar    = document.getElementById('sport-timer-bar');
+  const grassCanvas = document.getElementById('grass-canvas');
+  const grassCtx    = grassCanvas.getContext('2d');
   const sportBadge  = document.getElementById('sport-badge');
   const muteBadge   = document.getElementById('mute-badge');
   const groupBadge  = document.getElementById('group-badge');
@@ -449,9 +458,11 @@ const schema = JSON.stringify({
     lastTs = ts;
 
     stepSheep(dt);
+    stepGrass(dt);
     stepSpawn(dt);
     stepDogs(dt);
     checkHits();
+    drawGrass();
     updateHUD();
     if (sportMode) checkSport();
 
@@ -491,6 +502,53 @@ const schema = JSON.stringify({
     else sheepEl.classList.remove('speedy');
 
     moveSheepDom();
+  }
+
+  function stepGrass(dt) {
+    const eatR  = STAGES[stageIdx].size / 2 * 1.1;
+    const eatR2 = eatR * eatR;
+    for (let r = 0; r < grassRows; r++) {
+      for (let c = 0; c < grassCols; c++) {
+        const cx = (c + 0.5) * GRASS_CELL;
+        const cy = (r + 0.5) * GRASS_CELL;
+        const dx = cx - sx, dy = cy - sy;
+        if (dx * dx + dy * dy < eatR2) {
+          grassGrid[r][c] = Math.max(0, grassGrid[r][c] - GRASS_EAT_RATE * dt);
+        } else {
+          grassGrid[r][c] = Math.min(1, grassGrid[r][c] + GRASS_RECOVER_RATE * dt);
+        }
+      }
+    }
+  }
+
+  function grassColor(q) {
+    // brown (#c2862e) → yellow-green (#c8c040) → lush green (#7dc940)
+    let r, g, b;
+    if (q < 0.5) {
+      const t = q * 2;
+      r = Math.round(194 + (200 - 194) * t);
+      g = Math.round(134 + (192 - 134) * t);
+      b = Math.round(46  + (64  - 46)  * t);
+    } else {
+      const t = (q - 0.5) * 2;
+      r = Math.round(200 + (125 - 200) * t);
+      g = Math.round(192 + (201 - 192) * t);
+      b = 64;
+    }
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function drawGrass() {
+    grassCtx.fillStyle = '#7dc940';
+    grassCtx.fillRect(0, 0, grassCanvas.width, grassCanvas.height);
+    for (let r = 0; r < grassRows; r++) {
+      for (let c = 0; c < grassCols; c++) {
+        const q = grassGrid[r][c];
+        if (q >= 0.99) continue;
+        grassCtx.fillStyle = grassColor(q);
+        grassCtx.fillRect(c * GRASS_CELL, r * GRASS_CELL, GRASS_CELL, GRASS_CELL);
+      }
+    }
   }
 
   function stepSpawn(dt) {
@@ -788,6 +846,14 @@ const schema = JSON.stringify({
     fieldH = fieldEl.offsetHeight;
     sx = fieldW / 2; sy = fieldH / 2;
     tx = sx; ty = sy;
+
+    grassCols = Math.ceil(fieldW / GRASS_CELL);
+    grassRows = Math.ceil(fieldH / GRASS_CELL);
+    grassGrid = Array.from({ length: grassRows }, () => new Float32Array(grassCols).fill(1));
+    grassCanvas.width  = fieldW;
+    grassCanvas.height = fieldH;
+    grassCtx.fillStyle = '#7dc940';
+    grassCtx.fillRect(0, 0, fieldW, fieldH);
 
     stageIdx = 0; applySheepVisual(); moveSheepDom();
     sheepEl.style.display = '';
