@@ -250,7 +250,7 @@ window.GameFramework = (function () {
         try {
           await createGroupInFirebase(dbUrl, groupId, token);
         } catch (e) {
-          showFriendsCopyToast('Could not create group — check your connection.');
+          showFriendsCopyToast('Could not create group. Check your connection.');
           localStorage.removeItem(SKEY);
           return;
         }
@@ -278,7 +278,7 @@ window.GameFramework = (function () {
         navigator.share({ title: gameTitle, text: share, url }).catch(() => {});
       } else {
         navigator.clipboard.writeText(url).catch(() => {});
-        showFriendsCopyToast('Link copied — paste it in your ' + platform + '!');
+        showFriendsCopyToast('Link copied. Paste it in your ' + platform + '.');
       }
     };
     const igBtn = document.getElementById('friends-share-ig');
