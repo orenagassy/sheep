@@ -66,11 +66,11 @@ input[type="text"] { border: 0.5px solid var(--border); border-radius: 8px; padd
 input[type="text"]:focus { outline: none; border-color: var(--info); box-shadow: 0 0 0 2px var(--info-soft); }
 
 /* ---- Panels ---- */
-#hiscore-entry, #leaderboard {
+#leaderboard {
   background: var(--bg-card); border: 0.5px solid var(--border);
   border-radius: 8px; padding: 14px;
 }
-#hiscore-entry { margin-top: 16px; text-align: center; }
+#hiscore-entry { margin-bottom: 16px; text-align: center; }
 #hiscore-entry .entry-title { font-size: 14px; font-weight: 500; margin-bottom: 6px; }
 #hiscore-entry .entry-subtitle { font-size: 12px; color: var(--text-secondary); margin-bottom: 10px; }
 #hiscore-entry .entry-row { display: flex; gap: 8px; justify-content: center; align-items: center; }

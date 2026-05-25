@@ -110,18 +110,6 @@ const schema = JSON.stringify({
 
     <div id="power-hud"></div>
 
-    <div id="hiscore-entry" style="display: none;">
-      <div class="entry-title">🏅 New world best!</div>
-      <div class="entry-subtitle">Enter your name (up to 10 characters)</div>
-      <div class="entry-row">
-        <input id="hiscore-name" type="text" maxlength="10" autocomplete="off"
-               style="width: 160px; text-align: center; text-transform: uppercase; font-size: 16px; letter-spacing: 2px; font-weight: 500;" />
-        <button id="hiscore-save" style="font-weight: 500;">Save</button>
-      </div>
-    </div>
-
-    <div class="action-bar" id="action-bar"></div>
-
     <details>
       <summary>How to play &amp; what even is this</summary>
       <p>You are a sheep. A very hungry, very ambitious sheep. Your mission: eat everything in the pasture and get absolutely massive. Click anywhere to waddle toward it. Use WASD or arrow keys if you're feeling fancy. Eat grass, flowers, clovers, and apples to gain fat points. The fatter you get, the slower you move. Deeply unfair, very on-brand for a blob sheep.</p>
@@ -194,6 +182,16 @@ const schema = JSON.stringify({
       <div id="mode-popup-score-val"></div>
       <div id="mode-popup-score-sub"></div>
     </div>
+    <div id="hiscore-entry" style="display: none;">
+      <div class="entry-title">🏅 New world best!</div>
+      <div class="entry-subtitle">Enter your name (up to 10 characters)</div>
+      <div class="entry-row">
+        <input id="hiscore-name" type="text" maxlength="10" autocomplete="off"
+               style="width: 160px; text-align: center; text-transform: uppercase; font-size: 16px; letter-spacing: 2px; font-weight: 500;" />
+        <button id="hiscore-save" style="font-weight: 500;">Save</button>
+      </div>
+    </div>
+    <div class="action-bar" id="action-bar"></div>
     <div id="mode-popup-topbar">
       <div id="mode-popup-title">🐑 Fat Grazing Sheep</div>
       <button id="popup-stats-btn" title="Leaderboard &amp; stats">☰</button>
@@ -808,7 +806,7 @@ const schema = JSON.stringify({
     actionBar.innerHTML = '';
     const btn = document.createElement('button');
     btn.textContent = '↩ Try again'; btn.style.fontWeight = '500';
-    btn.onclick = () => { resultEl.style.display = 'none'; modSubEl.textContent = 'Choose your mode'; showPopup(); };
+    btn.onclick = () => { resultEl.style.display = 'none'; hiscoreEl.style.display = 'none'; actionBar.innerHTML = ''; modSubEl.textContent = 'Choose your mode'; };
     actionBar.appendChild(btn);
 
     modOvEl.style.display = 'flex';
