@@ -3,6 +3,9 @@
     "sheep-gates": {
       "leaderboard": { ".read": true, ".write": "auth != null" },
       "config":      { ".read": true, ".write": "auth != null" },
+      "sport": {
+        "leaderboard": { ".read": true, ".write": "auth != null" }
+      },
       "groups": {
         "$groupId": { ".read": true, ".write": "auth != null" }
       }

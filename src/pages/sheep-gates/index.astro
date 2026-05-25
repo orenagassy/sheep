@@ -595,10 +595,12 @@ const schema = JSON.stringify({
   }
   async function loadLeaderboard() {
     if (GROUP_MODE) { await loadGroupLeaderboard(); return; }
-    if (SPORT_MODE) { loadLocalLeaderboard(); renderLeaderboard(); return; }
+    const lbUrl = SPORT_MODE
+      ? `${FIREBASE_DB_URL}/sport/leaderboard.json`
+      : `${FIREBASE_DB_URL}/leaderboard.json`;
     setSyncStatus('Syncing...', 'syncing');
     try {
-      const res = await fetch(`${FIREBASE_DB_URL}/leaderboard.json`);
+      const res = await fetch(lbUrl);
       if (!res.ok) throw new Error('HTTP ' + res.status);
       leaderboard = extractScores(await res.json());
       setSyncStatus('Synced', '');
@@ -611,14 +613,12 @@ const schema = JSON.stringify({
   }
   async function saveLeaderboard() {
     if (GROUP_MODE) { return await saveGroupLeaderboard(); }
-    if (SPORT_MODE) {
-      leaderboard.sort((a, b) => b.score - a.score);
-      leaderboard = leaderboard.slice(0, MAX_LEADERBOARD);
-      saveLocalLeaderboard(); renderLeaderboard(); return true;
-    }
+    const lbUrl = SPORT_MODE
+      ? `${FIREBASE_DB_URL}/sport/leaderboard.json`
+      : `${FIREBASE_DB_URL}/leaderboard.json`;
     setSyncStatus('Saving...', 'syncing');
     try {
-      const latestRes = await fetch(`${FIREBASE_DB_URL}/leaderboard.json`);
+      const latestRes = await fetch(lbUrl);
       let serverScores = [];
       if (latestRes.ok) serverScores = extractScores(await latestRes.json());
       const combined = [...serverScores, ...leaderboard];
@@ -630,20 +630,20 @@ const schema = JSON.stringify({
       }
       merged.sort((a, b) => b.score - a.score);
       const trimmed = merged.slice(0, MAX_LEADERBOARD);
-      const putRes = await fetch(authUrl(`${FIREBASE_DB_URL}/leaderboard.json`), {
+      const putRes = await fetch(authUrl(lbUrl), {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ scores: trimmed })
       });
       if (!putRes.ok) throw new Error('HTTP ' + putRes.status);
       leaderboard = trimmed;
-      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
+      try { localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(leaderboard)); } catch (_) {}
       setSyncStatus('Synced', '');
       return true;
     } catch (e) {
       console.error('Failed to save leaderboard', e);
       setSyncStatus('Save failed', 'error');
-      try { localStorage.setItem(LOCAL_FALLBACK_KEY, JSON.stringify(leaderboard)); } catch (_) {}
+      try { localStorage.setItem(LB_LOCAL_KEY, JSON.stringify(leaderboard)); } catch (_) {}
       return false;
     }
   }
