@@ -138,3 +138,47 @@
   opacity: 0.4;
   z-index: 0;
 }
+
+/* ---- Energy / fight bar ---- */
+.energy-bar-wrap {
+  margin: 4px 0 6px;
+}
+.energy-bar-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin-bottom: 3px;
+}
+.energy-bar-track {
+  background: rgba(0,0,0,0.12);
+  border-radius: 4px;
+  height: 7px;
+  overflow: hidden;
+}
+.energy-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  background: #4caf50;
+  transition: width 0.1s linear, background 0.3s;
+  will-change: width;
+}
+
+/* ---- Hurt flash (dog contact) ---- */
+@keyframes hurt-flash {
+  0%   { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)) brightness(1) saturate(1); }
+  35%  { filter: drop-shadow(0 3px 6px rgba(255,0,0,0.6)) brightness(1.7) saturate(4) hue-rotate(330deg); }
+  100% { filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25)) brightness(1) saturate(1); }
+}
+#sheep-entity.hurt {
+  animation: hurt-flash 0.2s ease-out infinite;
+}
+
+/* ---- Dog size variants ---- */
+.dog-small {
+  opacity: 0.85;
+  filter: drop-shadow(0 1px 3px rgba(0,0,0,0.2));
+}
+.dog-guard {
+  filter: drop-shadow(0 2px 8px rgba(100,0,150,0.5)) drop-shadow(0 0 4px rgba(180,0,255,0.25));
+}
