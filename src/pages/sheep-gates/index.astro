@@ -428,7 +428,6 @@ const schema = JSON.stringify({
       if (!unlockedAchievements.has(a.id) && a.check(state, stats)) {
         unlockedAchievements.add(a.id);
         try { localStorage.setItem(ACHIEVEMENTS_KEY, JSON.stringify([...unlockedAchievements])); } catch(_) {}
-        showAchievementToast(a);
       }
     });
   }
@@ -1732,7 +1731,6 @@ const schema = JSON.stringify({
   }
   async function autoSaveScore() {
     await pushScore(sessionName);
-    showAchievementToast({ icon: '🏆', label: 'Score saved', desc: 'as ' + sessionName });
     showModePopup(true);
   }
   hiscoreSave.onclick = async () => {

@@ -286,11 +286,11 @@ const schema = JSON.stringify({
   // not raw speed. Collie overtakes Mega/Blob — use power-ups!
   const STAGES = [
     { name: 'Skinny', pts: 0,    size: 38,  speed: 165, maxEnergy: 30  },
-    { name: 'Chubby', pts: 40,   size: 48,  speed: 150, maxEnergy: 55  },
-    { name: 'Round',  pts: 120,  size: 60,  speed: 132, maxEnergy: 90  },
-    { name: 'Chonky', pts: 280,  size: 74,  speed: 112, maxEnergy: 135 },
-    { name: 'Mega',   pts: 580,  size: 90,  speed: 88,  maxEnergy: 190 },
-    { name: 'Blob',   pts: 1100, size: 110, speed: 70,  maxEnergy: 260 },
+    { name: 'Chubby', pts: 80,   size: 48,  speed: 150, maxEnergy: 55  },
+    { name: 'Round',  pts: 250,  size: 60,  speed: 132, maxEnergy: 90  },
+    { name: 'Chonky', pts: 580,  size: 74,  speed: 112, maxEnergy: 135 },
+    { name: 'Mega',   pts: 1200, size: 90,  speed: 88,  maxEnergy: 190 },
+    { name: 'Blob',   pts: 2500, size: 110, speed: 70,  maxEnergy: 260 },
   ];
 
   // ── Food types (weighted random) ───────────────────────────────────────────
@@ -305,10 +305,10 @@ const schema = JSON.stringify({
 
   // ── Dog breeds (size, speed, drain rate, AI style) ─────────────────────────
   const DOG_TYPES = [
-    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 14, speed: 52, drain: 10, collieStyle: false, minSpawns: 0, weight: 3   },
-    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 18, speed: 62, drain: 22, collieStyle: false, minSpawns: 0, weight: 3   },
-    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 22, speed: 88, drain: 38, collieStyle: true,  minSpawns: 4, weight: 1.5 },
-    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 28, speed: 72, drain: 60, collieStyle: false, minSpawns: 9, weight: 0.7 },
+    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 9,  speed: 52, drain: 10, collieStyle: false, minSpawns: 0, weight: 3   },
+    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 12, speed: 62, drain: 22, collieStyle: false, minSpawns: 0, weight: 3   },
+    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 14, speed: 88, drain: 38, collieStyle: true,  minSpawns: 4, weight: 1.5 },
+    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 17, speed: 72, drain: 60, collieStyle: false, minSpawns: 9, weight: 0.7 },
   ];
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -647,7 +647,7 @@ const schema = JSON.stringify({
 
   function checkHits(dt) {
     if (dead) return;
-    const sr = STAGES[stageIdx].size / 2 * 0.78;
+    const sr = STAGES[stageIdx].size / 2 * 0.85;
 
     // Food
     foods = foods.filter(food => {
