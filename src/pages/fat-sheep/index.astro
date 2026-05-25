@@ -92,6 +92,7 @@ const schema = JSON.stringify({
 
     <div id="grazing-field">
       <div id="sheep-entity" style="display:none">🐑</div>
+      <div id="move-target" style="display:none"></div>
       <div id="level-up-banner"></div>
       <div id="sport-timer"><div id="sport-timer-bar"></div></div>
     </div>
@@ -267,13 +268,16 @@ const schema = JSON.stringify({
   } = window.GameFramework;
 
   // ── Fat stages ─────────────────────────────────────────────────────────────
+  // speed = px/s. Herder dog = 62px/s, Collie = 92px/s.
+  // Sheep is always faster than herder so the challenge is positioning,
+  // not raw speed. Collie overtakes Mega/Blob — use power-ups!
   const STAGES = [
-    { name: 'Skinny', pts: 0,   size: 38,  speed: 130 },
-    { name: 'Chubby', pts: 10,  size: 48,  speed: 115 },
-    { name: 'Round',  pts: 35,  size: 60,  speed: 95  },
-    { name: 'Chonky', pts: 85,  size: 74,  speed: 75  },
-    { name: 'Mega',   pts: 185, size: 90,  speed: 55  },
-    { name: 'Blob',   pts: 385, size: 110, speed: 38  },
+    { name: 'Skinny', pts: 0,   size: 38,  speed: 165 },
+    { name: 'Chubby', pts: 10,  size: 48,  speed: 150 },
+    { name: 'Round',  pts: 35,  size: 60,  speed: 132 },
+    { name: 'Chonky', pts: 85,  size: 74,  speed: 112 },
+    { name: 'Mega',   pts: 185, size: 90,  speed: 88  },
+    { name: 'Blob',   pts: 385, size: 110, speed: 70  },
   ];
 
   // ── Food types (weighted random) ───────────────────────────────────────────
@@ -411,9 +415,9 @@ const schema = JSON.stringify({
   }
   function spawnDog() {
     // More collies as dogsSpawned grows
-    const collieChance = Math.min(0.55, dogsSpawned * 0.12);
+    const collieChance = Math.min(0.5, dogsSpawned * 0.12);
     const isCollie = Math.random() < collieChance;
-    const baseSpeed = isCollie ? 100 : 65;
+    const baseSpeed = isCollie ? 92 : 62;
 
     let x, y;
     const edge = Math.floor(Math.random() * 4);
@@ -545,7 +549,7 @@ const schema = JSON.stringify({
           } else {
             if (dog.circleT > 1.6) { dog.circling = false; dog.circleT = 0; }
             dog.angle += 2.8 * dt;
-            const orbitR = 95;
+            const orbitR = 80;
             const gx = sx + Math.cos(dog.angle) * orbitR;
             const gy = sy + Math.sin(dog.angle) * orbitR;
             const ddx = gx - dog.x, ddy = gy - dog.y;
@@ -773,7 +777,7 @@ const schema = JSON.stringify({
     running = true; dead = false;
     score = 0; fatPts = 0; stageIdx = 0;
     repelExp = 0; speedExp = 0; scareExp = 0;
-    spawnFoodT = 0; spawnDogT = 5;
+    spawnFoodT = 0; spawnDogT = 9;
     dogsSpawned = 0;
     Object.keys(keys).forEach(k => delete keys[k]);
 
@@ -787,6 +791,7 @@ const schema = JSON.stringify({
 
     stageIdx = 0; applySheepVisual(); moveSheepDom();
     sheepEl.style.display = '';
+    targetDot.style.display = 'none';
     lvlBanner.style.opacity = '0';
     lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
     hiscoreEl.style.display = 'none';
@@ -884,27 +889,37 @@ const schema = JSON.stringify({
   });
   document.addEventListener('keyup', e => { delete keys[e.key]; });
 
+  const targetDot = document.getElementById('move-target');
+  let targetFadeTimer = null;
+
+  function setTarget(x, y) {
+    tx = x; ty = y;
+    targetDot.style.left = x + 'px';
+    targetDot.style.top  = y + 'px';
+    targetDot.style.display = '';
+    targetDot.className = 'active';
+    clearTimeout(targetFadeTimer);
+    targetFadeTimer = setTimeout(() => { targetDot.className = 'fading'; }, 800);
+  }
+
   fieldEl.addEventListener('click', e => {
     if (!running) return;
     const rect = fieldEl.getBoundingClientRect();
-    tx = e.clientX - rect.left;
-    ty = e.clientY - rect.top;
+    setTarget(e.clientX - rect.left, e.clientY - rect.top);
   });
   fieldEl.addEventListener('touchstart', e => {
     if (!running) return;
     e.preventDefault();
     const rect = fieldEl.getBoundingClientRect();
     const t = e.touches[0];
-    tx = t.clientX - rect.left;
-    ty = t.clientY - rect.top;
+    setTarget(t.clientX - rect.left, t.clientY - rect.top);
   }, { passive: false });
   fieldEl.addEventListener('touchmove', e => {
     if (!running) return;
     e.preventDefault();
     const rect = fieldEl.getBoundingClientRect();
     const t = e.touches[0];
-    tx = t.clientX - rect.left;
-    ty = t.clientY - rect.top;
+    setTarget(t.clientX - rect.left, t.clientY - rect.top);
   }, { passive: false });
 
   // ── Init ───────────────────────────────────────────────────────────────────
