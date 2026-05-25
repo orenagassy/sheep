@@ -305,10 +305,10 @@ const schema = JSON.stringify({
 
   // ── Dog breeds (size, speed, drain rate, AI style) ─────────────────────────
   const DOG_TYPES = [
-    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 9,  speed: 52, drain: 10, collieStyle: false, minSpawns: 0, weight: 3   },
-    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 12, speed: 62, drain: 22, collieStyle: false, minSpawns: 0, weight: 3   },
-    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 14, speed: 88, drain: 38, collieStyle: true,  minSpawns: 4, weight: 1.5 },
-    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 17, speed: 72, drain: 60, collieStyle: false, minSpawns: 9, weight: 0.7 },
+    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 9,  speed: 90,  drain: 10, collieStyle: false, minSpawns: 0, weight: 3   },
+    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 12, speed: 115, drain: 22, collieStyle: false, minSpawns: 0, weight: 3   },
+    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 14, speed: 145, drain: 38, collieStyle: true,  minSpawns: 4, weight: 1.5 },
+    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 17, speed: 125, drain: 60, collieStyle: false, minSpawns: 9, weight: 0.7 },
   ];
 
   // ── State ──────────────────────────────────────────────────────────────────
@@ -450,10 +450,11 @@ const schema = JSON.stringify({
 
     let x, y;
     const edge = Math.floor(Math.random() * 4);
-    if (edge === 0)      { x = Math.random() * fieldW; y = -40; }
-    else if (edge === 1) { x = Math.random() * fieldW; y = fieldH + 40; }
-    else if (edge === 2) { x = -40; y = Math.random() * fieldH; }
-    else                 { x = fieldW + 40; y = Math.random() * fieldH; }
+    const spread = 60;
+    if (edge === 0)      { x = Math.max(20, Math.min(fieldW - 20, sx + (Math.random() - 0.5) * spread)); y = -40; }
+    else if (edge === 1) { x = Math.max(20, Math.min(fieldW - 20, sx + (Math.random() - 0.5) * spread)); y = fieldH + 40; }
+    else if (edge === 2) { x = -40; y = Math.max(20, Math.min(fieldH - 20, sy + (Math.random() - 0.5) * spread)); }
+    else                 { x = fieldW + 40; y = Math.max(20, Math.min(fieldH - 20, sy + (Math.random() - 0.5) * spread)); }
 
     const el = document.createElement('div');
     el.className = 'dog-entity' + (type.cssClass ? ' ' + type.cssClass : '');
