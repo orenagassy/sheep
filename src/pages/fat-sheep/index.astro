@@ -41,7 +41,7 @@ const schema = JSON.stringify({
 ---
 <BaseLayout
   title="Fat Grazing Sheep — Free Online Casual Game | Sheeps.online"
-  description="Guide your sheep around a pasture, eat everything, grow enormous, and dodge the sheepdogs! Free casual browser game — no download, no sign-up. How fat can you get?"
+  description="Guide your sheep around a pasture, eat everything, grow enormous, and dodge the sheepdogs! Free casual browser game, no download, no sign-up. How fat can you get?"
 >
   <Fragment slot="head">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
@@ -51,7 +51,7 @@ const schema = JSON.stringify({
 
 <div class="app">
   <h1>🐑 Fat Grazing Sheep</h1>
-  <p class="tagline">Eat everything. Become enormous. Dodge the dogs.</p>
+  <p class="tagline">Get as fat as possible. The sheepdogs object strongly.</p>
 
   <div class="ad-wrap ad-wrap--top">
     <!-- Ad unit loads here after AdSense approval -->
@@ -114,9 +114,9 @@ const schema = JSON.stringify({
 
     <details>
       <summary>How to play &amp; what even is this</summary>
-      <p>You are a sheep. A very hungry, very ambitious sheep. Your mission: eat everything in the pasture and get absolutely massive. Click anywhere to waddle toward it. Use WASD or arrow keys if you're feeling fancy. Eat grass, flowers, clovers, and apples to gain fat points. The fatter you get, the slower you move — which is deeply unfair but very on-brand for a blob sheep.</p>
+      <p>You are a sheep. A very hungry, very ambitious sheep. Your mission: eat everything in the pasture and get absolutely massive. Click anywhere to waddle toward it. Use WASD or arrow keys if you're feeling fancy. Eat grass, flowers, clovers, and apples to gain fat points. The fatter you get, the slower you move. Deeply unfair, very on-brand for a blob sheep.</p>
       <p>🌿 Grass gives 10 pts. 🌸 Flowers give 25 pts. 🍀 Clovers give 60 pts <em>and</em> repel dogs for 5 seconds (dogs hate clovers, they're very judgmental). 🍎 Apples give 90 pts <em>and</em> give you a speed boost for 4 seconds. 🔔 Whistles scare all dogs away for 8 whole seconds of blissful grazing freedom.</p>
-      <p>The sheepdogs 🐕 want to herd you back to zero. A basic Herder just chases you. A Border Collie 🐕‍🦺 is smarter — it circles, it feints, then it dashes. Once it catches you, game over. You were so close to becoming a blob.</p>
+      <p>The sheepdogs 🐕 want to herd you back to zero. A basic Herder just chases you. A Border Collie 🐕‍🦺 is smarter: it circles, it feints, then it dashes. Once it catches you, game over. You were so close to becoming a blob.</p>
       <p><strong>Fat stages:</strong> Skinny → Chubby → Round → Chonky → Mega → Blob. Each stage is slower but more majestic. Reaching Blob is the true victory condition, even if the leaderboard disagrees.<br/>
       <strong>Sport mode ⚡:</strong> 90 seconds. Everything spawns faster. Your dignity exits the chat.</p>
       <p>Free browser game. No download, no sign-up. Works on any device. Your friends are either impressed or very concerned about your sheep priorities.</p>
@@ -214,7 +214,7 @@ const schema = JSON.stringify({
 <div id="friends-overlay">
   <div id="friends-popup">
     <div id="friends-popup-title">👥 Play with Friends</div>
-    <p id="friends-popup-desc">Share this link — everyone on it competes for your group's Top 5.</p>
+    <p id="friends-popup-desc">Share this link. Everyone on it fights for your group's Top 5.</p>
     <div id="friends-link-box">
       <input id="friends-link-input" type="text" readonly />
     </div>
@@ -753,7 +753,7 @@ const schema = JSON.stringify({
     resultScore.textContent  = score;
     resultSub.textContent    = STAGES[stageIdx].name + ' sheep · ' + (sportMode ? 'Sport' : 'Normal') + ' mode';
     modTitleEl.textContent   = score === 0 ? 'Caught immediately!' : 'Game Over!';
-    modSubEl.textContent     = score >= 200 ? 'Impressive grazing! 🐑' : score >= 50 ? 'Keep eating!' : 'Faster next time!';
+    modSubEl.textContent     = score >= 200 ? 'Proper blob material. 🐑' : score >= 50 ? 'Keep eating!' : 'Faster next time!';
 
     const currentLb = sportMode ? sportLb : lb;
     if (isNewBest(currentLb, score, LB_MAX) && score > 0) hiscoreEl.style.display = '';

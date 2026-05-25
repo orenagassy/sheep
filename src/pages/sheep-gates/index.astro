@@ -44,7 +44,7 @@ const schema = JSON.stringify({
 ---
 <BaseLayout
   title="Sheep Gates — Free Online Casual Game | Sheeps.online"
-  description="Play Sheep Gates free in your browser! Pick the open gate, dodge the wolves, and survive as long as you can. Casual arcade game for kids and adults. No download."
+  description="Play Sheep Gates free in your browser. Pick the open gate, dodge the wolves, and survive as long as you can. Casual arcade game for kids and adults. No download."
 >
   <Fragment slot="head">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>">
@@ -176,12 +176,12 @@ const schema = JSON.stringify({
 
     <details>
       <summary>How to play &amp; what even is this</summary>
-      <p>You are a sheep. There are 7 gates. One of them will get you eaten. Your job: don't get eaten. Simple! Except it's really not, because with every level another gate locks shut — until you're basically playing Russian roulette with a wolf on the other side. Level 1 is chill (6 of 7 open). Level 7 is pure chaos (1 of 7 open). Good luck.</p>
-      <p>Sometimes the gates hide surprises. A 🍗 chicken leg means the wolf eats <em>that</em> instead of you — congratulations, you sacrificed a drumstick for science. A 🍀 lucky clover straight-up scares the wolf away (wolves hate clovers, apparently). A 2X means your next gates count double, so try not to immediately walk into a wolf.</p>
+      <p>You are a sheep. There are 7 gates. One of them will get you eaten. Your job: don't get eaten. Simple! Except it's really not, because with every level another gate locks shut, until you're basically playing Russian roulette with a wolf on the other side. Level 1 is chill (6 of 7 open). Level 7 is pure chaos (1 of 7 open). Good luck.</p>
+      <p>Sometimes the gates hide surprises. A 🍗 chicken leg means the wolf eats <em>that</em> instead of you. Congratulations, you sacrificed a drumstick for science. A 🍀 lucky clover straight-up scares the wolf away (wolves hate clovers, apparently). A 2X means your next gates count double, so try not to immediately walk into a wolf.</p>
       <p><strong>Normal mode:</strong> Take your time. Think it through. Panic anyway.<br/>
       <strong>Sport mode ⚡:</strong> You have a timer. You will not be ready. Pick faster.</p>
-      <p><strong>Bragging rights:</strong> Your score goes on a live global leaderboard so the whole internet can see how long your sheep survived. Hit Play with Friends, share the link, and drag your friends into the suffering — group mode keeps a private Top 5 just for your crew.</p>
-      <p>Free browser game. No download, no sign-up, no excuses. Works on any device — desktop, phone, tablet, that ancient laptop in the corner. Kids love it. Adults get unreasonably competitive about it.</p>
+      <p><strong>Bragging rights:</strong> Your score goes on a live global leaderboard so the whole internet can see how long your sheep survived. Hit Play with Friends, share the link, and drag your friends into the suffering. Group mode keeps a private Top 5 just for your crew.</p>
+      <p>Free browser game. No download, no sign-up, no excuses. Works on any device: desktop, phone, tablet, that ancient laptop in the corner. Kids love it. Adults get unreasonably competitive about it.</p>
     </details>
   </div>
 
@@ -292,7 +292,7 @@ const schema = JSON.stringify({
 <div id="friends-overlay">
   <div id="friends-popup">
     <div id="friends-popup-title">👥 Play with Friends</div>
-    <p id="friends-popup-desc">Share this link — everyone on it competes for your group's Top 5.</p>
+    <p id="friends-popup-desc">Share this link. Everyone on it fights for your group's Top 5.</p>
     <div id="friends-link-box">
       <input id="friends-link-input" type="text" readonly />
     </div>
@@ -747,7 +747,7 @@ const schema = JSON.stringify({
     const field = document.getElementById('field');
     if (field) {
       field.style.cssText = 'display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;padding:32px;text-align:center;';
-      field.innerHTML = '<div style="font-size:32px">🔗</div><div style="font-size:15px;font-weight:600;">This friend group has expired</div><div style="font-size:13px;color:var(--text-secondary);">Go back to the home screen to start a new group.</div>';
+      field.innerHTML = '<div style="font-size:32px">🔗</div><div style="font-size:15px;font-weight:600;">This friend group has expired</div><div style="font-size:13px;color:var(--text-secondary);">Head back to the main page to start a new one.</div>';
     }
   }
   function showFriendsCopyToast(msg) {
@@ -778,7 +778,7 @@ const schema = JSON.stringify({
           await createGroupInFirebase(groupId);
         } catch (e) {
           console.error('Failed to create group', e);
-          showFriendsCopyToast('Could not create group — check your connection.');
+          showFriendsCopyToast('Could not create group. Check your connection.');
           localStorage.removeItem(GROUP_STORAGE_KEY);
           return;
         }
@@ -800,7 +800,7 @@ const schema = JSON.stringify({
         navigator.share({ title: 'Sheep Gates', text: shareText, url }).catch(() => {});
       } else {
         navigator.clipboard.writeText(url).catch(() => {});
-        showFriendsCopyToast('Link copied — paste it in your ' + platform + '!');
+        showFriendsCopyToast('Copied! Paste it in your ' + platform + '.');
       }
     };
     document.getElementById('friends-share-ig').onclick     = nativeShare('Instagram story');
@@ -822,7 +822,7 @@ const schema = JSON.stringify({
     if (!leaderboard.length) {
       const empty = document.createElement('div');
       empty.style.cssText = 'color: var(--text-muted); font-size: 12px; padding: 4px 0;';
-      empty.textContent = 'No scores yet — be the first!';
+      empty.textContent = 'No scores yet. Be the first.';
       leaderboardList.replaceChildren(empty);
       return;
     }
@@ -1517,7 +1517,7 @@ const schema = JSON.stringify({
 
             gateEl.style.transition = 'background 0.15s, transform 0.5s cubic-bezier(0.34,1.56,0.64,1)';
             gateEl.style.background = '#e65100';
-            statusLabel.textContent = '🍗 The wolf is fed — keep going!';
+            statusLabel.textContent = '🍗 The wolf is fed. Keep going!';
             playGateOpen();
             spawnFloatingScore(gateEl, '🍗');
             setTimeout(() => {
