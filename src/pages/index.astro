@@ -183,6 +183,15 @@ const schema = JSON.stringify({
       font-size: 44px;
       margin-bottom: 14px;
       line-height: 1;
+      position: relative;
+      display: inline-block;
+    }
+    .icon-badge {
+      position: absolute;
+      font-size: 20px;
+      bottom: -4px;
+      right: -10px;
+      filter: drop-shadow(0 1px 2px rgba(0,0,0,0.2));
     }
     .game-card-title {
       font-size: 18px;
@@ -303,7 +312,7 @@ const schema = JSON.stringify({
 
     <div class="games-grid">
       <a class="game-card" href="/sheep-gates/" aria-label="Play Sheep Gates">
-        <div class="game-card-icon">🚪🐺</div>
+        <div class="game-card-icon">🐑<span class="icon-badge">🐺</span></div>
         <div class="game-card-title">Sheep Gates</div>
         <p class="game-card-desc">Seven gates, one wolf. Pick the right one and keep going.</p>
         <div class="game-card-meta">
@@ -314,7 +323,7 @@ const schema = JSON.stringify({
         </div>
       </a>
       <a class="game-card" href="/fat-sheep/" aria-label="Play Fat Grazing Sheep">
-        <div class="game-card-icon">🐑🌿</div>
+        <div class="game-card-icon">🐑<span class="icon-badge">🌿</span></div>
         <div class="game-card-title">Fat Grazing Sheep</div>
         <p class="game-card-desc">Guide your sheep, eat everything, grow enormous, and dodge the sheepdogs. How fat can you get?</p>
         <div class="game-card-meta">
