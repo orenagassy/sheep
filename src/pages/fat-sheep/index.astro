@@ -258,11 +258,12 @@ const schema = JSON.stringify({
   const GROUP_SKEY = 'fatgraze:group';
   const MUTE_KEY   = 'fatgraze:mute';
   const LB_MAX = 5;
-  const SPORT_SECONDS = 90;
-  const GRASS_CELL         = 35;
-  const GRASS_EAT_RATE     = 0.35;
-  const GRASS_RECOVER_RATE = 0.04;
-  const ENERGY_REGEN       = 5; // energy/sec recovered when no dog is biting
+  // ── Mutable game params — overrideable from Firebase /fat-sheep/config ───────
+  let SPORT_SECONDS      = 90;
+  let GRASS_CELL         = 35;
+  let GRASS_EAT_RATE     = 0.35;
+  let GRASS_RECOVER_RATE = 0.04;
+  let ENERGY_REGEN       = 20; // max energy/sec at full grass quality
 
   const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
   if (_urlGroupId) sessionStorage.setItem('fatgraze:active-group', _urlGroupId);
@@ -281,35 +282,46 @@ const schema = JSON.stringify({
   } = window.GameFramework;
 
   // ── Fat stages ─────────────────────────────────────────────────────────────
-  // speed = px/s. Herder dog = 62px/s, Collie = 92px/s.
-  // Sheep is always faster than herder so the challenge is positioning,
-  // not raw speed. Collie overtakes Mega/Blob — use power-ups!
-  const STAGES = [
-    { name: 'Skinny', pts: 0,    size: 38,  speed: 165, maxEnergy: 30  },
-    { name: 'Chubby', pts: 80,   size: 48,  speed: 150, maxEnergy: 55  },
-    { name: 'Round',  pts: 250,  size: 60,  speed: 132, maxEnergy: 90  },
-    { name: 'Chonky', pts: 580,  size: 74,  speed: 112, maxEnergy: 135 },
-    { name: 'Mega',   pts: 1200, size: 90,  speed: 88,  maxEnergy: 190 },
-    { name: 'Blob',   pts: 2500, size: 110, speed: 70,  maxEnergy: 260 },
+  // fatDecay = fat pts/sec lost while at this stage (must keep eating to maintain).
+  let STAGES = [
+    { name: 'Skinny', pts: 0,    size: 38,  speed: 165, maxEnergy: 30,  fatDecay: 0  },
+    { name: 'Chubby', pts: 160,  size: 48,  speed: 150, maxEnergy: 55,  fatDecay: 2  },
+    { name: 'Round',  pts: 500,  size: 60,  speed: 132, maxEnergy: 90,  fatDecay: 5  },
+    { name: 'Chonky', pts: 1160, size: 74,  speed: 112, maxEnergy: 135, fatDecay: 10 },
+    { name: 'Mega',   pts: 2400, size: 90,  speed: 88,  maxEnergy: 190, fatDecay: 18 },
+    { name: 'Blob',   pts: 5000, size: 110, speed: 70,  maxEnergy: 260, fatDecay: 28 },
   ];
 
   // ── Food types (weighted random) ───────────────────────────────────────────
-  const FOODS = [
+  let FOODS = [
     { type: 'grass',   emoji: '🌿', pts: 10, effect: null,    dur: 0,    w: 5   },
     { type: 'flower',  emoji: '🌸', pts: 25, effect: null,    dur: 0,    w: 3   },
     { type: 'clover',  emoji: '🍀', pts: 60, effect: 'repel', dur: 5000, w: 1.5 },
     { type: 'apple',   emoji: '🍎', pts: 90, effect: 'speed', dur: 4000, w: 1   },
     { type: 'whistle', emoji: '🔔', pts: 0,  effect: 'scare', dur: 8000, w: 0.5 },
   ];
-  const FOOD_TOTAL_W = FOODS.reduce((s, f) => s + f.w, 0);
+  let FOOD_TOTAL_W = FOODS.reduce((s, f) => s + f.w, 0);
 
-  // ── Dog breeds (size, speed, drain rate, AI style) ─────────────────────────
-  const DOG_TYPES = [
-    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 9,  speed: 90,  drain: 10, collieStyle: false, minSpawns: 0, weight: 3   },
-    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 12, speed: 115, drain: 22, collieStyle: false, minSpawns: 0, weight: 3   },
-    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 14, speed: 145, drain: 38, collieStyle: true,  minSpawns: 4, weight: 1.5 },
-    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 17, speed: 125, drain: 60, collieStyle: false, minSpawns: 9, weight: 0.7 },
+  // ── Dog breeds — aiStyle: 'erratic' | 'intercept' | 'collie' | 'guard' ─────
+  let DOG_TYPES = [
+    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 9,  speed: 90,  drain: 10, aiStyle: 'erratic',   minSpawns: 0, weight: 3   },
+    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 12, speed: 115, drain: 22, aiStyle: 'intercept', minSpawns: 0, weight: 3   },
+    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 14, speed: 145, drain: 38, aiStyle: 'collie',    minSpawns: 4, weight: 1.5 },
+    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 17, speed: 125, drain: 60, aiStyle: 'guard',     minSpawns: 9, weight: 0.7 },
   ];
+
+  // ── Spawn tuning params ────────────────────────────────────────────────────
+  let PARAMS = {
+    maxFoodNormal:   8,
+    maxFoodSport:    10,
+    foodIntervalMin: 0.7,
+    foodIntervalBase: 2.2,
+    foodScoreDiv:    600,
+    maxDogsCap:      4,
+    dogScoreDiv:     80,
+    dogIntervalMin:  6,
+    dogIntervalBase: 14,
+  };
 
   // ── State ──────────────────────────────────────────────────────────────────
   let token = null, lb = [], sportLb = [];
@@ -448,13 +460,19 @@ const schema = JSON.stringify({
     let r = Math.random() * totalW, type = available[0];
     for (const t of available) { r -= t.weight; if (r <= 0) { type = t; break; } }
 
-    let x, y;
-    const edge = Math.floor(Math.random() * 4);
-    const spread = 60;
-    if (edge === 0)      { x = Math.max(20, Math.min(fieldW - 20, sx + (Math.random() - 0.5) * spread)); y = -40; }
-    else if (edge === 1) { x = Math.max(20, Math.min(fieldW - 20, sx + (Math.random() - 0.5) * spread)); y = fieldH + 40; }
-    else if (edge === 2) { x = -40; y = Math.max(20, Math.min(fieldH - 20, sy + (Math.random() - 0.5) * spread)); }
-    else                 { x = fieldW + 40; y = Math.max(20, Math.min(fieldH - 20, sy + (Math.random() - 0.5) * spread)); }
+    // Spawn from the field corner farthest from the sheep.
+    const spawnCorners = [
+      { fx: 0,      fy: 0,      sx: -40,         sy: -40          },
+      { fx: fieldW, fy: 0,      sx: fieldW + 40,  sy: -40          },
+      { fx: 0,      fy: fieldH, sx: -40,          sy: fieldH + 40  },
+      { fx: fieldW, fy: fieldH, sx: fieldW + 40,  sy: fieldH + 40  },
+    ];
+    let best = spawnCorners[0], bestDist = -1;
+    for (const c of spawnCorners) {
+      const d = (c.fx - sx) * (c.fx - sx) + (c.fy - sy) * (c.fy - sy);
+      if (d > bestDist) { bestDist = d; best = c; }
+    }
+    let x = best.sx, y = best.sy;
 
     const el = document.createElement('div');
     el.className = 'dog-entity' + (type.cssClass ? ' ' + type.cssClass : '');
@@ -462,16 +480,20 @@ const schema = JSON.stringify({
     el.style.fontSize = type.fontSize + 'px';
     fieldEl.appendChild(el);
 
+    let aiState;
+    if      (type.aiStyle === 'erratic')   aiState = { phase: 'chase', timer: 0 };
+    else if (type.aiStyle === 'intercept') aiState = { timer: 0, prevSx: sx, prevSy: sy };
+    else if (type.aiStyle === 'collie')    aiState = { timer: 0, circling: false, angle: Math.atan2(sy - y, sx - x) };
+    else                                   aiState = { phase: 'stalk', timer: 0, chargeVx: 0, chargeVy: 0 };
+
     dogs.push({
       id: nextId++, x, y, el,
       speed: type.speed,
       drain: type.drain,
       hitR:  type.hitR,
       displayOff: type.fontSize / 2,
-      collieStyle: type.collieStyle,
-      angle: Math.atan2(sy - y, sx - x),
-      circling: false,
-      circleT: 0,
+      aiStyle: type.aiStyle,
+      aiState,
     });
     dogsSpawned++;
   }
@@ -484,6 +506,7 @@ const schema = JSON.stringify({
 
     stepSheep(dt);
     stepGrass(dt);
+    stepFatDecay(dt);
     stepSpawn(dt);
     stepDogs(dt);
     checkHits(dt);
@@ -546,6 +569,44 @@ const schema = JSON.stringify({
     }
   }
 
+  function getGrassQualityAtSheep() {
+    const eatR  = STAGES[stageIdx].size / 2 * 1.1;
+    const eatR2 = eatR * eatR;
+    let totalQ = 0, count = 0;
+    for (let r = 0; r < grassRows; r++) {
+      for (let c = 0; c < grassCols; c++) {
+        const cx = (c + 0.5) * GRASS_CELL;
+        const cy = (r + 0.5) * GRASS_CELL;
+        const dx = cx - sx, dy = cy - sy;
+        if (dx * dx + dy * dy < eatR2) { totalQ += grassGrid[r][c]; count++; }
+      }
+    }
+    return count > 0 ? totalQ / count : 0;
+  }
+
+  function stepFatDecay(dt) {
+    const decay = STAGES[stageIdx].fatDecay;
+    if (!decay) return;
+    fatPts = Math.max(0, fatPts - decay * dt);
+    let newIdx = 0;
+    for (let i = STAGES.length - 1; i >= 0; i--) {
+      if (fatPts >= STAGES[i].pts) { newIdx = i; break; }
+    }
+    if (newIdx < stageIdx) {
+      stageIdx = newIdx;
+      maxEnergy = STAGES[stageIdx].maxEnergy;
+      energy = Math.min(energy, maxEnergy);
+      applySheepVisual();
+      lvlBanner.textContent = '🌿 Eat more grass!';
+      lvlBanner.style.opacity = '1';
+      lvlBanner.style.transform = 'translate(-50%,-50%) scale(1)';
+      setTimeout(() => {
+        lvlBanner.style.opacity = '0';
+        lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
+      }, 1500);
+    }
+  }
+
   function grassColor(q) {
     // brown (#c2862e) → yellow-green (#c8c040) → lush green (#7dc940)
     let r, g, b;
@@ -585,14 +646,14 @@ const schema = JSON.stringify({
     spawnFoodT += dt;
     spawnDogT  += dt;
 
-    const maxFood = sportMode ? 10 : 8;
-    const foodInterval = Math.max(0.7, 2.2 - score / 600);
+    const maxFood = sportMode ? PARAMS.maxFoodSport : PARAMS.maxFoodNormal;
+    const foodInterval = Math.max(PARAMS.foodIntervalMin, PARAMS.foodIntervalBase - score / PARAMS.foodScoreDiv);
     if (spawnFoodT >= foodInterval && foods.length < maxFood) {
       spawnFoodT = 0; spawnFood();
     }
 
-    const maxDogs = Math.min(4, 1 + Math.floor(score / 80));
-    const dogInterval = Math.max(6, 14 - score / 80);
+    const maxDogs = Math.min(PARAMS.maxDogsCap, 1 + Math.floor(score / PARAMS.dogScoreDiv));
+    const dogInterval = Math.max(PARAMS.dogIntervalMin, PARAMS.dogIntervalBase - score / PARAMS.dogScoreDiv);
     if (spawnDogT >= dogInterval && dogs.length < maxDogs) {
       spawnDogT = 0; spawnDog();
     }
@@ -610,38 +671,94 @@ const schema = JSON.stringify({
         dog.x += (dx / d) * 95 * dt;
         dog.y += (dy / d) * 95 * dt;
         dog.el.classList.add('scared');
-      } else {
-        dog.el.classList.remove('scared');
-        if (repelled) {
-          const dx = sx - dog.x, dy = sy - dog.y;
-          const d = Math.sqrt(dx * dx + dy * dy) || 1;
-          if (d < 90) { dog.x -= (dx / d) * 38 * dt; dog.y -= (dy / d) * 38 * dt; }
-        } else if (!dog.collieStyle) {
+        dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+        return;
+      }
+      dog.el.classList.remove('scared');
+
+      if (repelled) {
+        const dx = sx - dog.x, dy = sy - dog.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (d < 90) { dog.x -= (dx / d) * 38 * dt; dog.y -= (dy / d) * 38 * dt; }
+        dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+        return;
+      }
+
+      const ai = dog.aiState;
+      ai.timer += dt;
+
+      if (dog.aiStyle === 'erratic') {
+        // Pup: dash toward sheep 1.2s, then veer at a random angle 0.7s, repeat.
+        if (ai.phase === 'chase') {
           const dx = sx - dog.x, dy = sy - dog.y;
           const d = Math.sqrt(dx * dx + dy * dy) || 1;
           dog.x += (dx / d) * dog.speed * dt;
           dog.y += (dy / d) * dog.speed * dt;
-        } else {
-          dog.circleT += dt;
-          if (!dog.circling) {
-            if (dog.circleT > 2.5) { dog.circling = true; dog.circleT = 0; }
-            const dx = sx - dog.x, dy = sy - dog.y;
-            const d = Math.sqrt(dx * dx + dy * dy) || 1;
-            dog.x += (dx / d) * dog.speed * dt;
-            dog.y += (dy / d) * dog.speed * dt;
-          } else {
-            if (dog.circleT > 1.6) { dog.circling = false; dog.circleT = 0; }
-            dog.angle += 2.8 * dt;
-            const orbitR = 80;
-            const gx = sx + Math.cos(dog.angle) * orbitR;
-            const gy = sy + Math.sin(dog.angle) * orbitR;
-            const ddx = gx - dog.x, ddy = gy - dog.y;
-            const d2 = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
-            dog.x += (ddx / d2) * 130 * dt;
-            dog.y += (ddy / d2) * 130 * dt;
+          if (ai.timer > 1.2) {
+            ai.phase = 'veer';
+            ai.timer = 0;
+            ai.veerAngle = Math.atan2(sy - dog.y, sx - dog.x) + (Math.random() - 0.5) * Math.PI * 1.4;
           }
+        } else {
+          dog.x += Math.cos(ai.veerAngle) * dog.speed * dt;
+          dog.y += Math.sin(ai.veerAngle) * dog.speed * dt;
+          if (ai.timer > 0.7) { ai.phase = 'chase'; ai.timer = 0; }
+        }
+
+      } else if (dog.aiStyle === 'intercept') {
+        // Herder: estimates sheep velocity and aims for a point ahead of the sheep.
+        const sheepVx = (sx - ai.prevSx) / dt;
+        const sheepVy = (sy - ai.prevSy) / dt;
+        ai.prevSx = sx; ai.prevSy = sy;
+        const predX = sx + sheepVx * 0.35;
+        const predY = sy + sheepVy * 0.35;
+        const dx = predX - dog.x, dy = predY - dog.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        dog.x += (dx / d) * dog.speed * dt;
+        dog.y += (dy / d) * dog.speed * dt;
+
+      } else if (dog.aiStyle === 'collie') {
+        // Border Collie: chase 2.5s → orbit at 80px for 1.6s → repeat.
+        if (!ai.circling) {
+          const dx = sx - dog.x, dy = sy - dog.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          dog.x += (dx / d) * dog.speed * dt;
+          dog.y += (dy / d) * dog.speed * dt;
+          if (ai.timer > 2.5) { ai.circling = true; ai.timer = 0; }
+        } else {
+          ai.angle += 2.8 * dt;
+          const gx = sx + Math.cos(ai.angle) * 80;
+          const gy = sy + Math.sin(ai.angle) * 80;
+          const ddx = gx - dog.x, ddy = gy - dog.y;
+          const d2 = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+          dog.x += (ddx / d2) * 130 * dt;
+          dog.y += (ddy / d2) * 130 * dt;
+          if (ai.timer > 1.6) { ai.circling = false; ai.timer = 0; }
+        }
+
+      } else if (dog.aiStyle === 'guard') {
+        // Guard Dog: slow stalk 2s (telegraphs) → locked charge at 220% speed 1s → cooldown 0.6s.
+        if (ai.phase === 'stalk') {
+          const dx = sx - dog.x, dy = sy - dog.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          dog.x += (dx / d) * dog.speed * 0.5 * dt;
+          dog.y += (dy / d) * dog.speed * 0.5 * dt;
+          if (ai.timer > 2.0) {
+            ai.phase = 'charge'; ai.timer = 0;
+            const ddx = sx - dog.x, ddy = sy - dog.y;
+            const dd = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+            ai.chargeVx = (ddx / dd) * dog.speed * 2.2;
+            ai.chargeVy = (ddy / dd) * dog.speed * 2.2;
+          }
+        } else if (ai.phase === 'charge') {
+          dog.x += ai.chargeVx * dt;
+          dog.y += ai.chargeVy * dt;
+          if (ai.timer > 1.0) { ai.phase = 'cooldown'; ai.timer = 0; }
+        } else {
+          if (ai.timer > 0.6) { ai.phase = 'stalk'; ai.timer = 0; }
         }
       }
+
       dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
     });
   }
@@ -661,6 +778,9 @@ const schema = JSON.stringify({
       return true;
     });
 
+    // Energy regen scales with grass quality — eaten-out patches restore little.
+    const grassQ = getGrassQualityAtSheep();
+
     // Dog contact — drain fight energy instead of instant death
     if (Date.now() >= scareExp) {
       let totalDrain = 0;
@@ -674,11 +794,11 @@ const schema = JSON.stringify({
         if (energy <= 0) { endGame(); return; }
       } else {
         sheepEl.classList.remove('hurt');
-        energy = Math.min(maxEnergy, energy + ENERGY_REGEN * dt);
+        energy = Math.min(maxEnergy, energy + ENERGY_REGEN * grassQ * dt);
       }
     } else {
       sheepEl.classList.remove('hurt');
-      energy = Math.min(maxEnergy, energy + ENERGY_REGEN * dt);
+      energy = Math.min(maxEnergy, energy + ENERGY_REGEN * grassQ * dt);
     }
   }
 
@@ -1031,11 +1151,31 @@ const schema = JSON.stringify({
     setTarget(t.clientX - rect.left, t.clientY - rect.top);
   }, { passive: false });
 
+  // ── Remote config ──────────────────────────────────────────────────────────
+  async function fetchConfig() {
+    try {
+      const res = await fetch(DB + '/config.json');
+      if (!res.ok) return;
+      const cfg = await res.json();
+      if (!cfg) return;
+      if (Array.isArray(cfg.stages))    STAGES = cfg.stages;
+      if (Array.isArray(cfg.foods))     { FOODS = cfg.foods; FOOD_TOTAL_W = FOODS.reduce((s, f) => s + f.w, 0); }
+      if (Array.isArray(cfg.dogs))      DOG_TYPES = cfg.dogs;
+      if (cfg.grassCell != null)        GRASS_CELL = cfg.grassCell;
+      if (cfg.grassEatRate != null)     GRASS_EAT_RATE = cfg.grassEatRate;
+      if (cfg.grassRecoverRate != null) GRASS_RECOVER_RATE = cfg.grassRecoverRate;
+      if (cfg.energyRegen != null)      ENERGY_REGEN = cfg.energyRegen;
+      if (cfg.sportSeconds != null)     SPORT_SECONDS = cfg.sportSeconds;
+      if (cfg.params && typeof cfg.params === 'object') Object.assign(PARAMS, cfg.params);
+    } catch (_) { /* use defaults on any error */ }
+  }
+
   // ── Init ───────────────────────────────────────────────────────────────────
   async function init() {
     bestDsp.textContent = personalBest || '—';
     updateStatsPanel();
 
+    await fetchConfig();
     token = await signInAnonymously(window.__FB_KEY__);
 
     if (GROUP_MODE) {
