@@ -1,0 +1,323 @@
+/* plop-drop.css — visuals for Plop Drop */
+
+/* ── Sky field ─────────────────────────────────────────────────────────────── */
+#sky-field {
+  background: linear-gradient(180deg, #b8dcf0 0%, #d6eef8 60%, #e8f5e0 100%);
+  border-radius: 8px;
+  height: 420px;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  touch-action: none;
+}
+
+/* ── Clouds (decorative) ───────────────────────────────────────────────────── */
+.cloud {
+  position: absolute;
+  font-size: 40px;
+  opacity: 0.5;
+  pointer-events: none;
+  user-select: none;
+  animation: cloud-drift linear infinite;
+  top: 8%;
+  filter: drop-shadow(0 2px 4px rgba(255,255,255,0.4));
+}
+@keyframes cloud-drift {
+  from { transform: translateX(-120px); }
+  to   { transform: translateX(calc(100vw + 120px)); }
+}
+
+/* ── Ground strip ──────────────────────────────────────────────────────────── */
+#ground-strip {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 64px;
+  background: linear-gradient(0deg, #a8cf7a 0%, #c8e6a0 100%);
+  border-top: 3px solid #8fba5e;
+}
+
+/* ── Drone sheep ───────────────────────────────────────────────────────────── */
+.drone-sheep {
+  position: absolute;
+  top: 0; left: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.2));
+}
+.rotor-wrap {
+  position: relative;
+  width: 52px;
+  height: 18px;
+  margin-bottom: 0px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rotor-body {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  animation: rotor-spin 0.22s linear infinite;
+  flex-shrink: 0;
+  margin-top: -17px;
+}
+.drone-sheep.slow-flier .rotor-body { animation-duration: 0.38s; }
+.rotor-blade {
+  position: absolute;
+  width: 100%;
+  height: 8px;
+  background: rgba(60,60,60,0.72);
+  border-radius: 4px;
+  top: 50%;
+  left: 0;
+  transform: translateY(-50%);
+}
+.rotor-blade.r2 {
+  transform: translateY(-50%) rotate(90deg);
+}
+.rotor-center {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: #888;
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  z-index: 1;
+}
+.rotor-strut {
+  position: absolute;
+  width: 3px;
+  height: 14px;
+  background: #777;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  margin-top: -6px;
+}
+.sheep-body {
+  line-height: 1;
+  margin-top: -2px;
+}
+.drone-sheep.fat-flier .sheep-body { font-size: 44px; }
+.drone-sheep.fast-flier .sheep-body { font-size: 28px; }
+.drone-sheep.rainbow-flier .sheep-body { font-size: 36px; }
+@keyframes rotor-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Turd entities ─────────────────────────────────────────────────────────── */
+.turd-item {
+  position: absolute;
+  top: 0; left: 0;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  transform-origin: center center;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+.turd-item.turd-golden {
+  filter: drop-shadow(0 0 8px rgba(255,200,0,0.8)) drop-shadow(0 2px 4px rgba(0,0,0,0.15));
+  animation: golden-pulse 0.6s ease-in-out infinite alternate;
+}
+@keyframes golden-pulse {
+  from { filter: drop-shadow(0 0 6px rgba(255,200,0,0.6)) drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+  to   { filter: drop-shadow(0 0 14px rgba(255,220,0,1.0)) drop-shadow(0 2px 4px rgba(0,0,0,0.15)); }
+}
+.turd-item.turd-powerup {
+  filter: drop-shadow(0 0 8px rgba(100,200,100,0.9));
+  animation: powerup-pulse 0.5s ease-in-out infinite alternate;
+}
+@keyframes powerup-pulse {
+  from { filter: drop-shadow(0 0 6px rgba(80,180,80,0.7)); }
+  to   { filter: drop-shadow(0 0 14px rgba(120,255,120,1.0)); }
+}
+
+/* ── Toilet seat ───────────────────────────────────────────────────────────── */
+#toilet-seat {
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  line-height: 1;
+  pointer-events: none;
+  user-select: none;
+  will-change: transform;
+  transform: translateX(-50%);
+  transition: transform 0.04s linear;
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3));
+  font-size: 52px;
+}
+#toilet-seat.catching {
+  animation: toilet-catch 0.35s cubic-bezier(0.34,1.56,0.64,1);
+}
+#toilet-seat.wide {
+  transform: translateX(-50%) scaleX(2.2);
+  transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes toilet-catch {
+  0%   { transform: translateX(-50%) scale(1); }
+  40%  { transform: translateX(-50%) scale(1.35); }
+  100% { transform: translateX(-50%) scale(1); }
+}
+#toilet-seat.magnet-active {
+  filter: drop-shadow(0 3px 8px rgba(0,0,0,0.3)) drop-shadow(0 0 12px rgba(130,80,220,0.8));
+}
+
+/* ── Miss flash ────────────────────────────────────────────────────────────── */
+#sky-field.miss-flash {
+  animation: miss-flash-anim 0.35s ease-out;
+}
+@keyframes miss-flash-anim {
+  0%   { background: linear-gradient(180deg, #f8b8b8 0%, #ffd6d6 60%, #e8f5e0 100%); }
+  100% { background: linear-gradient(180deg, #b8dcf0 0%, #d6eef8 60%, #e8f5e0 100%); }
+}
+
+/* ── Miss splat ────────────────────────────────────────────────────────────── */
+.miss-splat {
+  position: absolute;
+  font-size: 28px;
+  pointer-events: none;
+  user-select: none;
+  animation: splat-anim 0.9s ease-out forwards;
+  z-index: 5;
+  transform: translateX(-50%);
+}
+@keyframes splat-anim {
+  0%   { opacity: 1; transform: translateX(-50%) scale(1.4); }
+  40%  { opacity: 1; transform: translateX(-50%) scale(0.9); }
+  100% { opacity: 0; transform: translateX(-50%) scale(0.7); }
+}
+
+/* ── Flush ripple (catch effect) ───────────────────────────────────────────── */
+.flush-ripple {
+  position: absolute;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  border: 3px solid rgba(100,180,255,0.8);
+  pointer-events: none;
+  animation: flush-ripple-anim 0.5s ease-out forwards;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+}
+@keyframes flush-ripple-anim {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(0.3); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.0); }
+}
+
+/* ── Lives display ─────────────────────────────────────────────────────────── */
+#lives-display {
+  font-size: 20px;
+  letter-spacing: 3px;
+  line-height: 1;
+}
+#lives-display .life-lost {
+  opacity: 0.18;
+  filter: grayscale(1);
+}
+
+/* ── Combo bar ─────────────────────────────────────────────────────────────── */
+#combo-wrap {
+  background: var(--bg-card);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+#combo-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+#combo-pips {
+  display: flex;
+  gap: 4px;
+  flex: 1;
+}
+.combo-pip {
+  flex: 1;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--bg-soft);
+  transition: background 0.2s;
+  max-width: 28px;
+}
+.combo-pip.filled { background: #e65100; }
+#combo-bonus {
+  font-size: 12px;
+  font-weight: 700;
+  color: #e65100;
+  white-space: nowrap;
+  min-width: 30px;
+  text-align: right;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+#combo-bonus.active { opacity: 1; }
+
+/* ── Power-up HUD ──────────────────────────────────────────────────────────── */
+#power-hud {
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--success);
+  min-height: 22px;
+  margin: 2px 0 4px;
+  letter-spacing: 0.3px;
+}
+
+/* ── Level-up banner ───────────────────────────────────────────────────────── */
+#level-up-banner {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0.5);
+  opacity: 0;
+  background: rgba(15, 110, 86, 0.95); color: #fff;
+  padding: 10px 22px; border-radius: 8px;
+  font-size: 16px; font-weight: 600;
+  z-index: 5; pointer-events: none;
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1), opacity 0.4s;
+  text-align: center; white-space: nowrap;
+}
+
+/* ── Floating score ────────────────────────────────────────────────────────── */
+.plop-score {
+  position: absolute;
+  pointer-events: none;
+  z-index: 10;
+  font-weight: 700;
+  font-size: 18px;
+  color: #0f6e56;
+  transform: translateX(-50%);
+  text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  animation: score-float 0.9s ease-out forwards;
+}
+.plop-score.golden { font-size: 24px; color: #b07b00; }
+.plop-score.miss-label { color: #a32d2d; font-size: 15px; }
+@keyframes score-float {
+  0%   { transform: translateX(-50%) translateY(0);     opacity: 1; }
+  100% { transform: translateX(-50%) translateY(-52px); opacity: 0; }
+}
+
+/* ── Sport timer ───────────────────────────────────────────────────────────── */
+#sport-timer {
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 5px; z-index: 6; display: none;
+  border-radius: 8px 8px 0 0; overflow: hidden;
+}
+#sport-timer-bar {
+  height: 100%; width: 100%;
+  background: linear-gradient(to right, #43a047, #fdd835, #e53935);
+  transform-origin: left center;
+}
+
+/* ── Field shake ───────────────────────────────────────────────────────────── */
+#sky-field.shaking       { animation: screen-shake 0.5s ease-out; }
+#sky-field.shaking-small { animation: screen-shake-small 0.3s ease-out; }

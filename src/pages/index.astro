@@ -81,6 +81,28 @@ const schema = JSON.stringify({
               "suggestedMinAge": 5
             }
           }
+        },
+        {
+          "@type": "ListItem",
+          "position": 3,
+          "item": {
+            "@type": "VideoGame",
+            "@id": "https://sheeps.online/plop-drop/#game",
+            "name": "Plop Drop",
+            "url": "https://sheeps.online/plop-drop/",
+            "description": "Drone sheep are flying overhead dropping turds. Move your toilet seat to catch them all! Casual browser game with combos and power-ups.",
+            "genre": ["Casual", "Arcade", "Kids"],
+            "playMode": "SinglePlayer",
+            "applicationCategory": "Game",
+            "operatingSystem": "Any",
+            "gamePlatform": "Web Browser",
+            "isAccessibleForFree": true,
+            "image": "https://sheeps.online/og-image.svg",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 5
+            }
+          }
         }
       ]
     },
@@ -329,6 +351,17 @@ const schema = JSON.stringify({
         <div class="game-card-meta">
           <span class="tag">Casual</span>
           <span class="tag">Movement</span>
+          <span class="tag">Kids</span>
+          <span class="tag">Free</span>
+        </div>
+      </a>
+      <a class="game-card" href="/plop-drop/" aria-label="Play Plop Drop">
+        <div class="game-card-icon">🐑<span class="icon-badge">🚽</span></div>
+        <div class="game-card-title">Plop Drop</div>
+        <p class="game-card-desc">Drone sheep fly overhead dropping turds. Move your toilet seat to catch them all. The sheep are not sorry.</p>
+        <div class="game-card-meta">
+          <span class="tag">Casual</span>
+          <span class="tag">Reflex</span>
           <span class="tag">Kids</span>
           <span class="tag">Free</span>
         </div>

@@ -1,0 +1,998 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/shared.css';
+import '../../styles/plop-drop.css';
+const firebaseApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "VideoGame",
+      "@id": "https://sheeps.online/plop-drop/#game",
+      "name": "Plop Drop",
+      "url": "https://sheeps.online/plop-drop/",
+      "description": "Drone sheep are flying overhead dropping turds. Move your toilet seat to catch them all! A ridiculous casual browser game with combos, power-ups, and a global leaderboard.",
+      "genre": ["Casual", "Arcade", "Kids"],
+      "playMode": "SinglePlayer",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "gamePlatform": "Web Browser",
+      "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "image": "https://sheeps.online/og-image.svg",
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://sheeps.online/#organization",
+        "name": "Sheeps.online",
+        "url": "https://sheeps.online/"
+      },
+      "audience": { "@type": "PeopleAudience", "suggestedMinAge": 5 }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Free Games", "item": "https://sheeps.online/" },
+        { "@type": "ListItem", "position": 2, "name": "Plop Drop", "item": "https://sheeps.online/plop-drop/" }
+      ]
+    }
+  ]
+});
+---
+<BaseLayout
+  title="Plop Drop — Free Online Casual Game | Sheeps.online"
+  description="Drone sheep are flying overhead and dropping turds. Move your toilet seat to catch them all! Free casual browser game, no download, no sign-up."
+>
+  <Fragment slot="head">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚽</text></svg>">
+    <script type="application/ld+json" set:html={schema} />
+    <script is:inline src="/scripts/game-framework.js"></script>
+  </Fragment>
+
+<div class="app">
+  <h1>🚽 Plop Drop</h1>
+  <p class="tagline">Drone sheep. Falling turds. Dignity optional.</p>
+
+  <div class="ad-wrap ad-wrap--top"></div>
+
+  <div id="game-container">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <span id="group-badge" style="display:none">👥 Group Mode</span>
+        <div>
+          <div class="hud-title" id="hud-title">🚽 Plop Drop</div>
+          <div class="hud-subtitle" id="hud-subtitle">Catch everything</div>
+        </div>
+      </div>
+      <div class="stat-group">
+        <div class="stat">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="score-display">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Your best</div>
+          <div class="stat-value" id="best-display">—</div>
+        </div>
+        <div class="stat" id="lives-stat">
+          <div class="stat-label">Lives</div>
+          <div class="stat-value" id="lives-display">❤️❤️❤️</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="combo-wrap">
+      <span id="combo-label">Combo</span>
+      <div id="combo-pips">
+        <div class="combo-pip" data-pip="0"></div>
+        <div class="combo-pip" data-pip="1"></div>
+        <div class="combo-pip" data-pip="2"></div>
+        <div class="combo-pip" data-pip="3"></div>
+        <div class="combo-pip" data-pip="4"></div>
+      </div>
+      <span id="combo-bonus">×1.5</span>
+    </div>
+
+    <div id="sky-field">
+      <div id="sport-timer"><div id="sport-timer-bar"></div></div>
+      <div id="ground-strip"></div>
+      <div id="toilet-seat">🚽</div>
+      <div id="level-up-banner"></div>
+    </div>
+
+    <div id="power-hud"></div>
+
+    <details>
+      <summary>How to play &amp; what even is this</summary>
+      <p>Sheep have discovered drone technology. This was a mistake. They now fly overhead in little formations, humming contentedly, and drop things. You are in charge of a toilet seat. Your job is to catch the things. You did not choose this life, but here you are.</p>
+      <p>Move the toilet seat with your mouse, finger, or arrow keys. Catch the 💩 to score. Miss three times and it's over. Catch 5 in a row for a ×1.5 combo.</p>
+      <p>💩 Standard turd: 10 pts. 💩💩 Mega Plop: 25 pts. ✨💩 Golden turd: 50 pts. Power-ups fall too — 🧲 Magnet pulls nearby turds, 🕰️ Slow-Mo makes everything drift down peacefully, 🚿 Wide Seat doubles your reach, 🪠 Plunger Shield absorbs the next miss.</p>
+      <p><strong>Sport mode ⚡:</strong> 90 seconds. No lives — misses cost 15 pts instead. Panic levels: very high.</p>
+      <p>Free browser game. No download, no sign-up. The sheep are not sorry.</p>
+    </details>
+  </div>
+</div>
+
+<div id="info-overlay"></div>
+<div id="info-drawer">
+  <div id="info-drawer-header">
+    <span>Leaderboard &amp; Stats</span>
+    <button id="info-close">✕</button>
+  </div>
+
+  <div style="display:flex;gap:8px;margin-bottom:16px">
+    <div style="flex:1;display:flex;justify-content:space-between;align-items:center;background:var(--bg-soft);border-radius:8px;padding:8px 12px">
+      <span style="font-size:13px;font-weight:500">🔇 Mute</span>
+      <button id="mute-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button>
+    </div>
+  </div>
+
+  <div id="leaderboard">
+    <div class="leaderboard-title">
+      <span id="leaderboard-title">Top 5 of all time</span>
+      <span class="sync-indicator" id="sync-indicator"></span>
+    </div>
+    <div id="leaderboard-list"></div>
+  </div>
+
+  <div id="stats-panel">
+    <div class="stats-title">Your all-time stats</div>
+    <div class="stats-grid">
+      <div>
+        <div class="stat-item-label">Games played</div>
+        <div class="stat-item-value" id="stat-games">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Best score</div>
+        <div class="stat-item-value" id="stat-best">—</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Best combo</div>
+        <div class="stat-item-value" id="stat-combo">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Total caught</div>
+        <div class="stat-item-value" id="stat-caught">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Total missed</div>
+        <div class="stat-item-value" id="stat-missed">0</div>
+      </div>
+      <div>
+        <div class="stat-item-label">Power-ups</div>
+        <div class="stat-item-value" id="stat-powerups">0</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ad-wrap ad-wrap--drawer"></div>
+  <div id="drawer-credits">🚽💩🐑</div>
+</div>
+
+<div id="mode-overlay">
+  <div id="mode-popup">
+    <div id="mode-popup-result" style="display:none">
+      <div id="mode-popup-score-val"></div>
+      <div id="mode-popup-score-sub"></div>
+    </div>
+    <div id="hiscore-entry" style="display:none">
+      <div class="entry-title">🏅 New world best!</div>
+      <div class="entry-subtitle">Enter your name (up to 10 characters)</div>
+      <div class="entry-row">
+        <input id="hiscore-name" type="text" maxlength="10" autocomplete="off"
+               style="width:160px;text-align:center;text-transform:uppercase;font-size:16px;letter-spacing:2px;font-weight:500;" />
+        <button id="hiscore-save" style="font-weight:500;">Save</button>
+      </div>
+    </div>
+    <div class="action-bar" id="action-bar"></div>
+    <div id="mode-popup-topbar">
+      <div id="mode-popup-title">🚽 Plop Drop</div>
+      <button id="popup-stats-btn" title="Leaderboard &amp; stats">☰</button>
+    </div>
+    <div id="mode-popup-sub">Choose your mode</div>
+    <div id="mode-btn-wrap">
+      <button id="mpc-normal" class="mode-btn">
+        <span class="mode-btn-icon">🚽</span>Normal
+      </button>
+      <button id="mpc-sport" class="mode-btn">
+        <span class="mode-btn-icon">⚡</span>Sport
+      </button>
+    </div>
+    <button id="mpc-friends" class="mpc-friends-btn">
+      <span class="mpc-icon">👥</span>
+      <span>
+        <span class="mpc-name">Play with Friends</span>
+        <span class="mpc-desc">Share a link · Group Top 5</span>
+      </span>
+    </button>
+    <button id="mpc-leave-group" class="mpc-leave-group-btn" style="display:none">
+      ✕ Stop Group Mode
+    </button>
+    <a href="/" class="more-games-link">🎮 More free games →</a>
+  </div>
+</div>
+
+<div id="friends-overlay" style="display:none">
+  <div id="friends-popup">
+    <div id="friends-popup-title">👥 Play with Friends</div>
+    <p id="friends-popup-desc">Share this link. Everyone on it competes for your group's Top 5.</p>
+    <div id="friends-link-box">
+      <input id="friends-link-input" type="text" readonly />
+    </div>
+    <div id="friends-share-row">
+      <button id="friends-share-twitter" class="friends-share-btn share-twitter" title="Share on X / Twitter">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+      </button>
+      <button id="friends-share-ig" class="friends-share-btn share-ig" title="Share on Instagram">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+      </button>
+      <button id="friends-share-tiktok" class="friends-share-btn share-tiktok" title="Share on TikTok">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.67a8.27 8.27 0 004.84 1.56V6.78a4.85 4.85 0 01-1.07-.09z"/></svg>
+      </button>
+      <button id="friends-share-copy" class="friends-share-btn share-copy" title="Copy link">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+      </button>
+    </div>
+    <button id="friends-play-btn">▶ Play in Group Mode</button>
+    <button id="friends-close-btn">✕ Close</button>
+  </div>
+</div>
+
+<button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
+
+<script define:vars={{ firebaseApiKey }}> window.__FB_KEY__ = firebaseApiKey; </script>
+<script is:inline>
+(function () {
+  // ── Config ─────────────────────────────────────────────────────────────────
+  const DB        = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/plop-drop';
+  const LB_KEY    = 'plopdrop:leaderboard';
+  const LB_SPORT  = 'plopdrop:sport-leaderboard';
+  const STATS_KEY = 'plopdrop:stats';
+  const GROUP_SKEY= 'plopdrop:group';
+  const MUTE_KEY  = 'plopdrop:mute';
+  const LB_MAX    = 5;
+
+  // ── Remote-tunable params ──────────────────────────────────────────────────
+  let SPORT_SECONDS   = 90;
+  let GRAVITY         = 220;   // px/s²
+  let SPIN_RATE       = 190;   // deg/s for falling turds
+  let CATCH_ZONE      = 60;    // px from bottom edge counts as catchable
+  let CATCH_RADIUS    = 46;    // horizontal px half-width of toilet
+  let COMBO_STEPS     = 5;     // catches needed for combo activate
+  let PARAMS = {
+    sheepSpawnBase:   3.5,
+    sheepSpawnMin:    1.0,
+    sheepScoreDiv:    350,
+    maxSheep:         4,
+    dropIntervalBase: 2.8,
+    dropIntervalMin:  0.9,
+    dropScoreDiv:     500,
+    maxTurds:         14,
+  };
+
+  // ── Turd types ─────────────────────────────────────────────────────────────
+  let TURDS = [
+    { type: 'standard', emoji: '💩', pts: 10,  fontSize: 28, w: 6   },
+    { type: 'mega',     emoji: '💩', pts: 25,  fontSize: 42, w: 2   },
+    { type: 'golden',   emoji: '💩', pts: 50,  fontSize: 30, w: 1   },
+    { type: 'magnet',   emoji: '🧲', pts: 0,   fontSize: 28, w: 0.6, power: 'magnet',  dur: 8000 },
+    { type: 'slowmo',   emoji: '🕰️', pts: 0,  fontSize: 28, w: 0.5, power: 'slowmo',  dur: 5000 },
+    { type: 'wide',     emoji: '🚿', pts: 0,   fontSize: 28, w: 0.5, power: 'wide',    dur: 6000 },
+    { type: 'shield',   emoji: '🪠', pts: 0,   fontSize: 28, w: 0.4, power: 'shield',  dur: 0    },
+  ];
+  let TURD_TOTAL_W = TURDS.reduce((s, t) => s + t.w, 0);
+
+  // ── Drone sheep types ──────────────────────────────────────────────────────
+  let SHEEP_TYPES = [
+    { cls: '',             sheepFs: 36, rotorW: 52, speed: 80,  sineAmp: 18, sineFreq: 1.2, dropRate: 3.2, minScore: 0    },
+    { cls: 'fat-flier',   sheepFs: 44, rotorW: 60, speed: 60,  sineAmp: 8,  sineFreq: 0.7, dropRate: 2.5, minScore: 200  },
+    { cls: 'fast-flier',  sheepFs: 28, rotorW: 40, speed: 145, sineAmp: 24, sineFreq: 2.0, dropRate: 4.5, minScore: 400  },
+    { cls: 'rainbow-flier', sheepFs: 36, rotorW: 52, speed: 65, sineAmp: 12, sineFreq: 1.0, dropRate: 2.0, minScore: 800, rainbow: true },
+  ];
+
+  // ── URL group parsing ──────────────────────────────────────────────────────
+  const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
+  if (_urlGroupId) sessionStorage.setItem('plopdrop:active-group', _urlGroupId);
+  else sessionStorage.removeItem('plopdrop:active-group');
+  const GROUP_ID   = _urlGroupId ?? null;
+  const GROUP_MODE = !!GROUP_ID;
+
+  const {
+    signInAnonymously,
+    fetchLeaderboard, pushLeaderboard,
+    fetchGroupLeaderboard, pushGroupLeaderboard,
+    renderLeaderboard, isNewBest,
+    openFriendsDialog,
+    loadStats, saveStats, showAchievementToast,
+    getAudioContext, tone, setSyncStatus
+  } = window.GameFramework;
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let token = null, lb = [], sportLb = [];
+  let sportMode = false;
+  let running = false, dead = false;
+  let animId = null, lastTs = 0;
+  let fieldW = 0, fieldH = 0;
+
+  let score = 0;
+  let lives = 3;
+  let comboStreak = 0;
+  let bestCombo = 0;
+  let comboMultActive = false;
+
+  let turds = [], sheep = [];
+  let nextId = 0;
+  let spawnSheepT = 0;
+
+  // Power-up expiry timestamps
+  let magnetExp = 0, slowmoExp = 0, wideExp = 0;
+  let shieldActive = false;
+
+  // Toilet position
+  let toiletX = 0;
+  let targetX  = 0;
+  const LERP   = 0.16;
+
+  // Sport
+  let sportEnd = 0;
+
+  let stats = loadStats(STATS_KEY, { games: 0, best: 0, bestCombo: 0, caught: 0, missed: 0, powerups: 0 });
+  let personalBest = stats.best || 0;
+
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const fieldEl     = document.getElementById('sky-field');
+  const toiletEl    = document.getElementById('toilet-seat');
+  const scoreDsp    = document.getElementById('score-display');
+  const bestDsp     = document.getElementById('best-display');
+  const livesDsp    = document.getElementById('lives-display');
+  const syncEl      = document.getElementById('sync-indicator');
+  const lbListEl    = document.getElementById('leaderboard-list');
+  const lbTitleEl   = document.getElementById('leaderboard-title');
+  const powerHud    = document.getElementById('power-hud');
+  const actionBar   = document.getElementById('action-bar');
+  const hiscoreEl   = document.getElementById('hiscore-entry');
+  const modOvEl     = document.getElementById('mode-overlay');
+  const modTitleEl  = document.getElementById('mode-popup-title');
+  const modSubEl    = document.getElementById('mode-popup-sub');
+  const resultEl    = document.getElementById('mode-popup-result');
+  const resultScore = document.getElementById('mode-popup-score-val');
+  const resultSub   = document.getElementById('mode-popup-score-sub');
+  const lvlBanner   = document.getElementById('level-up-banner');
+  const sportTimEl  = document.getElementById('sport-timer');
+  const sportBar    = document.getElementById('sport-timer-bar');
+  const comboPips   = document.querySelectorAll('.combo-pip');
+  const comboBonus  = document.getElementById('combo-bonus');
+  const groupBadge  = document.getElementById('group-badge');
+  const hudTitle    = document.getElementById('hud-title');
+
+  // ── Audio ──────────────────────────────────────────────────────────────────
+  function sfx(type) {
+    if (muted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    if (type === 'catch') {
+      tone(ctx, 440, 'sine', 0.14, t, 0.06);
+      tone(ctx, 600, 'sine', 0.10, t + 0.05, 0.08);
+      tone(ctx, 800, 'sine', 0.07, t + 0.09, 0.07);
+    } else if (type === 'catch_golden') {
+      [523, 659, 784, 1047].forEach((f, i) => tone(ctx, f, 'sine', 0.18, t + i * 0.06, 0.12));
+    } else if (type === 'miss') {
+      tone(ctx, 220, 'sawtooth', 0.15, t, 0.06);
+      tone(ctx, 180, 'sawtooth', 0.12, t + 0.07, 0.12);
+    } else if (type === 'powerup') {
+      [784, 1046, 1318].forEach((f, i) => tone(ctx, f, 'sine', 0.18, t + i * 0.06, 0.13));
+    } else if (type === 'combo') {
+      [330, 440, 523].forEach((f, i) => tone(ctx, f, 'sine', 0.14, t + i * 0.08, 0.12));
+    } else if (type === 'sheep_baa') {
+      tone(ctx, 440, 'sine', 0.10, t, 0.09);
+      tone(ctx, 330, 'sine', 0.08, t + 0.1, 0.12);
+    } else if (type === 'game_over') {
+      [330, 311, 294, 277].forEach((f, i) => tone(ctx, f, 'sawtooth', 0.14, t + i * 0.13, 0.2));
+    }
+  }
+
+  // ── Sheep spawning ─────────────────────────────────────────────────────────
+  function randSheepType() {
+    const available = SHEEP_TYPES.filter(t => score >= t.minScore);
+    return available[Math.floor(Math.random() * available.length)];
+  }
+
+  function spawnSheep() {
+    const type  = randSheepType();
+    const goRight = Math.random() < 0.5;
+    const baseY   = 24 + Math.random() * (fieldH * 0.42);
+    const x       = goRight ? -(type.rotorW + 60) : fieldW + type.rotorW + 60;
+    const vx      = goRight ? type.speed : -type.speed;
+
+    const el = document.createElement('div');
+    el.className = 'drone-sheep' + (type.cls ? ' ' + type.cls : '');
+
+    // Rotor assembly
+    const rotorWrap = document.createElement('div');
+    rotorWrap.className = 'rotor-wrap';
+    rotorWrap.style.width  = type.rotorW + 'px';
+    rotorWrap.style.height = '18px';
+
+    const rotorBody = document.createElement('div');
+    rotorBody.className = 'rotor-body';
+    rotorBody.style.width  = type.rotorW + 'px';
+    rotorBody.style.height = type.rotorW + 'px';
+
+    const b1 = document.createElement('div');
+    b1.className = 'rotor-blade';
+    const b2 = document.createElement('div');
+    b2.className = 'rotor-blade r2';
+    const hub = document.createElement('div');
+    hub.className = 'rotor-center';
+
+    rotorBody.appendChild(b1);
+    rotorBody.appendChild(b2);
+    rotorBody.appendChild(hub);
+    rotorWrap.appendChild(rotorBody);
+
+    // Strut
+    const strut = document.createElement('div');
+    strut.className = 'rotor-strut';
+    rotorWrap.appendChild(strut);
+
+    // Sheep body
+    const bodyEl = document.createElement('div');
+    bodyEl.className = 'sheep-body';
+    bodyEl.style.fontSize = type.sheepFs + 'px';
+    bodyEl.textContent = type.rainbow ? '🌈🐑' : '🐑';
+    if (!goRight) bodyEl.style.transform = 'scaleX(-1)';
+
+    el.appendChild(rotorWrap);
+    el.appendChild(bodyEl);
+    fieldEl.appendChild(el);
+
+    sfx('sheep_baa');
+
+    sheep.push({
+      id: nextId++, x, y: baseY, vx, baseY, t: 0,
+      sineAmp: type.sineAmp, sineFreq: type.sineFreq,
+      dropTimer: type.dropRate * (0.8 + Math.random() * 0.4),
+      dropRate: type.dropRate, rotorW: type.rotorW,
+      sheepFs: type.sheepFs, rainbow: !!type.rainbow,
+      el,
+    });
+  }
+
+  // ── Turd spawning ──────────────────────────────────────────────────────────
+  function randTurd(rainbow) {
+    if (rainbow) {
+      const specials = TURDS.filter(t => t.pts >= 25 || t.power);
+      return specials[Math.floor(Math.random() * specials.length)];
+    }
+    let r = Math.random() * TURD_TOTAL_W;
+    for (const t of TURDS) { r -= t.w; if (r <= 0) return t; }
+    return TURDS[0];
+  }
+
+  function dropTurd(s) {
+    if (turds.length >= PARAMS.maxTurds) return;
+    const def = randTurd(s.rainbow);
+    const el  = document.createElement('div');
+    el.className = 'turd-item' + (def.type === 'golden' ? ' turd-golden' : def.power ? ' turd-powerup' : '');
+    el.style.fontSize = (def.fontSize || 28) + 'px';
+    el.textContent = def.emoji;
+    fieldEl.appendChild(el);
+
+    turds.push({
+      id: nextId++, x: s.x, y: s.y + s.sheepFs + 10,
+      vy: 30 + Math.random() * 20,
+      angle: Math.random() * 360,
+      def, el,
+    });
+  }
+
+  // ── Game loop ──────────────────────────────────────────────────────────────
+  function loop(ts) {
+    if (!running) return;
+    const dt = Math.min((ts - lastTs) / 1000, 0.12);
+    lastTs = ts;
+
+    stepToilet(dt);
+    stepSheep(dt);
+    stepTurds(dt);
+    checkMagnet();
+    updateHUD();
+    if (sportMode) checkSport();
+
+    animId = requestAnimationFrame(loop);
+  }
+
+  const KEY_SPEED = 420;
+  function stepToilet(dt) {
+    if (keys.ArrowLeft  || keys.a || keys.A) targetX -= KEY_SPEED * dt;
+    if (keys.ArrowRight || keys.d || keys.D) targetX += KEY_SPEED * dt;
+    targetX = Math.max(28, Math.min(fieldW - 28, targetX));
+    toiletX += (targetX - toiletX) * Math.min(1, LERP * (dt / 0.016));
+    toiletX = Math.max(28, Math.min(fieldW - 28, toiletX));
+    toiletEl.style.left = toiletX + 'px';
+    const wide = Date.now() < wideExp;
+    toiletEl.style.transform = wide ? 'translateX(-50%) scaleX(2.2)' : 'translateX(-50%)';
+    if (wide) toiletEl.classList.add('wide');
+    else toiletEl.classList.remove('wide');
+    if (Date.now() < magnetExp) toiletEl.classList.add('magnet-active');
+    else toiletEl.classList.remove('magnet-active');
+  }
+
+  function stepSheep(dt) {
+    spawnSheepT += dt;
+    const spawnInterval = Math.max(
+      PARAMS.sheepSpawnMin,
+      PARAMS.sheepSpawnBase - score / PARAMS.sheepScoreDiv
+    );
+    const maxSheep = Math.min(PARAMS.maxSheep, 1 + Math.floor(score / 300));
+    if (spawnSheepT >= spawnInterval && sheep.length < maxSheep) {
+      spawnSheepT = 0;
+      spawnSheep();
+    }
+
+    sheep = sheep.filter(s => {
+      s.t += dt;
+      s.x += s.vx * dt;
+      s.y  = s.baseY + Math.sin(s.t * s.sineFreq) * s.sineAmp;
+
+      // Drop turds
+      s.dropTimer -= dt;
+      if (s.dropTimer <= 0) {
+        s.dropTimer = s.dropRate * (0.7 + Math.random() * 0.6);
+        dropTurd(s);
+      }
+
+      // Update DOM position — center of rotor assembly + sheep body
+      const totalHeight = 18 + s.sheepFs + 2;
+      s.el.style.transform = `translate(${s.x - s.rotorW / 2}px, ${s.y - 18}px)`;
+
+      // Remove off-screen
+      if ((s.vx > 0 && s.x > fieldW + 120) || (s.vx < 0 && s.x < -120)) {
+        s.el.remove();
+        return false;
+      }
+      return true;
+    });
+  }
+
+  function stepTurds(dt) {
+    const now    = Date.now();
+    const slow   = now < slowmoExp;
+    const grav   = slow ? GRAVITY * 0.35 : GRAVITY;
+    const catchY = fieldH - CATCH_ZONE;
+    const radius = Date.now() < wideExp ? CATCH_RADIUS * 2.2 : CATCH_RADIUS;
+
+    turds = turds.filter(td => {
+      td.vy    += grav * dt;
+      td.y     += td.vy * dt;
+      td.angle += SPIN_RATE * dt * (slow ? 0.4 : 1);
+
+      const fs = td.def.fontSize || 28;
+      td.el.style.transform = `translate(${td.x - fs / 2}px, ${td.y - fs / 2}px) rotate(${td.angle}deg)`;
+
+      // Catch check
+      if (td.y >= catchY && Math.abs(td.x - toiletX) < radius) {
+        onCatch(td);
+        td.el.remove();
+        return false;
+      }
+
+      // Miss — hit ground
+      if (td.y > fieldH + 20) {
+        onMiss(td);
+        td.el.remove();
+        return false;
+      }
+
+      return true;
+    });
+  }
+
+  function checkMagnet() {
+    if (Date.now() >= magnetExp) return;
+    const PULL = 320;
+    const dt2  = 0.016;
+    turds.forEach(td => {
+      const dx   = toiletX - td.x;
+      const dist = Math.abs(dx);
+      if (dist < 150 && dist > 4) {
+        td.x += (dx / dist) * PULL * dt2;
+      }
+    });
+  }
+
+  // ── Catch / Miss ───────────────────────────────────────────────────────────
+  function onCatch(td) {
+    if (td.def.power) {
+      activatePower(td.def);
+      sfx('powerup');
+      stats.powerups = (stats.powerups || 0) + 1;
+      showBanner('💪 ' + powerName(td.def.power) + '!');
+    } else {
+      let pts = td.def.pts;
+      if (comboMultActive) pts = Math.round(pts * 1.5);
+      score += pts;
+      if (sportMode && score < 0) score = 0;
+      sfx(td.def.type === 'golden' ? 'catch_golden' : 'catch');
+      floatScore('+' + pts, td.x, td.y, td.def.type === 'golden' ? 'golden' : '');
+      stats.caught = (stats.caught || 0) + 1;
+    }
+
+    comboStreak++;
+    if (comboStreak > (stats.bestCombo || 0)) stats.bestCombo = comboStreak;
+    if (comboStreak > bestCombo) bestCombo = comboStreak;
+    comboMultActive = (comboStreak % COMBO_STEPS === 0 && comboStreak > 0);
+    if (comboMultActive) sfx('combo');
+
+    // Toilet bounce
+    toiletEl.classList.remove('catching');
+    void toiletEl.offsetWidth;
+    toiletEl.classList.add('catching');
+
+    // Flush ripple
+    const ripple = document.createElement('div');
+    ripple.className = 'flush-ripple';
+    ripple.style.left   = toiletX + 'px';
+    ripple.style.bottom = '36px';
+    ripple.style.top    = 'unset';
+    ripple.style.transform = 'translate(-50%, 50%)';
+    fieldEl.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 500);
+  }
+
+  function onMiss(td) {
+    if (td.def.power) return; // power-up hitting ground just disappears
+
+    stats.missed = (stats.missed || 0) + 1;
+    comboStreak = 0;
+    comboMultActive = false;
+
+    if (sportMode) {
+      score = Math.max(0, score - 15);
+      sfx('miss');
+      floatScore('−15', td.x, fieldH - 50, 'miss-label');
+    } else {
+      lives--;
+      sfx('miss');
+      renderLives();
+      floatScore('Miss!', td.x, fieldH - 60, 'miss-label');
+      // Miss splat on ground
+      const splat = document.createElement('div');
+      splat.className = 'miss-splat';
+      splat.textContent = '💩';
+      splat.style.left   = td.x + 'px';
+      splat.style.bottom = '20px';
+      splat.style.top    = 'unset';
+      fieldEl.appendChild(splat);
+      setTimeout(() => splat.remove(), 900);
+      // Flash field
+      fieldEl.classList.remove('miss-flash');
+      void fieldEl.offsetWidth;
+      fieldEl.classList.add('miss-flash');
+      if (lives <= 0) { endGame(); return; }
+    }
+  }
+
+  function activatePower(def) {
+    const now = Date.now();
+    if (def.power === 'magnet') magnetExp = now + def.dur;
+    else if (def.power === 'slowmo') slowmoExp = now + def.dur;
+    else if (def.power === 'wide')   wideExp   = now + def.dur;
+    else if (def.power === 'shield') shieldActive = true;
+  }
+
+  function powerName(p) {
+    return { magnet: 'Magnet', slowmo: 'Slow-Mo', wide: 'Wide Seat', shield: 'Shield' }[p] || p;
+  }
+
+  // ── HUD ────────────────────────────────────────────────────────────────────
+  function updateHUD() {
+    scoreDsp.textContent = score;
+
+    // Combo pips
+    const pip = comboStreak % COMBO_STEPS;
+    comboPips.forEach((p, i) => {
+      p.classList.toggle('filled', i < pip);
+    });
+    if (comboMultActive) {
+      comboPips.forEach(p => p.classList.add('filled'));
+    }
+    comboBonus.classList.toggle('active', comboMultActive);
+
+    // Power HUD
+    const now = Date.now();
+    const parts = [];
+    if (now < magnetExp) parts.push('🧲 Magnet');
+    if (now < slowmoExp) parts.push('🕰️ Slow-Mo');
+    if (now < wideExp)   parts.push('🚿 Wide Seat');
+    if (shieldActive)    parts.push('🪠 Shield');
+    powerHud.textContent = parts.join('  ');
+  }
+
+  function renderLives() {
+    if (sportMode) { livesDsp.textContent = '⚡'; return; }
+    let html = '';
+    for (let i = 0; i < 3; i++) {
+      html += `<span${i < lives ? '' : ' class="life-lost"'}>❤️</span>`;
+    }
+    livesDsp.innerHTML = html;
+  }
+
+  function floatScore(text, x, y, cls) {
+    const el = document.createElement('div');
+    el.className = 'plop-score' + (cls ? ' ' + cls : '');
+    el.textContent = text;
+    el.style.left = x + 'px';
+    el.style.top  = y + 'px';
+    fieldEl.appendChild(el);
+    setTimeout(() => el.remove(), 900);
+  }
+
+  function showBanner(text) {
+    lvlBanner.textContent = text;
+    lvlBanner.style.opacity   = '1';
+    lvlBanner.style.transform = 'translate(-50%,-50%) scale(1)';
+    setTimeout(() => {
+      lvlBanner.style.opacity   = '0';
+      lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
+    }, 1400);
+  }
+
+  function checkSport() {
+    const left = (sportEnd - Date.now()) / 1000;
+    if (left <= 0) { sportBar.style.transform = 'scaleX(0)'; endGame(); return; }
+    sportBar.style.transform = 'scaleX(' + (left / SPORT_SECONDS) + ')';
+  }
+
+  // ── End game ───────────────────────────────────────────────────────────────
+  function endGame() {
+    if (dead) return;
+    dead = true; running = false;
+    cancelAnimationFrame(animId);
+    sfx('game_over');
+    fieldEl.classList.add('shaking');
+    fieldEl.addEventListener('animationend', () => fieldEl.classList.remove('shaking'), { once: true });
+
+    if (score > (stats.best || 0)) stats.best = score;
+    saveStats(STATS_KEY, stats);
+    personalBest = stats.best;
+    bestDsp.textContent = personalBest || '—';
+
+    resultEl.style.display   = '';
+    resultScore.textContent  = score;
+    resultSub.textContent    = (sportMode ? 'Sport' : 'Normal') + ' mode · ' + (stats.caught || 0) + ' caught';
+    modTitleEl.textContent   = score === 0 ? 'Splat!' : 'Game Over!';
+
+    const currentLb = sportMode ? sportLb : lb;
+    if (isNewBest(currentLb, score, LB_MAX) && score > 0) hiscoreEl.style.display = '';
+    actionBar.innerHTML = '';
+    modSubEl.textContent = 'Choose your mode';
+    modOvEl.style.display = 'flex';
+    if (score > 0) pushScore(score);
+    updateStatsPanel();
+  }
+
+  async function pushScore(s) {
+    const lbUrl = sportMode ? DB + '/sport' : DB;
+    const lbKey = sportMode ? LB_SPORT : LB_KEY;
+    if (GROUP_MODE) {
+      const res = await pushGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode, max: LB_MAX, lb: addTempScore(s), token, syncEl });
+      if (sportMode) sportLb = res; else lb = res;
+    } else {
+      const merged = await pushLeaderboard({ dbUrl: lbUrl, localKey: lbKey, max: LB_MAX, lb: addTempScore(s), token, syncEl });
+      if (sportMode) sportLb = merged; else lb = merged;
+    }
+    refreshLb();
+  }
+
+  function addTempScore(s) {
+    const curr = sportMode ? [...sportLb] : [...lb];
+    curr.push({ name: '???', score: s, date: new Date().toISOString().slice(0, 10) });
+    curr.sort((a, b) => b.score - a.score);
+    return curr.slice(0, LB_MAX);
+  }
+
+  // ── Name entry ─────────────────────────────────────────────────────────────
+  const nameInput  = document.getElementById('hiscore-name');
+  const nameSaveBtn = document.getElementById('hiscore-save');
+
+  function doSaveScore() {
+    const raw  = nameInput.value.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, 10);
+    const name = raw || 'TOILET';
+    const entry = { name, score, date: new Date().toISOString().slice(0, 10) };
+    const lbUrl = sportMode ? DB + '/sport' : DB;
+    const lbKey = sportMode ? LB_SPORT : LB_KEY;
+    const curr  = sportMode ? [...sportLb] : [...lb];
+    curr.push(entry); curr.sort((a, b) => b.score - a.score);
+    const trimmed = curr.slice(0, LB_MAX);
+    pushLeaderboard({ dbUrl: lbUrl, localKey: lbKey, max: LB_MAX, lb: trimmed, token, syncEl });
+    if (sportMode) sportLb = trimmed; else lb = trimmed;
+    hiscoreEl.style.display = 'none';
+    refreshLb();
+  }
+  nameSaveBtn.onclick = doSaveScore;
+  nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSaveScore(); });
+
+  // ── Leaderboard ────────────────────────────────────────────────────────────
+  function refreshLb() {
+    renderLeaderboard(lbListEl, lbTitleEl, sportMode ? sportLb : lb,
+      GROUP_MODE ? '👥 Group Top 5' : (sportMode ? '⚡ Sport Top 5' : '🌍 World Top 5'));
+  }
+
+  // ── Stats panel ────────────────────────────────────────────────────────────
+  function updateStatsPanel() {
+    document.getElementById('stat-games').textContent   = stats.games    || 0;
+    document.getElementById('stat-best').textContent    = stats.best     || '—';
+    document.getElementById('stat-combo').textContent   = stats.bestCombo || 0;
+    document.getElementById('stat-caught').textContent  = stats.caught   || 0;
+    document.getElementById('stat-missed').textContent  = stats.missed   || 0;
+    document.getElementById('stat-powerups').textContent = stats.powerups || 0;
+  }
+
+  // ── Start game ─────────────────────────────────────────────────────────────
+  function startGame(isSport) {
+    sportMode = isSport;
+    running = true; dead = false;
+    score = 0; lives = 3;
+    comboStreak = 0; comboMultActive = false; bestCombo = 0;
+    magnetExp = 0; slowmoExp = 0; wideExp = 0; shieldActive = false;
+    spawnSheepT = 0;
+
+    turds.forEach(t => t.el.remove()); turds = [];
+    sheep.forEach(s => s.el.remove());  sheep = [];
+
+    fieldW = fieldEl.offsetWidth;
+    fieldH = fieldEl.offsetHeight;
+    toiletX  = fieldW / 2;
+    targetX  = fieldW / 2;
+
+    renderLives();
+    comboPips.forEach(p => p.classList.remove('filled'));
+    comboBonus.classList.remove('active');
+    lvlBanner.style.opacity   = '0';
+    lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
+    hiscoreEl.style.display   = 'none';
+    powerHud.textContent = '';
+    actionBar.innerHTML  = '';
+    toiletEl.classList.remove('catching', 'wide', 'magnet-active');
+    toiletEl.style.left      = (fieldW / 2) + 'px';
+    toiletEl.style.transform = 'translateX(-50%)';
+
+    if (sportMode) {
+      sportEnd = Date.now() + SPORT_SECONDS * 1000;
+      sportTimEl.style.display = '';
+      sportBar.style.transform = 'scaleX(1)';
+      document.body.classList.add('sport-mode');
+    } else {
+      sportTimEl.style.display = 'none';
+      document.body.classList.remove('sport-mode');
+    }
+
+    modOvEl.style.display = 'none';
+    stats.games = (stats.games || 0) + 1;
+    saveStats(STATS_KEY, stats);
+    updateHUD();
+    lastTs = performance.now();
+    animId = requestAnimationFrame(loop);
+  }
+
+  // ── Mode popup ─────────────────────────────────────────────────────────────
+  function showPopup() {
+    modOvEl.style.display = 'flex';
+    if (GROUP_MODE && groupBadge) { groupBadge.style.display = ''; }
+    document.getElementById('mpc-leave-group').style.display = GROUP_MODE ? '' : 'none';
+  }
+
+  document.getElementById('mpc-normal').onclick = () => startGame(false);
+  document.getElementById('mpc-sport').onclick  = () => startGame(true);
+  document.getElementById('popup-stats-btn').onclick = openDrawer;
+
+  document.getElementById('mpc-friends').onclick = () => {
+    openFriendsDialog({
+      dbUrl: DB, groupId: GROUP_ID, groupMode: GROUP_MODE,
+      token, storageKey: GROUP_SKEY, ttlMs: 864000000,
+      gameTitle: 'Plop Drop',
+      shareText: 'Drone sheep are dropping turds and I need help catching them 🚽💩 Play with me!',
+    });
+  };
+  document.getElementById('mpc-leave-group').onclick = () => {
+    localStorage.removeItem(GROUP_SKEY);
+    location.href = location.pathname;
+  };
+
+  // ── Info drawer ────────────────────────────────────────────────────────────
+  function openDrawer() {
+    document.getElementById('info-overlay').classList.add('open');
+    document.getElementById('info-drawer').classList.add('open');
+    refreshLb();
+    updateStatsPanel();
+  }
+  function closeDrawer() {
+    document.getElementById('info-overlay').classList.remove('open');
+    document.getElementById('info-drawer').classList.remove('open');
+  }
+  document.getElementById('stats-btn').onclick   = openDrawer;
+  document.getElementById('info-close').onclick  = closeDrawer;
+  document.getElementById('info-overlay').onclick = e => { if (e.target === e.currentTarget) closeDrawer(); };
+  document.getElementById('friends-close-btn').onclick = () => {
+    document.getElementById('friends-overlay').style.display = 'none';
+  };
+
+  // Mute
+  let muted = localStorage.getItem(MUTE_KEY) === '1';
+  function updateMuteUI() {
+    document.getElementById('mute-toggle').textContent = muted ? 'On' : 'Off';
+  }
+  document.getElementById('mute-toggle').onclick = () => {
+    muted = !muted;
+    localStorage.setItem(MUTE_KEY, muted ? '1' : '0');
+    updateMuteUI();
+  };
+  updateMuteUI();
+
+  // ── Input — mouse / touch / keys ───────────────────────────────────────────
+  function setTarget(clientX) {
+    const rect = fieldEl.getBoundingClientRect();
+    targetX = Math.max(0, Math.min(fieldW, clientX - rect.left));
+  }
+
+  fieldEl.addEventListener('mousemove', e => { if (running) setTarget(e.clientX); });
+  fieldEl.addEventListener('touchmove', e => {
+    if (!running) return;
+    e.preventDefault();
+    setTarget(e.touches[0].clientX);
+  }, { passive: false });
+  fieldEl.addEventListener('touchstart', e => {
+    if (!running) return;
+    e.preventDefault();
+    setTarget(e.touches[0].clientX);
+  }, { passive: false });
+  fieldEl.addEventListener('click', e => { if (running) setTarget(e.clientX); });
+
+  const keys = {};
+  document.addEventListener('keydown', e => { keys[e.key] = true; });
+  document.addEventListener('keyup',   e => { delete keys[e.key]; });
+
+  // ── Remote config ──────────────────────────────────────────────────────────
+  async function fetchConfig() {
+    try {
+      const res = await fetch(DB + '/config.json');
+      if (!res.ok) return;
+      const cfg = await res.json();
+      if (!cfg) return;
+      if (cfg.gravity != null)      GRAVITY       = cfg.gravity;
+      if (cfg.spinRate != null)     SPIN_RATE     = cfg.spinRate;
+      if (cfg.catchZone != null)    CATCH_ZONE    = cfg.catchZone;
+      if (cfg.catchRadius != null)  CATCH_RADIUS  = cfg.catchRadius;
+      if (cfg.comboSteps != null)   COMBO_STEPS   = cfg.comboSteps;
+      if (cfg.sportSeconds != null) SPORT_SECONDS = cfg.sportSeconds;
+      if (Array.isArray(cfg.turds)) { TURDS = cfg.turds; TURD_TOTAL_W = TURDS.reduce((s, t) => s + t.w, 0); }
+      if (Array.isArray(cfg.sheep)) SHEEP_TYPES = cfg.sheep;
+      if (cfg.params && typeof cfg.params === 'object') Object.assign(PARAMS, cfg.params);
+    } catch (_) { /* use defaults */ }
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  async function init() {
+    bestDsp.textContent = personalBest || '—';
+    updateStatsPanel();
+    await fetchConfig();
+    token   = await signInAnonymously(window.__FB_KEY__);
+    if (GROUP_MODE) {
+      lb = await fetchGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode: false, max: LB_MAX, syncEl });
+    } else {
+      lb      = await fetchLeaderboard({ dbUrl: DB,           localKey: LB_KEY,   max: LB_MAX, syncEl });
+      sportLb = await fetchLeaderboard({ dbUrl: DB + '/sport', localKey: LB_SPORT, max: LB_MAX, syncEl: null });
+    }
+    modTitleEl.textContent = '🚽 Plop Drop';
+    modSubEl.textContent   = 'Choose your mode';
+    resultEl.style.display = 'none';
+    showPopup();
+    refreshLb();
+  }
+
+  init();
+})();
+</script>
+</BaseLayout>
