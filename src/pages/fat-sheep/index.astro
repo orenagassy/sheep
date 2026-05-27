@@ -351,6 +351,9 @@ const schema = JSON.stringify({
   // Grass grid
   let grassGrid = [], grassCols = 0, grassRows = 0;
 
+  // Banner dismiss timer — kept to allow clearTimeout before rescheduling
+  let bannerTimer = null;
+
   // Keys
   const keys = {};
 
@@ -460,13 +463,13 @@ const schema = JSON.stringify({
     let r = Math.random() * totalW, type = available[0];
     for (const t of available) { r -= t.weight; if (r <= 0) { type = t; break; } }
 
-    // Spawn from the field corner farthest from the sheep.
+    // Spawn from the field corner farthest from the sheep; shuffle first to break ties randomly.
     const spawnCorners = [
       { fx: 0,      fy: 0,      sx: -40,         sy: -40          },
       { fx: fieldW, fy: 0,      sx: fieldW + 40,  sy: -40          },
       { fx: 0,      fy: fieldH, sx: -40,          sy: fieldH + 40  },
       { fx: fieldW, fy: fieldH, sx: fieldW + 40,  sy: fieldH + 40  },
-    ];
+    ].sort(() => Math.random() - 0.5);
     let best = spawnCorners[0], bestDist = -1;
     for (const c of spawnCorners) {
       const d = (c.fx - sx) * (c.fx - sx) + (c.fy - sy) * (c.fy - sy);
@@ -600,7 +603,8 @@ const schema = JSON.stringify({
       lvlBanner.textContent = '🌿 Eat more grass!';
       lvlBanner.style.opacity = '1';
       lvlBanner.style.transform = 'translate(-50%,-50%) scale(1)';
-      setTimeout(() => {
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => {
         lvlBanner.style.opacity = '0';
         lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
       }, 1500);
@@ -672,6 +676,8 @@ const schema = JSON.stringify({
         dog.y += (dy / d) * 95 * dt;
         dog.el.classList.add('scared');
         dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+        // Keep prevSx current so intercept velocity is fresh when scare expires
+        if (dog.aiStyle === 'intercept') { dog.aiState.prevSx = sx; dog.aiState.prevSy = sy; }
         return;
       }
       dog.el.classList.remove('scared');
@@ -681,6 +687,7 @@ const schema = JSON.stringify({
         const d = Math.sqrt(dx * dx + dy * dy) || 1;
         if (d < 90) { dog.x -= (dx / d) * 38 * dt; dog.y -= (dy / d) * 38 * dt; }
         dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+        if (dog.aiStyle === 'intercept') { dog.aiState.prevSx = sx; dog.aiState.prevSy = sy; }
         return;
       }
 
@@ -707,8 +714,10 @@ const schema = JSON.stringify({
 
       } else if (dog.aiStyle === 'intercept') {
         // Herder: estimates sheep velocity and aims for a point ahead of the sheep.
-        const sheepVx = (sx - ai.prevSx) / dt;
-        const sheepVy = (sy - ai.prevSy) / dt;
+        // Clamp to realistic sheep speed to prevent spikes on first frame after spawn/scare.
+        const MAX_SHEEP_SPD = 300;
+        const sheepVx = Math.max(-MAX_SHEEP_SPD, Math.min(MAX_SHEEP_SPD, (sx - ai.prevSx) / dt));
+        const sheepVy = Math.max(-MAX_SHEEP_SPD, Math.min(MAX_SHEEP_SPD, (sy - ai.prevSy) / dt));
         ai.prevSx = sx; ai.prevSy = sy;
         const predX = sx + sheepVx * 0.35;
         const predY = sy + sheepVy * 0.35;
@@ -794,11 +803,11 @@ const schema = JSON.stringify({
         if (energy <= 0) { endGame(); return; }
       } else {
         sheepEl.classList.remove('hurt');
-        energy = Math.min(maxEnergy, energy + ENERGY_REGEN * grassQ * dt);
+        energy = Math.min(maxEnergy, energy + ENERGY_REGEN * Math.max(0.1, grassQ) * dt);
       }
     } else {
       sheepEl.classList.remove('hurt');
-      energy = Math.min(maxEnergy, energy + ENERGY_REGEN * grassQ * dt);
+      energy = Math.min(maxEnergy, energy + ENERGY_REGEN * Math.max(0.1, grassQ) * dt);
     }
   }
 
@@ -833,7 +842,8 @@ const schema = JSON.stringify({
       lvlBanner.textContent = '🐑 ' + stageName + '!';
       lvlBanner.style.opacity = '1';
       lvlBanner.style.transform = 'translate(-50%,-50%) scale(1)';
-      setTimeout(() => {
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => {
         lvlBanner.style.opacity = '0';
         lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
       }, 1500);
@@ -1158,7 +1168,9 @@ const schema = JSON.stringify({
       if (!res.ok) return;
       const cfg = await res.json();
       if (!cfg) return;
-      if (Array.isArray(cfg.stages))    STAGES = cfg.stages;
+      if (Array.isArray(cfg.stages) && cfg.stages.length > 0 &&
+          cfg.stages.every(s => s.pts != null && s.size != null && s.speed != null && s.maxEnergy != null && s.fatDecay != null))
+        STAGES = cfg.stages;
       if (Array.isArray(cfg.foods))     { FOODS = cfg.foods; FOOD_TOTAL_W = FOODS.reduce((s, f) => s + f.w, 0); }
       if (Array.isArray(cfg.dogs))      DOG_TYPES = cfg.dogs;
       if (cfg.grassCell != null)        GRASS_CELL = cfg.grassCell;

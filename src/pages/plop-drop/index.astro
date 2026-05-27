@@ -498,7 +498,7 @@ const schema = JSON.stringify({
     stepToilet(dt);
     stepSheep(dt);
     stepTurds(dt);
-    checkMagnet();
+    checkMagnet(dt);
     updateHUD();
     if (sportMode) checkSport();
 
@@ -591,15 +591,14 @@ const schema = JSON.stringify({
     });
   }
 
-  function checkMagnet() {
+  function checkMagnet(dt) {
     if (Date.now() >= magnetExp) return;
     const PULL = 320;
-    const dt2  = 0.016;
     turds.forEach(td => {
       const dx   = toiletX - td.x;
       const dist = Math.abs(dx);
       if (dist < 150 && dist > 4) {
-        td.x += (dx / dist) * PULL * dt2;
+        td.x += (dx / dist) * PULL * dt;
       }
     });
   }
@@ -621,11 +620,14 @@ const schema = JSON.stringify({
       stats.caught = (stats.caught || 0) + 1;
     }
 
-    comboStreak++;
-    if (comboStreak > (stats.bestCombo || 0)) stats.bestCombo = comboStreak;
-    if (comboStreak > bestCombo) bestCombo = comboStreak;
-    comboMultActive = (comboStreak % COMBO_STEPS === 0 && comboStreak > 0);
-    if (comboMultActive) sfx('combo');
+    // Only scoring catches count toward the combo streak
+    if (!td.def.power) {
+      comboStreak++;
+      if (comboStreak > (stats.bestCombo || 0)) stats.bestCombo = comboStreak;
+      if (comboStreak > bestCombo) bestCombo = comboStreak;
+      comboMultActive = (comboStreak % COMBO_STEPS === 0 && comboStreak > 0);
+      if (comboMultActive) sfx('combo');
+    }
 
     // Toilet bounce
     toiletEl.classList.remove('catching');
@@ -645,6 +647,13 @@ const schema = JSON.stringify({
 
   function onMiss(td) {
     if (td.def.power) return; // power-up hitting ground just disappears
+
+    // Shield absorbs one miss
+    if (shieldActive) {
+      shieldActive = false;
+      floatScore('Shield!', td.x, fieldH - 60, '');
+      return;
+    }
 
     stats.missed = (stats.missed || 0) + 1;
     comboStreak = 0;
@@ -982,7 +991,8 @@ const schema = JSON.stringify({
     await fetchConfig();
     token   = await signInAnonymously(window.__FB_KEY__);
     if (GROUP_MODE) {
-      lb = await fetchGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode: false, max: LB_MAX, syncEl });
+      lb      = await fetchGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode: false, max: LB_MAX, syncEl });
+      sportLb = await fetchGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode: true,  max: LB_MAX, syncEl: null });
     } else {
       lb      = await fetchLeaderboard({ dbUrl: DB,           localKey: LB_KEY,   max: LB_MAX, syncEl });
       sportLb = await fetchLeaderboard({ dbUrl: DB + '/sport', localKey: LB_SPORT, max: LB_MAX, syncEl: null });

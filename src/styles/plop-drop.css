@@ -65,7 +65,7 @@
   flex-shrink: 0;
   margin-top: -17px;
 }
-.drone-sheep.slow-flier .rotor-body { animation-duration: 0.38s; }
+.drone-sheep.fat-flier .rotor-body { animation-duration: 0.38s; }
 .rotor-blade {
   position: absolute;
   width: 100%;
