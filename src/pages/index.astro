@@ -90,7 +90,7 @@ const schema = JSON.stringify({
             "@id": "https://sheeps.online/plop-drop/#game",
             "name": "Plop Drop",
             "url": "https://sheeps.online/plop-drop/",
-            "description": "Drone sheep are flying overhead dropping turds. Move your toilet seat to catch them all! Casual browser game with combos and power-ups.",
+            "description": "Drone sheep are flying overhead dropping plops. Move your toilet seat to catch them all! Casual browser game with combos and power-ups.",
             "genre": ["Casual", "Arcade", "Kids"],
             "playMode": "SinglePlayer",
             "applicationCategory": "Game",
@@ -101,6 +101,28 @@ const schema = JSON.stringify({
             "audience": {
               "@type": "PeopleAudience",
               "suggestedMinAge": 5
+            }
+          }
+        },
+        {
+          "@type": "ListItem",
+          "position": 4,
+          "item": {
+            "@type": "VideoGame",
+            "@id": "https://sheeps.online/state-quest/#game",
+            "name": "Sheep State Quest",
+            "url": "https://sheeps.online/state-quest/",
+            "description": "Guide your sheep to the correct US state on a blank map! A wooden sign names the target state, the clock starts ticking — zoom in and click before time runs out.",
+            "genre": ["Casual", "Educational", "Geography", "Kids"],
+            "playMode": "SinglePlayer",
+            "applicationCategory": "Game",
+            "operatingSystem": "Any",
+            "gamePlatform": "Web Browser",
+            "isAccessibleForFree": true,
+            "image": "https://sheeps.online/og-image.svg",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 7
             }
           }
         }
@@ -362,6 +384,17 @@ const schema = JSON.stringify({
         <div class="game-card-meta">
           <span class="tag">Casual</span>
           <span class="tag">Reflex</span>
+          <span class="tag">Kids</span>
+          <span class="tag">Free</span>
+        </div>
+      </a>
+      <a class="game-card" href="/state-quest/" aria-label="Play Sheep State Quest">
+        <div class="game-card-icon">🐑<span class="icon-badge">🗺️</span></div>
+        <div class="game-card-title">Sheep State Quest</div>
+        <p class="game-card-desc">Guide your sheep to the right US state on a blank map! Zoom in, pan around, and click before the timer runs out.</p>
+        <div class="game-card-meta">
+          <span class="tag">Geography</span>
+          <span class="tag">Educational</span>
           <span class="tag">Kids</span>
           <span class="tag">Free</span>
         </div>

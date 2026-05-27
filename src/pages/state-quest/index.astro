@@ -1,0 +1,1104 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import '../../styles/shared.css';
+import '../../styles/state-quest.css';
+const firebaseApiKey = import.meta.env.PUBLIC_FIREBASE_API_KEY ?? '';
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "VideoGame",
+      "@id": "https://sheeps.online/state-quest/#game",
+      "name": "Sheep State Quest",
+      "url": "https://sheeps.online/state-quest/",
+      "description": "Guide your sheep to the correct US state on a blank map! A wooden sign announces each state, then race the clock to find it. Zoom in, pan around, and click the right state. The faster you answer, the more points you score.",
+      "genre": ["Casual", "Educational", "Kids", "Geography"],
+      "playMode": "SinglePlayer",
+      "applicationCategory": "Game",
+      "operatingSystem": "Any",
+      "gamePlatform": "Web Browser",
+      "isAccessibleForFree": true,
+      "inLanguage": "en",
+      "image": "https://sheeps.online/og-image.svg",
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://sheeps.online/#organization",
+        "name": "Sheeps.online",
+        "url": "https://sheeps.online/"
+      },
+      "audience": { "@type": "PeopleAudience", "suggestedMinAge": 7 }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Free Games", "item": "https://sheeps.online/" },
+        { "@type": "ListItem", "position": 2, "name": "Sheep State Quest", "item": "https://sheeps.online/state-quest/" }
+      ]
+    }
+  ]
+});
+---
+<BaseLayout
+  title="Sheep State Quest — Find All 50 US States | Sheeps.online"
+  description="Can your sheep find all 50 states? A wooden sign names the state, the clock starts ticking — zoom in, pan the blank USA map, and click the right state before time runs out. Free browser geography game."
+>
+  <Fragment slot="head">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🗺️</text></svg>">
+    <script type="application/ld+json" set:html={schema} />
+    <script is:inline src="/scripts/game-framework.js"></script>
+  </Fragment>
+
+<div class="app">
+  <h1>🗺️ Sheep State Quest</h1>
+  <p class="tagline">Guide your sheep to the right state — before the clock runs out! 🐑</p>
+
+  <div class="ad-wrap ad-wrap--top"></div>
+
+  <div id="game-container">
+
+    <div class="topbar">
+      <div class="topbar-left">
+        <span id="group-badge" style="display:none">👥 Group Mode</span>
+        <div>
+          <div class="hud-title">🗺️ State Quest</div>
+          <div class="hud-subtitle" id="hud-subtitle">Find all 50 states</div>
+        </div>
+      </div>
+      <div class="stat-group">
+        <div class="stat">
+          <div class="stat-label">Score</div>
+          <div class="stat-value" id="score-display">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-label">Your best</div>
+          <div class="stat-value" id="best-display">—</div>
+        </div>
+        <div class="stat" id="round-stat">
+          <div class="stat-label">Round</div>
+          <div class="stat-value" id="round-display-val">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="sign-wrap">
+      <div id="state-sign" style="display:none"></div>
+    </div>
+
+    <div id="timer-label">20.0s</div>
+    <div id="timer-bar-wrap">
+      <div id="timer-bar"></div>
+    </div>
+
+    <div id="round-display"></div>
+
+    <div id="map-wrap">
+      <div id="map-svg-container"></div>
+      <div id="map-sheep">🐑</div>
+      <div id="compass">🧭</div>
+      <button id="reset-zoom">🔍 Reset</button>
+      <div id="feedback-toast"></div>
+      <div id="result-overlay">
+        <div style="font-size:48px" id="result-emoji">🐑</div>
+        <div id="result-score-big">0</div>
+        <div id="result-label">out of 10,000</div>
+        <div id="result-correct"></div>
+        <div id="result-grade" style="font-size:22px;font-weight:700;margin-top:4px"></div>
+        <div style="display:flex;gap:10px;margin-top:12px">
+          <button class="card-btn" id="play-again-btn">Play Again</button>
+          <button class="card-btn" id="view-lb-btn">Leaderboard</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="state-correct-label" class="state-correct-label"></div>
+
+    <div id="mode-popup" class="mode-popup" style="display:none">
+      <div class="mode-popup-inner">
+        <div class="mode-popup-title" id="mode-popup-title">🐑 Sheep State Quest</div>
+        <div class="mode-popup-sub" id="mode-popup-sub">Find all 50 US states on a blank map!</div>
+        <div class="mode-popup-score" id="mode-popup-score" style="display:none">
+          <span id="mode-popup-score-val" style="font-size:42px;font-weight:700"></span>
+          <span id="mode-popup-score-sub" style="font-size:14px;color:var(--text-secondary)"></span>
+        </div>
+        <div class="mode-btn-row">
+          <button id="mpc-normal" class="mode-btn">
+            <span class="mode-btn-icon">🗺️</span>Normal
+          </button>
+          <button id="mpc-sport" class="mode-btn">
+            <span class="mode-btn-icon">⚡</span>Sport
+          </button>
+        </div>
+        <div id="mpc-name-row" class="name-entry" style="display:none">
+          <input id="mpc-name" class="name-input" type="text" maxlength="10" placeholder="YOUR NAME" autocomplete="off" spellcheck="false">
+          <button id="mpc-save" class="card-btn">Save score</button>
+        </div>
+      </div>
+    </div>
+
+    <details>
+      <summary>How to play</summary>
+      <p>A wooden sign slides in naming a US state — your sheep needs to find it on the blank map! Click or tap the correct state before the 20-second timer runs out. The faster you answer, the more points you score (up to 1,000 per round across 10 rounds). Zoom in with your mouse wheel or pinch gesture to get a closer look, and drag to pan around.</p>
+      <p>Wrong click? The state flashes red and the clock keeps ticking — keep looking! When time runs out, the correct state is revealed. Score up to 10,000 total.</p>
+      <p><strong>Sport mode ⚡:</strong> 15 seconds per state and a +200 speed bonus if you find it in the first 5 seconds. Smaller states appear in the mix earlier. Go fast!</p>
+    </details>
+  </div>
+</div>
+
+<div id="info-overlay"></div>
+<div id="info-drawer">
+  <div id="info-drawer-header">
+    <span>Leaderboard &amp; Stats</span>
+    <button id="info-close">✕</button>
+  </div>
+  <div class="info-section">
+    <div class="info-section-title" id="lb-title">Global · Normal</div>
+    <div id="lb-list"></div>
+    <div id="lb-friends-wrap" style="display:none">
+      <div class="info-section-title" style="margin-top:16px">Friend Group</div>
+      <div id="lb-friends-list"></div>
+    </div>
+  </div>
+  <div class="info-section">
+    <div class="info-section-title">Your Stats</div>
+    <div id="stats-grid" class="stats-grid">
+      <div class="stat-cell"><span id="stat-games">0</span><label>Games</label></div>
+      <div class="stat-cell"><span id="stat-best">0</span><label>Best score</label></div>
+      <div class="stat-cell"><span id="stat-correct">0</span><label>States found</label></div>
+      <div class="stat-cell"><span id="stat-perfect">0</span><label>Perfect rounds</label></div>
+    </div>
+  </div>
+  <div class="info-section" id="ach-section">
+    <div class="info-section-title">Achievements</div>
+    <div id="ach-list"></div>
+  </div>
+  <div class="info-section friends-section">
+    <div class="info-section-title">Play with friends</div>
+    <p class="friends-desc">Create a group leaderboard and share it with friends. Scores stay for 10 days.</p>
+    <div id="friends-actions">
+      <button id="create-group-btn" class="card-btn">Create friend group</button>
+      <div id="group-link-wrap" style="display:none">
+        <div id="group-link-display" class="group-link-display"></div>
+        <div class="share-row">
+          <button class="share-btn" data-net="twitter">𝕏 Twitter</button>
+          <button class="share-btn" data-net="copy">📋 Copy</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
+
+<script define:vars={{ firebaseApiKey }}>window.__FB_KEY__ = firebaseApiKey;</script>
+<script is:inline>
+(function () {
+  // ── Config ────────────────────────────────────────────────────────────────
+  const DB        = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/state-quest';
+  const LB_KEY    = 'statequest:lb';
+  const LB_SPORT  = 'statequest:lb-sport';
+  const STATS_KEY = 'statequest:stats';
+  const GROUP_SKEY= 'statequest:group';
+  const MUTE_KEY  = 'statequest:mute';
+  const LB_MAX    = 5;
+  const TOTAL_ROUNDS  = 10;
+  const NORMAL_TIME   = 20;   // seconds per round (normal)
+  const SPORT_TIME    = 15;   // seconds per round (sport)
+  const SPORT_SPEED_BONUS = 200; // bonus if answered in first 5s (sport)
+  const MAX_SCORE_PER_ROUND = 1000;
+
+  // ── Game framework utilities ──────────────────────────────────────────────
+  const {
+    loadLocalLeaderboard, saveLocalLeaderboard,
+    renderLeaderboard, isNewBest, fetchLeaderboard, pushLeaderboard,
+    generateGroupId, getGroupUrl, createGroupInFirebase,
+    showFriendsCopyToast,
+    loadStats, saveStats, showAchievementToast, tone, getAudioContext
+  } = window.GameFramework;
+
+  // ── State data ────────────────────────────────────────────────────────────
+  // Each entry: [id, name, emoji, cx, cy, tier]
+  // cx/cy = centroid in SVG coords (where sheep walks to on correct answer)
+  // tier: 'easy' | 'medium' | 'hard'
+  const STATES = [
+    ['AL','Alabama','🏈',738,375,'medium'],
+    ['AK','Alaska','🐻',155,488,'easy'],
+    ['AZ','Arizona','🌵',292,365,'easy'],
+    ['AR','Arkansas','🎸',626,362,'medium'],
+    ['CA','California','🌴',128,333,'easy'],
+    ['CO','Colorado','⛷️',413,280,'easy'],
+    ['CT','Connecticut','⚓',860,170,'hard'],
+    ['DE','Delaware','🦆',855,212,'hard'],
+    ['FL','Florida','🐊',793,482,'easy'],
+    ['GA','Georgia','🍑',785,388,'medium'],
+    ['HI','Hawaii','🌺',365,508,'medium'],
+    ['ID','Idaho','🥔',246,150,'medium'],
+    ['IL','Illinois','🌽',678,258,'medium'],
+    ['IN','Indiana','🏎️',727,228,'medium'],
+    ['IA','Iowa','🌾',628,228,'medium'],
+    ['KS','Kansas','🌻',540,296,'medium'],
+    ['KY','Kentucky','🏇',738,273,'medium'],
+    ['LA','Louisiana','🎷',630,425,'medium'],
+    ['ME','Maine','🦞',878,98,'hard'],
+    ['MD','Maryland','🦀',830,225,'hard'],
+    ['MA','Massachusetts','🦞',860,143,'hard'],
+    ['MI','Michigan','🚗',718,158,'medium'],
+    ['MN','Minnesota','🏒',628,118,'medium'],
+    ['MS','Mississippi','🎸',690,385,'medium'],
+    ['MO','Missouri','🏛️',628,298,'medium'],
+    ['MT','Montana','🏔️',368,106,'easy'],
+    ['NE','Nebraska','🌽',550,237,'medium'],
+    ['NV','Nevada','🎰',228,260,'easy'],
+    ['NH','New Hampshire','🍁',858,108,'hard'],
+    ['NJ','New Jersey','🗽',855,182,'hard'],
+    ['NM','New Mexico','🌶️',415,360,'easy'],
+    ['NY','New York','🗽',818,130,'medium'],
+    ['NC','North Carolina','⛵',820,278,'medium'],
+    ['ND','North Dakota','🌾',554,88,'medium'],
+    ['OH','Ohio','🎭',780,215,'medium'],
+    ['OK','Oklahoma','🤠',540,350,'medium'],
+    ['OR','Oregon','🌲',140,176,'medium'],
+    ['PA','Pennsylvania','🔔',811,182,'medium'],
+    ['RI','Rhode Island','⚓',886,168,'hard'],
+    ['SC','South Carolina','🌴',823,332,'medium'],
+    ['SD','South Dakota','🦬',554,168,'medium'],
+    ['TN','Tennessee','🎵',738,318,'medium'],
+    ['TX','Texas','🤠',570,435,'easy'],
+    ['UT','Utah','🏜️',298,283,'medium'],
+    ['VT','Vermont','🍁',836,107,'hard'],
+    ['VA','Virginia','🎻',818,238,'medium'],
+    ['WA','Washington','☕',142,90,'medium'],
+    ['WV','West Virginia','⛏️',788,220,'hard'],
+    ['WI','Wisconsin','🧀',686,160,'medium'],
+    ['WY','Wyoming','🦬',365,205,'easy'],
+  ];
+
+  // ── SVG map paths (simplified Albers-like projection, viewBox 0 0 960 600) ─
+  // Continental US: ~x:70-912, y:47-545
+  // Alaska inset: x:52-260, y:425-550
+  // Hawaii inset: x:282-450, y:488-522
+  const MAP_SVG = `<svg id="map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 600" style="width:100%;height:100%">
+  <path id="WA" data-name="Washington"       class="state-path" d="M70,52 L215,52 L215,130 L138,130 L100,140 L70,130 Z"/>
+  <path id="OR" data-name="Oregon"           class="state-path" d="M70,130 L215,130 L212,222 L70,222 Z"/>
+  <path id="CA" data-name="California"       class="state-path" d="M70,222 L178,218 L200,240 L205,300 L198,375 L176,435 L148,452 L70,450 Z"/>
+  <path id="NV" data-name="Nevada"           class="state-path" d="M178,218 L288,180 L288,222 L282,302 L238,345 L178,345 Z"/>
+  <path id="ID" data-name="Idaho"            class="state-path" d="M205,52 L296,52 L296,110 L272,115 L268,162 L288,222 L245,225 L205,225 L178,172 L200,115 Z"/>
+  <path id="MT" data-name="Montana"          class="state-path" d="M248,47 L490,47 L490,165 L248,165 Z"/>
+  <path id="WY" data-name="Wyoming"          class="state-path" d="M285,165 L448,165 L448,248 L285,248 Z"/>
+  <path id="UT" data-name="Utah"             class="state-path" d="M245,225 L355,225 L355,302 L348,345 L268,345 L245,285 Z"/>
+  <path id="CO" data-name="Colorado"         class="state-path" d="M353,245 L477,245 L477,318 L353,318 Z"/>
+  <path id="AZ" data-name="Arizona"          class="state-path" d="M232,302 L355,302 L355,352 L368,428 L355,430 L312,430 L228,420 L228,302 Z"/>
+  <path id="NM" data-name="New Mexico"       class="state-path" d="M355,300 L477,300 L477,422 L356,422 L355,352 Z"/>
+  <path id="ND" data-name="North Dakota"     class="state-path" d="M480,47 L628,47 L628,130 L480,130 Z"/>
+  <path id="SD" data-name="South Dakota"     class="state-path" d="M480,130 L628,130 L628,208 L480,208 Z"/>
+  <path id="NE" data-name="Nebraska"         class="state-path" d="M480,208 L622,208 L622,268 L480,268 Z"/>
+  <path id="KS" data-name="Kansas"           class="state-path" d="M466,268 L616,268 L616,325 L466,325 Z"/>
+  <path id="OK" data-name="Oklahoma"         class="state-path" d="M466,295 L522,295 L522,325 L616,325 L616,378 L466,378 L466,295 Z"/>
+  <path id="TX" data-name="Texas"            class="state-path" d="M466,295 L522,295 L522,325 L616,325 L616,368 L685,368 L700,395 L698,455 L665,512 L628,528 L575,532 L540,530 L478,492 L452,445 L435,395 L435,355 L466,325 Z"/>
+  <path id="MN" data-name="Minnesota"        class="state-path" d="M582,47 L680,47 L682,118 L655,178 L622,195 L582,195 Z"/>
+  <path id="WI" data-name="Wisconsin"        class="state-path" d="M648,108 L722,108 L725,158 L718,215 L668,215 L648,192 Z"/>
+  <path id="IA" data-name="Iowa"             class="state-path" d="M582,195 L676,195 L676,262 L582,262 Z"/>
+  <path id="IL" data-name="Illinois"         class="state-path" d="M648,210 L710,210 L710,310 L685,320 L648,300 Z"/>
+  <path id="IN" data-name="Indiana"          class="state-path" d="M705,172 L750,172 L752,285 L705,285 Z"/>
+  <path id="OH" data-name="Ohio"             class="state-path" d="M748,172 L812,172 L812,258 L748,258 Z"/>
+  <path id="MI" data-name="Michigan"         class="state-path" d="M650,88 L752,88 L752,115 L650,115 Z M700,115 L754,115 L756,150 L752,215 L700,215 L682,195 L690,148 Z"/>
+  <path id="MO" data-name="Missouri"         class="state-path" d="M582,262 L676,262 L688,318 L670,338 L645,338 L645,325 L625,325 L625,338 L582,338 Z"/>
+  <path id="AR" data-name="Arkansas"         class="state-path" d="M582,338 L670,338 L672,392 L582,392 Z"/>
+  <path id="LA" data-name="Louisiana"        class="state-path" d="M582,392 L685,392 L688,450 L662,462 L618,465 L582,458 Z"/>
+  <path id="MS" data-name="Mississippi"      class="state-path" d="M662,325 L720,325 L718,445 L680,458 L665,445 Z"/>
+  <path id="AL" data-name="Alabama"          class="state-path" d="M718,312 L762,312 L762,440 L718,440 Z"/>
+  <path id="TN" data-name="Tennessee"        class="state-path" d="M668,298 L808,298 L808,340 L668,340 Z"/>
+  <path id="KY" data-name="Kentucky"         class="state-path" d="M670,248 L810,248 L808,300 L668,300 Z"/>
+  <path id="GA" data-name="Georgia"          class="state-path" d="M750,338 L820,338 L822,435 L778,442 L750,440 Z"/>
+  <path id="FL" data-name="Florida"          class="state-path" d="M742,435 L822,435 L845,455 L850,490 L835,535 L795,542 L762,532 L742,498 Z"/>
+  <path id="SC" data-name="South Carolina"   class="state-path" d="M792,298 L855,298 L855,362 L820,368 L792,340 Z"/>
+  <path id="NC" data-name="North Carolina"   class="state-path" d="M764,258 L878,258 L878,300 L792,300 Z"/>
+  <path id="VA" data-name="Virginia"         class="state-path" d="M762,212 L872,212 L872,260 L764,260 Z"/>
+  <path id="WV" data-name="West Virginia"    class="state-path" d="M762,192 L778,158 L796,158 L796,192 L815,192 L815,248 L780,255 L762,248 Z"/>
+  <path id="PA" data-name="Pennsylvania"     class="state-path" d="M762,155 L860,155 L862,212 L762,212 Z"/>
+  <path id="NY" data-name="New York"         class="state-path" d="M758,105 L875,105 L862,158 L762,158 Z"/>
+  <path id="MD" data-name="Maryland"         class="state-path" d="M795,212 L862,212 L865,238 L812,238 L795,225 Z"/>
+  <path id="DE" data-name="Delaware"         class="state-path" d="M845,192 L868,192 L868,232 L845,232 Z"/>
+  <path id="NJ" data-name="New Jersey"       class="state-path" d="M835,162 L872,162 L870,205 L845,205 L840,192 Z"/>
+  <path id="CT" data-name="Connecticut"      class="state-path" d="M843,158 L878,158 L878,182 L843,182 Z"/>
+  <path id="RI" data-name="Rhode Island"     class="state-path" d="M878,155 L895,155 L895,182 L878,182 Z"/>
+  <path id="MA" data-name="Massachusetts"    class="state-path" d="M828,128 L895,128 L895,158 L843,158 L828,148 Z"/>
+  <path id="VT" data-name="Vermont"          class="state-path" d="M825,80 L848,80 L848,135 L825,135 Z"/>
+  <path id="NH" data-name="New Hampshire"    class="state-path" d="M848,78 L870,78 L870,140 L848,140 Z"/>
+  <path id="ME" data-name="Maine"            class="state-path" d="M845,50 L912,50 L912,148 L868,150 L848,130 Z"/>
+  <path id="AK" data-name="Alaska"           class="state-path" d="M52,428 L205,428 L238,445 L260,472 L255,532 L222,548 L168,548 L105,535 L52,510 Z"/>
+  <path id="HI" data-name="Hawaii"           class="state-path" d="M282,495 L302,490 L320,505 L312,520 L282,520 Z M315,496 L332,490 L348,500 L345,515 L318,515 Z M350,494 L368,490 L385,500 L380,514 L352,514 Z M385,493 L405,488 L422,498 L418,512 L387,512 Z M422,492 L445,488 L450,502 L428,510 Z"/>
+  <!-- Inset labels -->
+  <text x="62" y="420" font-size="10" fill="#666" font-family="sans-serif">AK</text>
+  <text x="295" y="487" font-size="10" fill="#666" font-family="sans-serif">HI</text>
+  <rect x="50" y="415" width="218" height="140" fill="none" stroke="#aaa" stroke-width="0.8" stroke-dasharray="3,2"/>
+  <rect x="280" y="484" width="178" height="42" fill="none" stroke="#aaa" stroke-width="0.8" stroke-dasharray="3,2"/>
+</svg>`;
+
+  // ── URL group parsing ──────────────────────────────────────────────────────
+  const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
+  if (_urlGroupId) sessionStorage.setItem('statequest:active-group', _urlGroupId);
+  else sessionStorage.removeItem('statequest:active-group');
+  const GROUP_ID   = _urlGroupId ?? null;
+  const GROUP_MODE = !!GROUP_ID;
+
+  // ── Auth & leaderboard ────────────────────────────────────────────────────
+  let token = null;
+  let lb = [], sportLb = [];
+  let sportMode = false;
+  let MUTED = localStorage.getItem(MUTE_KEY) === '1';
+
+  // ── State ─────────────────────────────────────────────────────────────────
+  let score = 0;
+  let roundIndex = 0;
+  let currentState = null;    // { id, name, emoji, cx, cy, tier }
+  let roundQueue = [];        // ordered list for this game
+  let timeLeft = NORMAL_TIME;
+  let maxTime  = NORMAL_TIME;
+  let timerRaf = null;
+  let timerStartTs = null;
+  let answered = false;       // has the current round been answered?
+  let running  = false;
+  let roundResults = [];      // { correct: bool, points: int }
+
+  // Zoom / pan
+  let zoom = 1, panX = 0, panY = 0;
+  let dragging = false, dragLast = null;
+  let pinchDist0 = null, pinchPan0 = null, pinchZoom0 = 1;
+
+  // Sheep position (relative to map-wrap, px)
+  let sheepX = 0, sheepY = 0;
+
+  let stats = loadStats(STATS_KEY, { games: 0, best: 0, correct: 0, perfect: 0 });
+  let personalBest = stats.best || 0;
+
+  // ── Achievements ──────────────────────────────────────────────────────────
+  const ACHIEVEMENTS = [
+    { id: 'lightning', icon: '⚡', label: 'Lightning Round',  desc: 'Answer a state in under 3 seconds' },
+    { id: 'perfect',   icon: '💯', label: 'Perfect Score',    desc: 'Score 10,000 in one game' },
+    { id: 'explorer',  icon: '🗺️', label: 'Map Explorer',     desc: 'Play 10 games' },
+    { id: 'alaska',    icon: '🏔️', label: 'Last Frontier',    desc: 'Find Alaska correctly' },
+    { id: 'streaker',  icon: '🔥', label: 'Unstoppable',       desc: 'Get 5 correct in a row' },
+    { id: 'scholar',   icon: '🎓', label: 'Geography Scholar', desc: 'Score 800+ on a hard state' },
+  ];
+  let unlockedAch = new Set(JSON.parse(localStorage.getItem('statequest:ach') || '[]'));
+
+  function unlockAch(id) {
+    if (unlockedAch.has(id)) return;
+    unlockedAch.add(id);
+    localStorage.setItem('statequest:ach', JSON.stringify([...unlockedAch]));
+    const a = ACHIEVEMENTS.find(x => x.id === id);
+    if (a) showAchievementToast(a);
+  }
+
+  // ── DOM references ─────────────────────────────────────────────────────────
+  const scoreEl    = document.getElementById('score-display');
+  const bestEl     = document.getElementById('best-display');
+  const roundValEl = document.getElementById('round-display-val');
+  const hudSub     = document.getElementById('hud-subtitle');
+  const signWrap   = document.getElementById('sign-wrap');
+  const stateSign  = document.getElementById('state-sign');
+  const timerLbl   = document.getElementById('timer-label');
+  const timerBar   = document.getElementById('timer-bar');
+  const timerWrap  = document.getElementById('timer-bar-wrap');
+  const roundPips  = document.getElementById('round-display');
+  const mapWrap    = document.getElementById('map-wrap');
+  const mapCont    = document.getElementById('map-svg-container');
+  const sheep      = document.getElementById('map-sheep');
+  const fbToast    = document.getElementById('feedback-toast');
+  const corrLabel  = document.getElementById('state-correct-label');
+  const resultOv   = document.getElementById('result-overlay');
+  const resultBig  = document.getElementById('result-score-big');
+  const resultLbl  = document.getElementById('result-label');
+  const resultCorr = document.getElementById('result-correct');
+  const resultGrd  = document.getElementById('result-grade');
+  const resultEmo  = document.getElementById('result-emoji');
+  const modePopup  = document.getElementById('mode-popup');
+  const mpcNormal  = document.getElementById('mpc-normal');
+  const mpcSport   = document.getElementById('mpc-sport');
+  const mpcTitle   = document.getElementById('mode-popup-title');
+  const mpcSub     = document.getElementById('mode-popup-sub');
+  const mpcScoreWrap = document.getElementById('mode-popup-score');
+  const mpcScoreVal  = document.getElementById('mode-popup-score-val');
+  const mpcScoreSub  = document.getElementById('mode-popup-score-sub');
+  const mpcNameRow = document.getElementById('mpc-name-row');
+  const mpcNameIn  = document.getElementById('mpc-name');
+  const mpcSave    = document.getElementById('mpc-save');
+  const groupBadge = document.getElementById('group-badge');
+  const resetZoom  = document.getElementById('reset-zoom');
+  const statsBtn   = document.getElementById('stats-btn');
+
+  // ── Init map ───────────────────────────────────────────────────────────────
+  mapCont.innerHTML = MAP_SVG;
+
+  // Center sheep
+  const mRect = mapWrap.getBoundingClientRect();
+  sheepX = mapWrap.offsetWidth / 2;
+  sheepY = mapWrap.offsetHeight / 2;
+  sheep.style.left = sheepX + 'px';
+  sheep.style.top  = sheepY + 'px';
+
+  // ── Zoom / pan helpers ────────────────────────────────────────────────────
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  function applyTransform() {
+    mapCont.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
+  }
+
+  function resetView() {
+    zoom = 1; panX = 0; panY = 0;
+    applyTransform();
+  }
+
+  // Convert viewport coords (relative to mapWrap) → SVG coords
+  function toSvgCoords(vx, vy) {
+    // mapCont is centered via flex; its visual origin after scale/translate:
+    // effective origin = (wrapW/2 - svgW*zoom/2) + panX*zoom + mapCont.offsetLeft
+    const wrapW = mapWrap.offsetWidth;
+    const wrapH = mapWrap.offsetHeight;
+    const svgEl = mapCont.querySelector('svg');
+    if (!svgEl) return [0, 0];
+    const svgNatW = 960;
+    const svgNatH = 600;
+    // rendered SVG size (before zoom)
+    const rendW = Math.min(wrapW, wrapW); // 100% of container width
+    const rendH = Math.min(wrapH, wrapH);
+    // SVG scales to fit container (preserveAspectRatio xMidYMid meet by default)
+    const scaleRatio = Math.min(rendW / svgNatW, rendH / svgNatH);
+    const displayW = svgNatW * scaleRatio;
+    const displayH = svgNatH * scaleRatio;
+    // SVG origin within mapCont (centered)
+    const svgOriginX = (wrapW - displayW) / 2;
+    const svgOriginY = (wrapH - displayH) / 2;
+    // Account for zoom/pan transform on mapCont (transform-origin: center center)
+    const tcX = wrapW / 2;
+    const tcY = wrapH / 2;
+    const transformedX = (vx - tcX) / zoom + tcX - panX;
+    const transformedY = (vy - tcY) / zoom + tcY - panY;
+    // Convert to SVG coordinate space
+    const sx = (transformedX - svgOriginX) / scaleRatio;
+    const sy = (transformedY - svgOriginY) / scaleRatio;
+    return [sx, sy];
+  }
+
+  resetZoom.addEventListener('click', e => { e.stopPropagation(); resetView(); });
+
+  // Mouse wheel zoom
+  mapWrap.addEventListener('wheel', e => {
+    e.preventDefault();
+    const factor = e.deltaY > 0 ? 0.85 : 1.18;
+    const prevZoom = zoom;
+    zoom = clamp(zoom * factor, 1, 6);
+    if (zoom !== prevZoom) applyTransform();
+  }, { passive: false });
+
+  // Drag to pan
+  mapWrap.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    dragging = true;
+    dragLast = { x: e.clientX, y: e.clientY };
+    mapWrap.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mousemove', e => {
+    if (!dragging) return;
+    const dx = (e.clientX - dragLast.x) / zoom;
+    const dy = (e.clientY - dragLast.y) / zoom;
+    dragLast = { x: e.clientX, y: e.clientY };
+    const wrapW = mapWrap.offsetWidth;
+    const wrapH = mapWrap.offsetHeight;
+    const maxPan = ((zoom - 1) / zoom) * (wrapW / 2) + 40;
+    const maxPanY = ((zoom - 1) / zoom) * (wrapH / 2) + 40;
+    panX = clamp(panX + dx, -maxPan, maxPan);
+    panY = clamp(panY + dy, -maxPanY, maxPanY);
+    applyTransform();
+  });
+  window.addEventListener('mouseup', () => {
+    dragging = false;
+    mapWrap.style.cursor = 'crosshair';
+  });
+
+  // Touch: pinch-to-zoom + drag
+  mapWrap.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      pinchDist0 = Math.hypot(dx, dy);
+      pinchZoom0 = zoom;
+      pinchPan0 = { x: panX, y: panY };
+    } else if (e.touches.length === 1) {
+      dragLast = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+  }, { passive: false });
+
+  mapWrap.addEventListener('touchmove', e => {
+    e.preventDefault();
+    if (e.touches.length === 2 && pinchDist0 !== null) {
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      const dist = Math.hypot(dx, dy);
+      zoom = clamp(pinchZoom0 * (dist / pinchDist0), 1, 6);
+      applyTransform();
+    } else if (e.touches.length === 1 && dragLast) {
+      const dx = (e.touches[0].clientX - dragLast.x) / zoom;
+      const dy = (e.touches[0].clientY - dragLast.y) / zoom;
+      dragLast = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+      const wrapW = mapWrap.offsetWidth;
+      const wrapH = mapWrap.offsetHeight;
+      const maxPan = ((zoom - 1) / zoom) * (wrapW / 2) + 40;
+      const maxPanY = ((zoom - 1) / zoom) * (wrapH / 2) + 40;
+      panX = clamp(panX + dx, -maxPan, maxPan);
+      panY = clamp(panY + dy, -maxPanY, maxPanY);
+      applyTransform();
+    }
+  }, { passive: false });
+
+  mapWrap.addEventListener('touchend', e => {
+    if (e.touches.length < 2) pinchDist0 = null;
+  });
+
+  // ── Map click handler ──────────────────────────────────────────────────────
+  mapWrap.addEventListener('click', e => {
+    if (!running || answered || dragging) return;
+    const path = e.target.closest('path[data-name]');
+    if (!path) return;
+    const rect = mapWrap.getBoundingClientRect();
+    const vx = e.clientX - rect.left;
+    const vy = e.clientY - rect.top;
+    moveSheepTo(vx, vy);
+    checkAnswer(path.dataset.name, vx, vy);
+  });
+
+  mapWrap.addEventListener('touchend', e => {
+    if (!running || answered || pinchDist0 !== null) return;
+    if (e.changedTouches.length !== 1) return;
+    const touch = e.changedTouches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const path = el && el.closest ? el.closest('path[data-name]') : null;
+    if (!path) return;
+    const rect = mapWrap.getBoundingClientRect();
+    const vx = touch.clientX - rect.left;
+    const vy = touch.clientY - rect.top;
+    moveSheepTo(vx, vy);
+    checkAnswer(path.dataset.name, vx, vy);
+  }, { passive: true });
+
+  // ── Sheep movement ─────────────────────────────────────────────────────────
+  function moveSheepTo(vx, vy) {
+    sheepX = vx;
+    sheepY = vy;
+    sheep.style.left = vx + 'px';
+    sheep.style.top  = vy + 'px';
+  }
+
+  // Move sheep to SVG centroid of a state (for correct answer reveal)
+  function moveSheepToCentroid(cx, cy) {
+    // Convert SVG coords to viewport coords (reverse of toSvgCoords)
+    const wrapW = mapWrap.offsetWidth;
+    const wrapH = mapWrap.offsetHeight;
+    const svgNatW = 960, svgNatH = 600;
+    const scaleRatio = Math.min(wrapW / svgNatW, wrapH / svgNatH);
+    const displayW = svgNatW * scaleRatio;
+    const displayH = svgNatH * scaleRatio;
+    const svgOriginX = (wrapW - displayW) / 2;
+    const svgOriginY = (wrapH - displayH) / 2;
+    const rawX = cx * scaleRatio + svgOriginX;
+    const rawY = cy * scaleRatio + svgOriginY;
+    // Apply inverse of zoom/pan transform
+    const tcX = wrapW / 2;
+    const tcY = wrapH / 2;
+    const vx = (rawX - tcX) * zoom + tcX + panX * zoom;
+    const vy = (rawY - tcY) * zoom + tcY + panY * zoom;
+    moveSheepTo(
+      clamp(vx, 20, wrapW - 20),
+      clamp(vy, 20, wrapH - 20)
+    );
+  }
+
+  // ── State flash ────────────────────────────────────────────────────────────
+  function flashState(id, cls, duration) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), duration);
+  }
+
+  // ── Answer check ───────────────────────────────────────────────────────────
+  function checkAnswer(clickedName, vx, vy) {
+    if (!currentState) return;
+    if (clickedName === currentState.name) {
+      correctAnswer(vx, vy);
+    } else {
+      wrongAnswer(clickedName);
+    }
+  }
+
+  function correctAnswer(vx, vy) {
+    answered = true;
+    stopTimer();
+    const elapsed = maxTime - timeLeft;
+    let points = Math.round((timeLeft / maxTime) * MAX_SCORE_PER_ROUND);
+    if (sportMode && elapsed < 5) points += SPORT_SPEED_BONUS;
+    points = Math.max(0, points);
+    score += points;
+    roundResults.push({ correct: true, points });
+
+    flashState(currentState.id, 'flash-correct', 1200);
+    sheep.classList.remove('retreating');
+    sheep.classList.add('celebrating');
+    setTimeout(() => sheep.classList.remove('celebrating'), 700);
+    moveSheepToCentroid(currentState.cx, currentState.cy);
+    sfx('correct');
+    floatScore('+' + points, vx, vy);
+    corrLabel.textContent = `✅ ${currentState.name}! ${points > 0 ? '+' + points + ' pts' : 'Time up!'}`;
+    updateScoreDisplay();
+
+    // Achievements
+    if (elapsed < 3) unlockAch('lightning');
+    if (currentState.id === 'AK') unlockAch('alaska');
+    if (currentState.tier === 'hard' && points >= 800) unlockAch('scholar');
+    const streak = roundResults.slice(-5);
+    if (streak.length === 5 && streak.every(r => r.correct)) unlockAch('streaker');
+
+    setTimeout(() => advanceRound(), 1200);
+  }
+
+  function wrongAnswer(clickedName) {
+    flashState(clickedName.replace(/ /g,'_') || '', 'flash-wrong', 600);
+    // Find path by data-name
+    const paths = mapCont.querySelectorAll('path[data-name]');
+    for (const p of paths) {
+      if (p.dataset.name === clickedName) {
+        p.classList.add('flash-wrong');
+        setTimeout(() => p.classList.remove('flash-wrong'), 600);
+        break;
+      }
+    }
+    sfx('wrong');
+    showToast('Not that one — keep looking!', 800);
+    corrLabel.textContent = `❌ That's ${clickedName} — keep searching!`;
+  }
+
+  // ── Timer ──────────────────────────────────────────────────────────────────
+  function startTimer() {
+    timerStartTs = performance.now();
+    timerRaf = requestAnimationFrame(tickTimer);
+  }
+
+  function tickTimer(ts) {
+    if (!running || answered) return;
+    const elapsed = (ts - timerStartTs) / 1000;
+    timeLeft = Math.max(0, maxTime - elapsed);
+    const frac = timeLeft / maxTime;
+    timerBar.style.transform = `scaleX(${frac})`;
+    timerLbl.textContent = timeLeft.toFixed(1) + 's';
+    if (timeLeft <= 5 && timeLeft > 0) {
+      timerBar.classList.add('urgent');
+      if (!MUTED && Math.floor(timeLeft * 2) !== Math.floor((timeLeft + 0.05) * 2)) sfxTick();
+    } else {
+      timerBar.classList.remove('urgent');
+    }
+    if (timeLeft <= 0) {
+      timeOut();
+      return;
+    }
+    timerRaf = requestAnimationFrame(tickTimer);
+  }
+
+  function stopTimer() {
+    if (timerRaf) { cancelAnimationFrame(timerRaf); timerRaf = null; }
+    timerBar.classList.remove('urgent');
+  }
+
+  function timeOut() {
+    answered = true;
+    stopTimer();
+    roundResults.push({ correct: false, points: 0 });
+    // Reveal correct state
+    flashState(currentState.id, 'reveal-state', 1800);
+    sfx('timeout');
+    corrLabel.textContent = `⏱️ Time's up! It was ${currentState.name} ${currentState.emoji}`;
+    updateScoreDisplay();
+    setTimeout(() => advanceRound(), 1800);
+  }
+
+  // ── Round management ───────────────────────────────────────────────────────
+  function buildRoundQueue() {
+    const easy   = STATES.filter(s => s[5] === 'easy').map(s => [...s]);
+    const medium = STATES.filter(s => s[5] === 'medium').map(s => [...s]);
+    const hard   = STATES.filter(s => s[5] === 'hard').map(s => [...s]);
+
+    shuffle(easy); shuffle(medium); shuffle(hard);
+
+    const queue = [];
+    // Sport mode: no tier distinction — just shuffle all
+    if (sportMode) {
+      const all = STATES.map(s => [...s]);
+      shuffle(all);
+      return all.slice(0, TOTAL_ROUNDS);
+    }
+    // Normal: 4 easy, 4 medium, 2 hard
+    queue.push(...easy.slice(0, 4));
+    queue.push(...medium.slice(0, 4));
+    queue.push(...hard.slice(0, 2));
+    return queue;
+  }
+
+  function shuffle(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+  }
+
+  function beginRound() {
+    const [id, name, emoji, cx, cy, tier] = roundQueue[roundIndex];
+    currentState = { id, name, emoji, cx, cy, tier };
+    answered = false;
+    timeLeft = maxTime;
+    timerBar.style.transform = 'scaleX(1)';
+    timerLbl.textContent = maxTime.toFixed(1) + 's';
+    timerBar.classList.remove('urgent');
+    corrLabel.textContent = '';
+    roundValEl.textContent = `${roundIndex + 1} / ${TOTAL_ROUNDS}`;
+    updateRoundPips();
+    showSign(name, emoji, () => {
+      startTimer();
+    });
+  }
+
+  function advanceRound() {
+    roundIndex++;
+    updateRoundPips();
+    if (roundIndex >= TOTAL_ROUNDS) {
+      endGame();
+    } else {
+      beginRound();
+    }
+  }
+
+  // ── Sign animation ─────────────────────────────────────────────────────────
+  function showSign(name, emoji, onReady) {
+    stateSign.style.display = '';
+    stateSign.textContent = `Find: ${name} ${emoji}`;
+    stateSign.classList.remove('sign-arrive', 'sign-leave');
+    void stateSign.offsetWidth; // force reflow
+    stateSign.classList.add('sign-arrive');
+    sfx('sign');
+    setTimeout(() => { onReady && onReady(); }, 600);
+  }
+
+  // ── Round pips ────────────────────────────────────────────────────────────
+  function updateRoundPips() {
+    let html = '';
+    for (let i = 0; i < TOTAL_ROUNDS; i++) {
+      let cls = '';
+      if (i < roundIndex) {
+        cls = roundResults[i] && roundResults[i].correct ? 'done' : 'missed';
+      } else if (i === roundIndex && running) {
+        cls = 'current';
+      }
+      html += `<div class="round-pip ${cls}"></div>`;
+    }
+    roundPips.innerHTML = html;
+  }
+
+  // ── Score display ─────────────────────────────────────────────────────────
+  function updateScoreDisplay() {
+    scoreEl.textContent = score;
+    if (score > personalBest) bestEl.textContent = score;
+  }
+
+  // ── Floating score popup ──────────────────────────────────────────────────
+  function floatScore(text, vx, vy) {
+    const el = document.createElement('div');
+    el.className = 'map-score-pop' + (text === '+0' ? ' zero' : '');
+    el.textContent = text;
+    el.style.left = vx + 'px';
+    el.style.top  = vy + 'px';
+    mapWrap.appendChild(el);
+    setTimeout(() => el.remove(), 1200);
+  }
+
+  // ── Feedback toast ─────────────────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(msg, dur) {
+    fbToast.textContent = msg;
+    fbToast.classList.add('visible');
+    if (toastTimer) clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => fbToast.classList.remove('visible'), dur || 1000);
+  }
+
+  // ── Start / end game ──────────────────────────────────────────────────────
+  function startGame(sport) {
+    sportMode = sport;
+    maxTime = sport ? SPORT_TIME : NORMAL_TIME;
+    score = 0;
+    roundIndex = 0;
+    roundResults = [];
+    running = true;
+    resetView();
+
+    // Center sheep
+    sheepX = mapWrap.offsetWidth / 2;
+    sheepY = mapWrap.offsetHeight / 2;
+    sheep.style.left = sheepX + 'px';
+    sheep.style.top  = sheepY + 'px';
+    sheep.style.transition = 'left 0.6s cubic-bezier(0.25,0.46,0.45,0.94), top 0.6s cubic-bezier(0.25,0.46,0.45,0.94)';
+
+    resultOv.classList.remove('visible');
+    modePopup.style.display = 'none';
+    hudSub.textContent = sport ? '⚡ Sport mode' : 'Find all 10 states';
+    scoreEl.textContent = 0;
+    bestEl.textContent = personalBest > 0 ? personalBest : '—';
+    corrLabel.textContent = '';
+
+    if (GROUP_MODE) groupBadge.style.display = '';
+
+    roundQueue = buildRoundQueue();
+    updateRoundPips();
+    beginRound();
+  }
+
+  function endGame() {
+    running = false;
+    stopTimer();
+    corrLabel.textContent = '';
+    stateSign.style.display = 'none';
+    timerLbl.textContent = '';
+
+    // Stats
+    stats.games++;
+    const correctCount = roundResults.filter(r => r.correct).length;
+    stats.correct = (stats.correct || 0) + correctCount;
+    if (score === 10000) { stats.perfect = (stats.perfect || 0) + 1; unlockAch('perfect'); }
+    if (stats.games >= 10) unlockAch('explorer');
+    const prevBest = stats.best || 0;
+    if (score > prevBest) stats.best = score;
+    personalBest = stats.best;
+    saveStats(STATS_KEY, stats);
+
+    // Grade
+    const pct = score / (TOTAL_ROUNDS * MAX_SCORE_PER_ROUND);
+    let grade, gradeEmo;
+    if (pct >= 0.95) { grade = 'Geography Master!'; gradeEmo = '🏆'; }
+    else if (pct >= 0.80) { grade = 'Expert Explorer'; gradeEmo = '🌟'; }
+    else if (pct >= 0.60) { grade = 'Solid Navigator'; gradeEmo = '🗺️'; }
+    else if (pct >= 0.40) { grade = 'Still Learning'; gradeEmo = '📚'; }
+    else { grade = 'Keep Exploring!'; gradeEmo = '🐑'; }
+
+    resultEmo.textContent = gradeEmo;
+    resultBig.textContent = score.toLocaleString();
+    resultLbl.textContent = 'out of 10,000';
+    resultCorr.textContent = `${correctCount} / ${TOTAL_ROUNDS} states found`;
+    resultGrd.textContent = grade;
+    resultOv.classList.add('visible');
+    sfx('end');
+    updateRoundPips();
+
+    // Leaderboard
+    const lbRef = sportMode ? sportLb : lb;
+
+    if (isNewBest(lbRef, score, LB_MAX)) {
+      mpcScoreVal.textContent = score.toLocaleString();
+      mpcScoreSub.textContent = grade;
+      mpcScoreWrap.style.display = 'block';
+      mpcNameRow.style.display = 'flex';
+      mpcTitle.textContent = '🏆 New Best!';
+      mpcSub.textContent = 'Enter your name for the leaderboard:';
+      mpcNormal.style.display = 'none';
+      mpcSport.style.display = 'none';
+      modePopup.style.display = 'flex';
+    } else {
+      refreshLeaderboard();
+    }
+  }
+
+  // ── Leaderboard helpers ────────────────────────────────────────────────────
+  async function initLeaderboards() {
+    if (!token) {
+      try {
+        const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${window.__FB_KEY__}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({returnSecureToken:true}) });
+        const data = await res.json();
+        token = data.idToken || null;
+      } catch {}
+    }
+    lb      = loadLocalLeaderboard(LB_KEY, LB_MAX);
+    sportLb = loadLocalLeaderboard(LB_SPORT, LB_MAX);
+    try {
+      lb      = await fetchLeaderboard({ dbUrl: DB,           localKey: LB_KEY,   max: LB_MAX }) || lb;
+      sportLb = await fetchLeaderboard({ dbUrl: `${DB}/sport`, localKey: LB_SPORT, max: LB_MAX }) || sportLb;
+    } catch {}
+    bestEl.textContent = personalBest > 0 ? personalBest : '—';
+  }
+
+  function refreshLeaderboard() {
+    const list = sportMode ? sportLb : lb;
+    const titleEl = document.getElementById('lb-title');
+    renderLeaderboard(document.getElementById('lb-list'), titleEl, list, sportMode ? 'Global · Sport' : 'Global · Normal');
+  }
+
+  // ── Mode popup & save ──────────────────────────────────────────────────────
+  mpcNormal.addEventListener('click', () => startGame(false));
+  mpcSport.addEventListener('click',  () => startGame(true));
+
+  mpcSave.addEventListener('click', async () => {
+    const raw = (mpcNameIn.value || '').trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+    const name = raw.slice(0, 10) || 'ANON';
+    const entry = { name, score };
+    const lbRef  = sportMode ? sportLb : lb;
+    const lbKey  = sportMode ? LB_SPORT : LB_KEY;
+    const dbBase = sportMode ? `${DB}/sport` : DB;
+
+    lbRef.push(entry);
+    lbRef.sort((a,b) => b.score - a.score);
+    if (lbRef.length > LB_MAX) lbRef.length = LB_MAX;
+    saveLocalLeaderboard(lbKey, lbRef);
+    try { await pushLeaderboard({ dbUrl: dbBase, localKey: lbKey, max: LB_MAX, lb: lbRef, token }); } catch {}
+
+    modePopup.style.display = 'none';
+    mpcNormal.style.display = '';
+    mpcSport.style.display = '';
+    mpcNameRow.style.display = 'none';
+    mpcScoreWrap.style.display = 'none';
+    mpcTitle.textContent = '🗺️ Sheep State Quest';
+    mpcSub.textContent = 'Find all 50 US states on a blank map!';
+    refreshLeaderboard();
+  });
+
+  document.getElementById('play-again-btn').addEventListener('click', () => {
+    resultOv.classList.remove('visible');
+    mpcTitle.textContent = '🗺️ Sheep State Quest';
+    mpcSub.textContent = 'Play again?';
+    mpcScoreWrap.style.display = 'none';
+    mpcNameRow.style.display = 'none';
+    mpcNormal.style.display = '';
+    mpcSport.style.display = '';
+    modePopup.style.display = 'flex';
+  });
+
+  document.getElementById('view-lb-btn').addEventListener('click', () => {
+    refreshLeaderboard();
+    document.getElementById('info-overlay').classList.add('visible');
+    document.getElementById('info-drawer').classList.add('open');
+  });
+
+  // ── Stats / leaderboard drawer ─────────────────────────────────────────────
+  statsBtn.addEventListener('click', () => {
+    refreshLeaderboard();
+    updateStatsPanel();
+    renderAchievements();
+    document.getElementById('info-overlay').classList.add('visible');
+    document.getElementById('info-drawer').classList.add('open');
+  });
+  document.getElementById('info-close').addEventListener('click', closeDrawer);
+  document.getElementById('info-overlay').addEventListener('click', closeDrawer);
+  function closeDrawer() {
+    document.getElementById('info-overlay').classList.remove('visible');
+    document.getElementById('info-drawer').classList.remove('open');
+  }
+
+  function updateStatsPanel() {
+    document.getElementById('stat-games').textContent   = stats.games || 0;
+    document.getElementById('stat-best').textContent    = stats.best || 0;
+    document.getElementById('stat-correct').textContent = stats.correct || 0;
+    document.getElementById('stat-perfect').textContent = stats.perfect || 0;
+  }
+
+  function renderAchievements() {
+    const list = document.getElementById('ach-list');
+    list.innerHTML = ACHIEVEMENTS.map(a => `
+      <div class="ach-item ${unlockedAch.has(a.id) ? 'unlocked' : 'locked'}">
+        <span class="ach-icon">${a.icon}</span>
+        <div><strong>${a.label}</strong><br><small>${a.desc}</small></div>
+      </div>
+    `).join('');
+  }
+
+  // ── Mute button (reuse shared pattern) ───────────────────────────────────
+  // (The mute toggle lives in shared.css / game-framework; we wire it up here)
+  document.addEventListener('keydown', e => {
+    if (e.key === 'm' || e.key === 'M') {
+      MUTED = !MUTED;
+      localStorage.setItem(MUTE_KEY, MUTED ? '1' : '0');
+    }
+  });
+
+  // ── Audio ──────────────────────────────────────────────────────────────────
+  function sfx(type) {
+    if (MUTED) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    if (type === 'sign') {
+      tone(ctx, 523, 'triangle', 0.12, now,       0.18);
+      tone(ctx, 659, 'triangle', 0.12, now + 0.12, 0.18);
+      tone(ctx, 784, 'triangle', 0.15, now + 0.24, 0.25);
+    } else if (type === 'correct') {
+      tone(ctx, 523, 'triangle', 0.14, now,       0.15);
+      tone(ctx, 659, 'triangle', 0.14, now + 0.12, 0.15);
+      tone(ctx, 784, 'triangle', 0.14, now + 0.24, 0.15);
+      tone(ctx, 1047,'triangle', 0.18, now + 0.36, 0.3);
+    } else if (type === 'wrong') {
+      tone(ctx, 330, 'sawtooth', 0.12, now,       0.1);
+      tone(ctx, 220, 'sawtooth', 0.10, now + 0.1, 0.15);
+    } else if (type === 'timeout') {
+      tone(ctx, 330, 'sawtooth', 0.12, now,        0.12);
+      tone(ctx, 247, 'sawtooth', 0.12, now + 0.12, 0.12);
+      tone(ctx, 196, 'sawtooth', 0.12, now + 0.24, 0.2);
+    } else if (type === 'end') {
+      [523, 659, 784, 1047].forEach((f, i) => {
+        tone(ctx, f, 'triangle', 0.14, now + i * 0.1, 0.3);
+      });
+    }
+  }
+
+  function sfxTick() {
+    if (MUTED) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    tone(ctx, 440, 'sine', 0.07, ctx.currentTime, 0.06);
+  }
+
+  // ── Friends group ──────────────────────────────────────────────────────────
+  document.getElementById('create-group-btn').addEventListener('click', async () => {
+    const id = generateGroupId();
+    const url = getGroupUrl(id);
+    const wrap = document.getElementById('group-link-wrap');
+    document.getElementById('group-link-display').textContent = url;
+    wrap.style.display = '';
+    document.getElementById('create-group-btn').style.display = 'none';
+    try { await createGroupInFirebase(DB, id, token); } catch {}
+  });
+
+  document.querySelectorAll('.share-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const net = btn.dataset.net;
+      const url = document.getElementById('group-link-display').textContent;
+      if (net === 'copy') {
+        navigator.clipboard.writeText(url).then(() => showFriendsCopyToast());
+      } else if (net === 'twitter') {
+        window.open(`https://twitter.com/intent/tweet?text=Play+Sheep+State+Quest+with+me!&url=${encodeURIComponent(url)}`);
+      }
+    });
+  });
+
+  // ── Boot ───────────────────────────────────────────────────────────────────
+  (async () => {
+    await initLeaderboards();
+    refreshLeaderboard();
+    updateStatsPanel();
+    renderAchievements();
+    // Show mode picker
+    mpcTitle.textContent = '🗺️ Sheep State Quest';
+    mpcSub.textContent = 'Find all 50 US states on a blank map!';
+    mpcNormal.style.display = '';
+    mpcSport.style.display = '';
+    mpcNameRow.style.display = 'none';
+    mpcScoreWrap.style.display = 'none';
+    modePopup.style.display = 'flex';
+  })();
+
+})();
+</script>
+</BaseLayout>
