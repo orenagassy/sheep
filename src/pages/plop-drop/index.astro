@@ -12,7 +12,7 @@ const schema = JSON.stringify({
       "@id": "https://sheeps.online/plop-drop/#game",
       "name": "Plop Drop",
       "url": "https://sheeps.online/plop-drop/",
-      "description": "Drone sheep are flying overhead dropping turds. Move your toilet seat to catch them all! A ridiculous casual browser game with combos, power-ups, and a global leaderboard.",
+      "description": "Woolly drones are zooming through the sky dropping plops! Move your toilet seat to catch them all before they hit the ground. A silly casual browser game with combos, power-ups, and a global leaderboard.",
       "genre": ["Casual", "Arcade", "Kids"],
       "playMode": "SinglePlayer",
       "applicationCategory": "Game",
@@ -41,7 +41,7 @@ const schema = JSON.stringify({
 ---
 <BaseLayout
   title="Plop Drop — Free Online Casual Game | Sheeps.online"
-  description="Drone sheep are flying overhead and dropping turds. Move your toilet seat to catch them all! Free casual browser game, no download, no sign-up."
+  description="Woolly drones are zooming overhead dropping plops from the sky! Move your toilet seat to catch them all. Free silly browser game for kids, no download, no sign-up."
 >
   <Fragment slot="head">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚽</text></svg>">
@@ -51,7 +51,7 @@ const schema = JSON.stringify({
 
 <div class="app">
   <h1>🚽 Plop Drop</h1>
-  <p class="tagline">Drone sheep. Falling turds. Dignity optional.</p>
+  <p class="tagline">Woolly drones. Flying plops. Catch them all! 🚽</p>
 
   <div class="ad-wrap ad-wrap--top"></div>
 
@@ -104,11 +104,11 @@ const schema = JSON.stringify({
 
     <details>
       <summary>How to play &amp; what even is this</summary>
-      <p>Sheep have discovered drone technology. This was a mistake. They now fly overhead in little formations, humming contentedly, and drop things. You are in charge of a toilet seat. Your job is to catch the things. You did not choose this life, but here you are.</p>
-      <p>Move the toilet seat with your mouse, finger, or arrow keys. Catch the 💩 to score. Miss three times and it's over. Catch 5 in a row for a ×1.5 combo.</p>
-      <p>💩 Standard turd: 10 pts. 💩💩 Mega Plop: 25 pts. ✨💩 Golden turd: 50 pts. Power-ups fall too — 🧲 Magnet pulls nearby turds, 🕰️ Slow-Mo makes everything drift down peacefully, 🚿 Wide Seat doubles your reach, 🪠 Plunger Shield absorbs the next miss.</p>
-      <p><strong>Sport mode ⚡:</strong> 90 seconds. No lives — misses cost 15 pts instead. Panic levels: very high.</p>
-      <p>Free browser game. No download, no sign-up. The sheep are not sorry.</p>
+      <p>The sheep have learned to fly! Using tiny drones strapped to their fluffy backs, they zoom across the sky and drop plops as they go. You are in charge of a toilet seat on the ground. Your mission: catch every single plop before it hits the grass. The sheep think this is hilarious.</p>
+      <p>Move the toilet seat with your mouse, finger, or arrow keys. Catch the 💩 to score points. Miss three times and the game is over. Catch 5 in a row without missing for a ×1.5 combo bonus!</p>
+      <p>💩 Regular plop: 10 pts · 💩💩 Mega Plop: 25 pts · ✨💩 Golden Plop: 50 pts. Special items fall too — 🧲 Magnet pulls nearby plops toward you, 🕰️ Slow-Mo makes everything drift down slowly, 🚿 Wide Seat doubles your catching range, 🪠 Plunger Shield saves you from one miss!</p>
+      <p><strong>Sport mode ⚡:</strong> 90 seconds. No lives — missed plops cost 15 pts instead. Very fast. Very silly.</p>
+      <p>Free browser game. No download, no sign-up. Great for kids. Works on any device.</p>
     </details>
   </div>
 </div>
@@ -472,6 +472,8 @@ const schema = JSON.stringify({
 
   function dropTurd(s) {
     if (turds.length >= PARAMS.maxTurds) return;
+    // Only drop when sheep is fully visible — prevents invisible off-screen misses
+    if (s.x < 30 || s.x > fieldW - 30) return;
     const def = randTurd(s.rainbow);
     const el  = document.createElement('div');
     el.className = 'turd-item' + (def.type === 'golden' ? ' turd-golden' : def.power ? ' turd-powerup' : '');
@@ -893,7 +895,7 @@ const schema = JSON.stringify({
       dbUrl: DB, groupId: GROUP_ID, groupMode: GROUP_MODE,
       token, storageKey: GROUP_SKEY, ttlMs: 864000000,
       gameTitle: 'Plop Drop',
-      shareText: 'Drone sheep are dropping turds and I need help catching them 🚽💩 Play with me!',
+      shareText: 'Flying sheep are dropping plops and I need help catching them 🚽💩 Play with me!',
     });
   };
   document.getElementById('mpc-leave-group').onclick = () => {
