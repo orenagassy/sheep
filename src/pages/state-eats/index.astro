@@ -530,7 +530,7 @@ const schema = JSON.stringify({
     STATE_EATS.forEach(([abbr,,,, cx, cy]) => {
       const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       txt.setAttribute('x', cx); txt.setAttribute('y', cy + 4);
-      txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('font-size', '7');
+      txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('font-size', '11');
       txt.setAttribute('font-family', 'sans-serif'); txt.setAttribute('font-weight', '700');
       txt.setAttribute('fill', 'rgba(255,255,255,0.9)'); txt.setAttribute('pointer-events', 'none');
       txt.setAttribute('id', 'lbl-' + abbr); txt.textContent = abbr;
@@ -690,10 +690,24 @@ const schema = JSON.stringify({
   }
 
   function onLogoWrong(cardEl){
-    firstAttempt=false;
+    answered=true;
+    stopTimer();
+    roundResults.push({correct:false,points:0});
     cardEl.classList.add('flash-wrong-card');
-    setTimeout(()=>cardEl.classList.remove('flash-wrong-card'),500);
-    sfx('wrong'); showToast('Not quite — try again!',800);
+    sfx('wrong');
+    dimState(currentState.id);
+    // Show correct answer briefly before advancing
+    const correctCard = quizGrid.querySelector('[data-domain="'+currentState.domain+'"]');
+    if(correctCard) correctCard.classList.add('flash-correct-card');
+    const brandName = BRAND_NAMES[currentState.domain]||currentState.domain;
+    corrLabel.textContent = '❌ Wrong! '+currentState.name+' → '+brandName;
+    updateScoreDisplay();
+    setTimeout(()=>{
+      hideQuizPopup();
+      roundIndex++;
+      if(roundIndex>=TOTAL_ROUNDS){endGame();}
+      else{updateRoundPips();hudSub.textContent='Click another state!';}
+    },1200);
   }
 
   function startTimer(){timerStartTs=performance.now();timerRaf=requestAnimationFrame(tickTimer);}
