@@ -1,4 +1,4 @@
-﻿---
+---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import '../../styles/shared.css';
 import '../../styles/state-eats.css';
@@ -12,7 +12,7 @@ const schema = JSON.stringify({
       "@id": "https://sheeps.online/state-eats/#game",
       "name": "State Eats Quest",
       "url": "https://sheeps.online/state-eats/",
-      "description": "A fast food geography quiz! Each round highlights a US state â€” click it on the map, then pick the state's iconic fast food chain from four logo choices.",
+      "description": "Click any US state on the map to reveal a fast food quiz. Pick the chain most popular in that state from four real logo choices.",
       "genre": ["Casual", "Educational", "Trivia", "Geography"],
       "playMode": "SinglePlayer",
       "applicationCategory": "Game",
@@ -40,18 +40,18 @@ const schema = JSON.stringify({
 });
 ---
 <BaseLayout
-  title="State Eats Quest â€” USA Fast Food Trivia Game | Sheeps.online"
-  description="Can you match every US state to its favorite fast food? Click the highlighted state on the map, then pick the right logo from four choices. Free browser trivia game."
+  title="State Eats Quest — USA Fast Food Trivia Game | Sheeps.online"
+  description="Click any US state on the map and pick its favorite fast food from four logo choices. Can you name all 50? Free browser trivia game."
 >
   <Fragment slot="head">
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>ðŸ”</text></svg>">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🍔</text></svg>">
     <script type="application/ld+json" set:html={schema} />
     <script is:inline src="/scripts/game-framework.js"></script>
   </Fragment>
 
 <div class="app">
-  <h1>ðŸ” State Eats Quest</h1>
-  <p class="tagline">Find the highlighted state, then pick its favorite fast food! ðŸ—ºï¸</p>
+  <h1>🍔 State Eats Quest</h1>
+  <p class="tagline">Click any state — then pick its favorite fast food! 🗺️</p>
 
   <div class="ad-wrap ad-wrap--top"></div>
 
@@ -59,44 +59,29 @@ const schema = JSON.stringify({
 
     <div class="topbar">
       <div class="topbar-left">
-        <span id="group-badge" style="display:none">ðŸ‘¥ Group Mode</span>
+        <span id="group-badge" style="display:none">👥 Group Mode</span>
         <div>
-          <div class="hud-title">ðŸ” State Eats</div>
-          <div class="hud-subtitle" id="hud-subtitle">Find states &amp; their fast food</div>
+          <div class="hud-title">🍔 State Eats</div>
+          <div class="hud-subtitle" id="hud-subtitle">Click a state to begin</div>
         </div>
       </div>
       <div class="stat-group">
-        <div class="stat">
-          <div class="stat-label">Score</div>
-          <div class="stat-value" id="score-display">0</div>
-        </div>
-        <div class="stat">
-          <div class="stat-label">Your best</div>
-          <div class="stat-value" id="best-display">â€”</div>
-        </div>
-        <div class="stat" id="round-stat">
-          <div class="stat-label">Round</div>
-          <div class="stat-value" id="round-display-val">â€”</div>
-        </div>
+        <div class="stat"><div class="stat-label">Score</div><div class="stat-value" id="score-display">0</div></div>
+        <div class="stat"><div class="stat-label">Your best</div><div class="stat-value" id="best-display">—</div></div>
+        <div class="stat" id="round-stat"><div class="stat-label">Round</div><div class="stat-value" id="round-display-val">—</div></div>
       </div>
     </div>
 
-    <div id="sign-wrap">
-      <div id="state-sign" style="display:none"></div>
-    </div>
+    <div id="sign-wrap"><div id="state-sign" style="display:none"></div></div>
 
-    <div id="timer-label">30.0s</div>
-    <div id="timer-bar-wrap">
-      <div id="timer-bar"></div>
-    </div>
-
+    <div id="timer-label"></div>
+    <div id="timer-bar-wrap"><div id="timer-bar"></div></div>
     <div id="round-display"></div>
 
     <div id="map-wrap">
       <div id="map-svg-container"></div>
-      <div id="map-sheep">ðŸ”</div>
-      <div id="compass">ðŸ§­</div>
-      <button id="reset-zoom">ðŸ” Reset</button>
+      <div id="compass">🧭</div>
+      <button id="reset-zoom">🔍 Reset</button>
       <div id="feedback-toast"></div>
       <div id="quiz-overlay">
         <div id="quiz-popup">
@@ -105,7 +90,7 @@ const schema = JSON.stringify({
         </div>
       </div>
       <div id="result-overlay">
-        <div style="font-size:48px" id="result-emoji">ðŸ”</div>
+        <div style="font-size:48px" id="result-emoji">🍔</div>
         <div id="result-score-big">0</div>
         <div id="result-label">out of 10,000</div>
         <div id="result-correct"></div>
@@ -121,28 +106,25 @@ const schema = JSON.stringify({
 
     <details>
       <summary>How to play</summary>
-      <p>A sign slides in naming a US state â€” find it on the map and click it! The state is highlighted in amber to help you. Once you click it, four fast food logos appear: pick the one most popular in that state before time runs out. The faster you answer both steps, the more points you score (up to 1,000 per round across 10 rounds).</p>
-      <p>Wrong click on the map? The state flashes red and the clock keeps ticking â€” keep looking! Wrong logo pick? Try again while the timer runs. When time runs out, the correct state and answer are revealed.</p>
-      <p><strong>Sport mode âš¡:</strong> 20 seconds per round and a +200 speed bonus if you complete both steps in the first 5 seconds. Go fast!</p>
+      <p>All 50 US states are labeled on the map. Click any state to get a fast food question: four real logos appear and you need to pick the chain most popular in that state. You have 20 seconds per question. The faster you answer, the more points you score (up to 1,000 per round, 10 rounds total).</p>
+      <p>Pick the wrong logo? Try again while the timer runs. When time runs out the correct answer is revealed.</p>
+      <p><strong>Sport mode ⚡:</strong> 15 seconds per question and a +200 speed bonus if you answer in the first 5 seconds.</p>
     </details>
   </div>
 </div>
+
 <div id="mode-overlay">
   <div id="mode-popup">
     <div class="mode-popup-inner">
-      <div class="mode-popup-title" id="mode-popup-title">ðŸ” State Eats Quest</div>
-      <div class="mode-popup-sub" id="mode-popup-sub">Find the state &amp; pick its fast food!</div>
+      <div class="mode-popup-title" id="mode-popup-title">🍔 State Eats Quest</div>
+      <div class="mode-popup-sub" id="mode-popup-sub">Click any state &amp; pick its fast food!</div>
       <div class="mode-popup-score" id="mode-popup-score" style="display:none">
         <div id="mode-popup-score-val"></div>
         <div id="mode-popup-score-sub"></div>
       </div>
       <div class="mode-btn-row">
-        <button id="mpc-normal" class="mode-btn">
-          <span class="mode-btn-icon">ðŸ—ºï¸</span>Normal
-        </button>
-        <button id="mpc-sport" class="mode-btn">
-          <span class="mode-btn-icon">âš¡</span>Sport
-        </button>
+        <button id="mpc-normal" class="mode-btn"><span class="mode-btn-icon">🗺️</span>Normal</button>
+        <button id="mpc-sport"  class="mode-btn"><span class="mode-btn-icon">⚡</span>Sport</button>
       </div>
       <div id="mpc-name-row" class="name-entry" style="display:none">
         <input id="mpc-name" class="name-input" type="text" maxlength="10" placeholder="YOUR NAME" autocomplete="off" spellcheck="false">
@@ -156,10 +138,10 @@ const schema = JSON.stringify({
 <div id="info-drawer">
   <div id="info-drawer-header">
     <span>Leaderboard &amp; Stats</span>
-    <button id="info-close">âœ•</button>
+    <button id="info-close">✕</button>
   </div>
   <div class="info-section">
-    <div class="info-section-title" id="lb-title">Global Â· Normal</div>
+    <div class="info-section-title" id="lb-title">Global &middot; Normal</div>
     <div id="lb-list"></div>
     <div id="lb-friends-wrap" style="display:none">
       <div class="info-section-title" style="margin-top:16px">Friend Group</div>
@@ -171,7 +153,7 @@ const schema = JSON.stringify({
     <div id="stats-grid" class="stats-grid">
       <div class="stat-cell"><span id="stat-games">0</span><label>Games</label></div>
       <div class="stat-cell"><span id="stat-best">0</span><label>Best score</label></div>
-      <div class="stat-cell"><span id="stat-correct">0</span><label>States identified</label></div>
+      <div class="stat-cell"><span id="stat-correct">0</span><label>States answered</label></div>
       <div class="stat-cell"><span id="stat-perfect">0</span><label>Perfect rounds</label></div>
     </div>
   </div>
@@ -187,45 +169,39 @@ const schema = JSON.stringify({
       <div id="group-link-wrap" style="display:none">
         <div id="group-link-display" class="group-link-display"></div>
         <div class="share-row">
-          <button class="share-btn" data-net="twitter">ð• Twitter</button>
-          <button class="share-btn" data-net="copy">ðŸ“‹ Copy</button>
+          <button class="share-btn" data-net="twitter">𝕏 Twitter</button>
+          <button class="share-btn" data-net="copy">📋 Copy</button>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<button id="stats-btn" title="Leaderboard &amp; stats">â˜°</button>
+<button id="stats-btn" title="Leaderboard &amp; stats">☰</button>
 
 <script define:vars={{ firebaseApiKey }}>window.__FB_KEY__ = firebaseApiKey;</script>
 <script is:inline>
 (function () {
-  // â”€â”€ Config â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const DB        = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/state-eats';
   const LB_KEY    = 'stateeats:lb';
   const LB_SPORT  = 'stateeats:lb-sport';
   const STATS_KEY = 'stateeats:stats';
-  const GROUP_SKEY= 'stateeats:group';
   const MUTE_KEY  = 'stateeats:mute';
   const LB_MAX    = 5;
   const TOTAL_ROUNDS        = 10;
-  const NORMAL_TIME         = 30;
-  const SPORT_TIME          = 20;
+  const NORMAL_TIME         = 20;
+  const SPORT_TIME          = 15;
   const SPORT_SPEED_BONUS   = 200;
   const FIRST_ATTEMPT_BONUS = 150;
   const MAX_SCORE_PER_ROUND = 1000;
 
-  // â”€â”€ Game framework utilities â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const {
     loadLocalLeaderboard, saveLocalLeaderboard,
     renderLeaderboard, isNewBest, fetchLeaderboard, pushLeaderboard,
-    generateGroupId, getGroupUrl, createGroupInFirebase,
-    showFriendsCopyToast,
+    generateGroupId, getGroupUrl, createGroupInFirebase, showFriendsCopyToast,
     loadStats, saveStats, showAchievementToast, tone, getAudioContext
   } = window.GameFramework;
 
-  // â”€â”€ State â†’ fast food data â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // [id, name, domain, tier, cx, cy]
   const STATE_EATS = [
     ['AL','Alabama',         'captainds.com',       'hard',   654,416],
     ['AK','Alaska',          'dominos.com',         'easy',   114,510],
@@ -280,50 +256,30 @@ const schema = JSON.stringify({
   ];
 
   const BRAND_NAMES = {
-    'captainds.com':        "Captain D's",
-    'dominos.com':          "Domino's Pizza",
-    'jackinthebox.com':     "Jack in the Box",
-    'sonicdrivein.com':     "Sonic Drive-In",
-    'in-n-out.com':         "In-N-Out Burger",
-    'qdoba.com':            "Qdoba",
-    'jerseymikes.com':      "Jersey Mike's",
-    'chick-fil-a.com':      "Chick-fil-A",
-    'pollotropical.com':    "Pollo Tropical",
-    'zippys.com':           "Zippy's",
-    'papamurphys.com':      "Papa Murphy's",
-    'jimmyjohns.com':       "Jimmy John's",
-    'steaknshake.com':      "Steak 'n Shake",
-    'maid-rite.com':        "Maid-Rite",
-    'freddysusa.com':       "Freddy's",
-    'fazolis.com':          "Fazoli's",
-    'raisingcanes.com':     "Raising Cane's",
-    'amatos.com':           "Amato's",
-    'ledopizza.com':        "Ledo Pizza",
-    'dangelos.com':         "D'Angelo",
-    'jetspizza.com':        "Jet's Pizza",
-    'culvers.com':          "Culver's",
-    'bumpersdrivein.com':   "Bumpers Drive-In",
-    'lionschoice.com':      "Lion's Choice",
-    'wendys.com':           "Wendy's",
-    'runza.com':            "Runza",
-    'moes.com':             "Moe's",
-    'blakeslotaburger.com': "Blake's Lotaburger",
-    'bojangles.com':        "Bojangles",
-    'spacealiensgrill.com': "Space Aliens",
-    'tacojohns.com':        "Taco John's",
-    'palsweb.com':          "Pal's Sudden Service",
-    'whataburger.com':      "Whataburger",
-    'arcticcircle.com':     "Arctic Circle",
-    'alsfrenchfrys.com':    "Al's French Frys",
-    'hardees.com':          "Hardee's",
-    'tacotime.com':         "Taco Time NW",
-    'dels.com':             "Del's Lemonade",
-    'shakeshack.com':       "Shake Shack",
+    'captainds.com':"Captain D's",'dominos.com':"Domino's Pizza",
+    'jackinthebox.com':"Jack in the Box",'sonicdrivein.com':"Sonic Drive-In",
+    'in-n-out.com':"In-N-Out Burger",'qdoba.com':"Qdoba",
+    'jerseymikes.com':"Jersey Mike's",'chick-fil-a.com':"Chick-fil-A",
+    'pollotropical.com':"Pollo Tropical",'zippys.com':"Zippy's",
+    'papamurphys.com':"Papa Murphy's",'jimmyjohns.com':"Jimmy John's",
+    'steaknshake.com':"Steak 'n Shake",'maid-rite.com':"Maid-Rite",
+    'freddysusa.com':"Freddy's",'fazolis.com':"Fazoli's",
+    'raisingcanes.com':"Raising Cane's",'amatos.com':"Amato's",
+    'ledopizza.com':"Ledo Pizza",'dangelos.com':"D'Angelo",
+    'jetspizza.com':"Jet's Pizza",'culvers.com':"Culver's",
+    'bumpersdrivein.com':"Bumpers Drive-In",'lionschoice.com':"Lion's Choice",
+    'wendys.com':"Wendy's",'runza.com':"Runza",'moes.com':"Moe's",
+    'blakeslotaburger.com':"Blake's Lotaburger",'bojangles.com':"Bojangles",
+    'spacealiensgrill.com':"Space Aliens",'tacojohns.com':"Taco John's",
+    'palsweb.com':"Pal's Sudden Service",'whataburger.com':"Whataburger",
+    'arcticcircle.com':"Arctic Circle",'alsfrenchfrys.com':"Al's French Frys",
+    'hardees.com':"Hardee's",'tacotime.com':"Taco Time NW",
+    'dels.com':"Del's Lemonade",'shakeshack.com':"Shake Shack",
   };
 
-  const ALL_DOMAINS = [...new Set(STATE_EATS.map(e => e[2]))];
+  const STATE_BY_NAME = Object.fromEntries(STATE_EATS.map(e => [e[1], e]));
+  const ALL_DOMAINS   = [...new Set(STATE_EATS.map(e => e[2]))];
 
-  // â”€â”€ SVG map (same Albers projection as State Quest) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const MAP_SVG = `<svg id="map-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 959 593" style="width:100%;height:100%">
   <path id="AL" data-name="Alabama" class="state-path" d="m 643,467.4 .4,-7.3 -.9,-1.2 -1.7,-.7 -2.5,-2.8 .5,-2.9 48.8,-5.1 -.7,-2.2 -1.5,-1.5 -.5,-1.4 .6,-6.3 -2.4,-5.7 .5,-2.6 .3,-3.7 2.2,-3.8 -.2,-1.1 -1.7,-1 v -3.2 l -1.8,-1.9 -2.9,-6.1 -12.9,-45.8 -45.7,4 1.3,2 -1.3,67 4.4,33.2 .9,-.5 1.3,.1 .6,.4 .8,-.1 2,-3.8 v -2.3 l 1.1,-1.1 1.4,.5 3.4,6.4 v .9 l -3.3,2.2 3.5,-.4 4.9,-1.6 z"/>
   <path id="AK" data-name="Alaska" class="state-path" d="m 15.8,572 h 2.4 l .7,.7 -1,1.2 -1.9,.2 -2.5,1.3 -3.7,-.1 2.2,-.9 .3,-1.1 2.5,-.3 z m 8.3,-1.7 1.3,.5 h .9 l .5,1.2 .3,-.6 .9,.2 1.1,1.5 0,.5 -4.2,1.9 -2.4,-.1 -1,-.5 -1.1,.7 -2,0 -1.1,-1.4 4.7,-.5 z m 5.4,-.1 1,.1 .7,.7 v 1 l -1.3,.1 -.9,-1.1 z m 2.5,.3 1.3,-.1 -.1,1 -1.1,.6 z m .3,2.2 3.4,-.1 .2,1.1 -1.3,.1 -.3,-.5 -.8,.6 -.4,-.6 -.9,-.2 z m 166.3,7.6 2.1,.1 -1,1.9 -1.1,-.1 -.4,-.8 .5,-1.3 m -1.1,-2.9 .6,-1.3 -.2,-2.3 2.4,-.5 4.5,4.4 1.3,3.4 1.9,1.6 .3,5.1 -1.4,0 -1.3,-2.3 -3.1,-2.4 h -.6 l 1.1,2.8 1.7,.2 .2,2.1 -.9,.1 -4.1,-4.4 -.1,-.9 1.9,-1 0,-1 -.5,-.8 -1.6,-.6 -1.7,-1.3 1.4,.1 .5,-.4 -.6,-.9 -.6,.5 z m -3.6,-9.1 1.3,.1 2.4,2.5 -.2,.8 -.8,-.1 -.1,1.8 .5,.5 0,1.5 -.8,.3 -.4,1.2 -.8,-.4 -.4,-2.2 1.1,-1.4 -2.1,-2.2 .1,-1.2 z m 1.5,-1.5 1.9,.2 2.5,.1 3.4,3.2 -.2,.5 -1.1,.6 -1.1,-.2 -.1,-.7 -1.2,-1.6 -.3,.7 1,1.3 -.2,1.2 -.8,-.1 -1.3,.2 -.1,-1.7 -2.6,-2.8 z m -12.7,-8.9 .9,-.4 h 1.6 l .7,-.5 4.1,2.2 .1,1.5 -.5,.5 h -.8 l -1.4,-.7 1.1,1.3 1.8,0 .5,2 -.9,0 -2.2,-1.5 -1.1,-.2 .6,1.3 .1,.9 .8,-.6 1.7,1.2 1.3,-.1 -.2,.8 1.9,4.3 0,3.4 .4,2.1 -.8,.3 -1.2,-2 -.5,-1.5 -1.6,-1.6 -.2,-2.7 -.6,-1.7 h -.7 l .3,1.1 0,.5 -1.4,1 .1,-3.3 -1.6,-1.6 -1.3,-2.3 -1.2,-1.2 z m 7.2,-2.3 1.1,1.8 2.4,-.1 1,2.1 -.6,.6 2,3.2 v 1.3 l -1.2,.8 v .7 l -2,1.9 -.5,-1.4 -.1,-1.3 .6,-.7 v -1.1 l -1.5,-1.9 -.5,-3.7 -.9,-1.5 z m -56.7,-18.3 -4,4.1 v 1.6 l 2.1,-.8 .8,-1.9 2.2,-2.4 z m -31.6,16.6 0,.6 1.8,1.2 .2,-1.4 .6,.9 3.5,.1 .7,-.6 .2,-1.8 -.5,-.7 -1.4,0 0,-.8 .4,-.6 v -.4 l -1.5,-.3 -3.3,3.6 z m -8.1,6.2 1.5,5.8 h 2.1 l 2.4,-2.5 .3,1.2 6.3,-4 .7,-1 -1,-1.1 v -.7 l .5,-1.3 -.9,-.1 -2,1 0,-1.2 -2.7,-.6 -2.4,.3 -.2,3.4 -.8,-2 -1.5,-.1 -1,.6 z m -2.2,8.2 .1,-.7 2.1,-1.3 .6,.3 1.3,.2 1.3,1.2 -2.2,-.2 -.4,-.6 -1,.6 z m -5.2,3.3 -1.1,.8 1.5,1.4 .8,-.7 -.1,-1.3 z m -6.3,-7.9 1.4,.1 .4,.6 -1.8,.1 z m -13.9,11.9 v .5 l .7,.1 -.1,-.6 z m -.4,-3.2 -1,1 v .5 l .7,1.1 1,-1 -.7,-.1 z m -2,-.8 -.3,1 -1.3,.1 -.4,.2 0,1.3 -.5,.9 .6,0 .7,-.9 .8,-.1 .9,-1 .2,-1.3 z m -4.4,-2 -.2,1.8 1.4,.8 1.2,-.6 0,-1 1.7,-.3 -.1,-.6 -.9,-.2 -.7,.6 -.9,-.5 z m -4.9,-.1 1,.7 -.3,1.2 -1.4,-1.1 z m -4.2,1.3 1.4,.1 -.7,.8 z m -3.5,3 1.8,1.1 -1.7,.1 z m -25.4,-31.2 1.2,.6 -.8,.6 z m -.7,-6.3 .4,1.2 .8,-1.2 z m 24.3,-19.3 1.5,-.1 .9,.4 1.1,-.5 1.3,-.1 1.6,.8 .8,1.9 -.1,.9 -1.2,2 -2.4,-.2 -2.1,-1.8 -1,-.4 -1.1,-2 z m -21.1,-14.4 .1,1.9 2,2 v .5 l -.8,-.2 -1.7,-.8 -.3,-1.1 -.3,-1.6 z m 18.3,-23.3 v 1.2 l 1.9,1.8 h 2.3 l .6,1.1 v 1.6 l 2.1,1.9 1.8,1.2 -.1,.7 -.7,1.1 -1.4,-1.2 -2.1,.1 -.8,-.8 -.9,-2.1 -1.5,-2.2 -2.6,-.1 -1,-.7 1,-2.1 z m 16.8,-4.5 1,0 .1,1.1 h -1 z m 16.2,19.7 .9,.1 0,1.2 -1.7,-.5 z m 127.8,77.7 -1.2,.4 -.1,1.1 h 1.2 z m -157.6,-4.5 -1.3,-.4 -4.1,.6 -2.8,1.4 -.1,1.9 1.9,.7 1.5,-.9 1.7,-.1 4.7,1.4 .1,-1.3 -1.6,-1.1 z m 2.1,2.3 -.4,-1.4 1.2,.2 .1,1.4 1.8,0 .4,-2.5 .3,2.4 2.5,-.1 3.2,-3.3 .8,.1 -.7,1.3 1.4,.9 4.2,-.2 2.6,-1.2 1.4,-.1 .3,1.5 .6,-.5 .4,-1.4 5.9,.2 1.9,-1.6 -1.3,-1.1 .6,-1.2 2.6,.2 -.2,-1.2 2.5,.2 .7,-1.1 1.1,.2 4.6,-1.9 .2,-1.7 5.6,-2.4 2,-1.9 1.2,-.6 1.3,.8 2.3,-.9 1.1,-1.9 .5,-1.3 1.7,-.9 1.5,-.7 .4,-1.4 -1.1,-1.7 -2.2,-.2 -.2,-1.3 .8,-1.6 1.4,-.2 1.3,-1.5 1.9,-.1 3.4,-3.2 .4,-1.4 1.5,-2.3 3.8,-4.1 2.5,-.9 1.9,-.9 2.1,.8 1.4,2.6 -1.5,0 -1.4,-1.5 -3,2 -1.7,.1 -.2,3.1 -3.1,4.9 .6,2 2.3,0 -.6,1 -1.4,.1 -2.4,1.8 0,.9 1.9,1 3.4,-.6 1.4,-1.7 1.4,.1 3,-1.7 .5,-2.3 1.6,-.1 6.3,.8 1,-1.1 1,-4.5 -1.6,1.1 .6,-2.2 -1.6,-1.4 .8,-1.5 .1,1.5 3.4,0 .7,-1 1.6,-.1 -.3,1.7 1.9,.1 -1.9,1.3 4.1,1.1 -3.5,.4 -1.3,1.2 .9,1.4 4.6,-1.7 2.3,1.7 .7,-.9 .6,1.4 4,2.3 h 2.9 l 3.9,-.5 4.3,1.1 2,1.9 4.5,.4 1.8,-1.5 .8,2.4 -1.8,.7 1.2,1.2 7.4,3.8 1.4,2.5 5.4,4.1 3.3,-2 -.6,-2.2 -3.5,-2 3.1,1.2 .5,-.7 .9,1.3 0,2.7 2.1,-.6 2.1,1.8 -2.5,-9.8 1.2,1.3 1.4,6 2.2,2.5 2.4,-.4 1.8,3.5 h .9 l .6,5.6 3.4,.5 1.6,2.2 1.8,1.1 .4,2.8 -1.8,2.6 2.9,1.6 1.2,-2.4 -.2,3.1 -.8,.9 1.4,1.7 .7,-2.4 -.2,-1.2 .8,.2 .6,2.3 -1,1.4 .6,2.6 .5,.4 .3,-1.6 .7,.6 -.3,2 1.2,.2 -.4,.9 1.7,-.1 0,-1 h -1 l .1,-1.7 -.8,-.6 1.7,-.3 .5,-.8 0,-1.6 .5,1.3 -.6,1.8 1.2,3.9 1.8,.1 2.2,-4.2 .1,-1.9 -1.3,-4 -.1,-1.2 .5,-1.2 -.7,-.7 -1.7,.1 -2.5,-2 -1.7,0 -2,-1.4 -1.5,0 -.5,-1.6 -1.4,-.3 -.2,-1.5 -1,-.5 .1,-1.7 -5.1,-7.4 -1.8,-1.5 v -1.2 l -4.3,-3.5 -.7,-1.1 -1.6,-2 -1.9,-.6 0,-2.2 -1.2,-1.3 -1.7,-.7 -2.1,1.3 -1.6,2.1 -.4,2.4 -1.5,.1 -2.5,2.7 -.8,-.3 v -2.5 l -2.4,-2.2 -2.3,-2 -.5,-2 -2.5,-1.3 .2,-2.2 -2.8,-.1 -.7,1.1 -1.2,0 -.7,-.7 -1.2,.8 -1.8,-1.2 0,-85.8 -6.9,-4.1 -1.8,-.5 -2.2,1.1 -2.2,.1 -2.3,-1.6 -4.3,-.6 -5.8,-3.6 -5.7,-.4 -2,.5 -.2,-1.8 -1.8,-.7 1.1,-1 -.2,-.9 -3.2,-1.1 h -2.4 l -.4,.4 -.9,-.6 .1,-2.6 -.8,-.9 -2.5,2.9 -.8,-.1 v -.8 l 1.7,-.8 v -.8 l -1.9,-2.4 -1.1,-.1 -4.5,3.1 h -3.9 l .4,-.9 -1.8,-.1 -5.2,3.4 -1.8,0 -.6,-.8 -2.7,1.5 -3.6,3.7 -2.8,2.7 -1.5,1.2  -2.6,.1 -2.2,-.4 -2.3,-1.3 v 0 l -2.8,3.9 -.1,2.4 2.6,2.4 2.1,4.5 .2,5.3 2.9,2 3.4,.4 .7,.8 -1.5,2.3 .7,2.7 -1.7,-2.6 v -2.4 l -1.5,-.3 .1,1.2 .7,2.1 2.9,3.7 h -1.4 l -2.2,1.1 -6.2,-2.5 -.1,-2 1.4,-1.3 0,-1.4 -2.1,-.5 -2.3,.2 -4.8,.2 1.5,2.3 -1.9,-1.8 -8.4,1.2 -.8,1.5 4.9,4.7 -.8,1.4 -.3,2 -.7,.8 -.1,1.9 4.4,3.6 4.1,.2 4.6,1.9 h 2 l .8,-.6 3.8,.1 .1,-.8 1.2,1.1 .1,2 -2.5,-.1 .1,3.3 .5,3.2 -2.9,2.7 -1.9,-.1 -2,-.8 -1,.1 -3.1,2.1 -1.7,.2 -1.4,-2.8 -3.1,0 -2.2,2 -.5,1.8 -3.3,1.8 -5.3,4.3 -.3,3.1 .7,2.2 1,1.2 1,-.4 .9,1 -.8,.6 -1.5,.9 1.1,1.5 -2.6,1.1 .8,2.2 1.7,2.3 .8,4.1 4,1.5 2.6,-.8 1.7,-1.1 .5,2.1 .3,4.4 -1.9,1.4 0,4.4 -.6,.9 h -1.7 l 1.7,1.2 2.1,-.1 .4,-1 4.6,-.6 2,2.6 1.3,-.7 1.3,5.1 1,.5 1,-.7 .1,-2.4 .9,-1 .7,1.1 .2,1.6 1.6,.4 4.7,-1.2 .2,1.2 -2,1.1 -1.6,1.7 -2.8,7 -4.3,2 -1.4,1.5 -.3,1.4 -1,-.6 -9.3,3.3 -1.8,4.1 -1.3,-.4 .5,-1.1 -1.5,-1.4 -3.5,-.2 -5.3,3.2 -2.2,1.3 -2.3,0 -.5,2.4 z"/>
@@ -490,58 +446,37 @@ const schema = JSON.stringify({
   <rect x="224" y="490" width="175" height="100" fill="none" stroke="#aaa" stroke-width="0.7" stroke-dasharray="3,2"/>
 </svg>`;
 
-  // â”€â”€ URL group parsing â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
   if (_urlGroupId) sessionStorage.setItem('stateeats:active-group', _urlGroupId);
   else sessionStorage.removeItem('stateeats:active-group');
   const GROUP_ID   = _urlGroupId ?? null;
   const GROUP_MODE = !!GROUP_ID;
 
-  // â”€â”€ Auth & leaderboard â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  let token = null;
-  let lb = [], sportLb = [];
+  let token = null, lb = [], sportLb = [];
   let sportMode = false;
   let MUTED = localStorage.getItem(MUTE_KEY) === '1';
-
-  // â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  let score = 0;
-  let roundIndex = 0;
-  let currentState = null;    // { id, name, domain, tier, cx, cy }
-  let roundQueue = [];
-  let timeLeft = NORMAL_TIME;
-  let maxTime  = NORMAL_TIME;
-  let timerRaf = null;
-  let timerStartTs = null;
-  let answered = false;
-  let firstAttempt = true;
-  let running  = false;
+  let score = 0, roundIndex = 0, currentState = null;
+  let usedStateIds = new Set();
+  let timeLeft = NORMAL_TIME, maxTime = NORMAL_TIME;
+  let timerRaf = null, timerStartTs = null;
+  let answered = false, firstAttempt = true, running = false;
   let roundResults = [];
-  let mapPhase  = true;       // waiting for map click
-  let quizPhase = false;      // waiting for logo click
-  let currentHighlight = null;
-
-  // Zoom / pan
   let zoom = 1, panX = 0, panY = 0;
   let dragging = false, dragLast = null;
-  let pinchDist0 = null, pinchPan0 = null, pinchZoom0 = 1;
+  let pinchDist0 = null, pinchZoom0 = 1;
 
-  // Food icon position
-  let sheepX = 0, sheepY = 0;
-
-  let stats = loadStats(STATS_KEY, { games: 0, best: 0, correct: 0, perfect: 0 });
+  let stats = loadStats(STATS_KEY, { games:0, best:0, correct:0, perfect:0 });
   let personalBest = stats.best || 0;
 
-  // â”€â”€ Achievements â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const ACHIEVEMENTS = [
-    { id: 'lightning', icon: 'âš¡', label: 'Lightning Round',   desc: 'Complete a round in under 3 seconds' },
-    { id: 'perfect',   icon: 'ðŸ’¯', label: 'Perfect Score',     desc: 'Score 10,000 in one game' },
-    { id: 'explorer',  icon: 'ðŸ—ºï¸', label: 'Food Explorer',     desc: 'Play 10 games' },
-    { id: 'texas',     icon: 'ðŸ¤ ', label: 'Don\'t Mess',       desc: 'Identify Texas correctly' },
-    { id: 'streaker',  icon: 'ðŸ”¥', label: 'Unstoppable',       desc: 'Get 5 correct in a row' },
-    { id: 'scholar',   icon: 'ðŸŽ“', label: 'Food Scholar',      desc: 'Score 800+ on a hard state' },
+    { id:'lightning', icon:'⚡', label:'Lightning Round', desc:'Answer in under 3 seconds' },
+    { id:'perfect',   icon:'\U0001f4af', label:'Perfect Score',   desc:'Score 10,000 in one game' },
+    { id:'explorer',  icon:'\U0001f5fa️', label:'Food Explorer', desc:'Play 10 games' },
+    { id:'texas',     icon:'\U0001f920', label:"Don't Mess",    desc:'Answer Texas correctly' },
+    { id:'streaker',  icon:'\U0001f525', label:'Unstoppable',   desc:'Get 5 correct in a row' },
+    { id:'scholar',   icon:'\U0001f393', label:'Food Scholar',  desc:'Score 800+ on a hard state' },
   ];
   let unlockedAch = new Set(JSON.parse(localStorage.getItem('stateeats:ach') || '[]'));
-
   function unlockAch(id) {
     if (unlockedAch.has(id)) return;
     unlockedAch.add(id);
@@ -550,20 +485,16 @@ const schema = JSON.stringify({
     if (a) showAchievementToast(a);
   }
 
-  // â”€â”€ DOM references â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const scoreEl    = document.getElementById('score-display');
   const bestEl     = document.getElementById('best-display');
   const roundValEl = document.getElementById('round-display-val');
   const hudSub     = document.getElementById('hud-subtitle');
-  const signWrap   = document.getElementById('sign-wrap');
   const stateSign  = document.getElementById('state-sign');
   const timerLbl   = document.getElementById('timer-label');
   const timerBar   = document.getElementById('timer-bar');
-  const timerWrap  = document.getElementById('timer-bar-wrap');
   const roundPips  = document.getElementById('round-display');
   const mapWrap    = document.getElementById('map-wrap');
   const mapCont    = document.getElementById('map-svg-container');
-  const foodIcon   = document.getElementById('map-sheep');
   const fbToast    = document.getElementById('feedback-toast');
   const corrLabel  = document.getElementById('state-correct-label');
   const resultOv   = document.getElementById('result-overlay');
@@ -572,8 +503,7 @@ const schema = JSON.stringify({
   const resultCorr = document.getElementById('result-correct');
   const resultGrd  = document.getElementById('result-grade');
   const resultEmo  = document.getElementById('result-emoji');
-  const modeOverlay = document.getElementById('mode-overlay');
-  const modePopup  = document.getElementById('mode-popup');
+  const modeOverlay= document.getElementById('mode-overlay');
   const mpcNormal  = document.getElementById('mpc-normal');
   const mpcSport   = document.getElementById('mpc-sport');
   const mpcTitle   = document.getElementById('mode-popup-title');
@@ -587,771 +517,425 @@ const schema = JSON.stringify({
   const groupBadge = document.getElementById('group-badge');
   const resetZoom  = document.getElementById('reset-zoom');
   const statsBtn   = document.getElementById('stats-btn');
-  const quizOverlay = document.getElementById('quiz-overlay');
-  const quizGrid   = document.getElementById('quiz-grid');
+  const quizOverlay  = document.getElementById('quiz-overlay');
+  const quizGrid     = document.getElementById('quiz-grid');
   const quizQuestion = document.getElementById('quiz-question');
 
-  // â”€â”€ Init map â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   mapCont.innerHTML = MAP_SVG;
   injectStateLabels();
 
-  // Center food icon
-  sheepX = mapWrap.offsetWidth / 2;
-  sheepY = mapWrap.offsetHeight / 2;
-  foodIcon.style.left = sheepX + 'px';
-  foodIcon.style.top  = sheepY + 'px';
-
-  // â”€â”€ State abbreviation labels â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function injectStateLabels() {
     const svgEl = mapCont.querySelector('svg');
     if (!svgEl) return;
     STATE_EATS.forEach(([abbr,,,, cx, cy]) => {
       const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      txt.setAttribute('x', cx);
-      txt.setAttribute('y', cy + 4);
-      txt.setAttribute('text-anchor', 'middle');
-      txt.setAttribute('font-size', '7');
-      txt.setAttribute('font-family', 'sans-serif');
-      txt.setAttribute('font-weight', '700');
-      txt.setAttribute('fill', 'rgba(255,255,255,0.85)');
-      txt.setAttribute('pointer-events', 'none');
-      txt.setAttribute('id', 'lbl-' + abbr);
-      txt.textContent = abbr;
+      txt.setAttribute('x', cx); txt.setAttribute('y', cy + 4);
+      txt.setAttribute('text-anchor', 'middle'); txt.setAttribute('font-size', '7');
+      txt.setAttribute('font-family', 'sans-serif'); txt.setAttribute('font-weight', '700');
+      txt.setAttribute('fill', 'rgba(255,255,255,0.9)'); txt.setAttribute('pointer-events', 'none');
+      txt.setAttribute('id', 'lbl-' + abbr); txt.textContent = abbr;
       svgEl.appendChild(txt);
     });
   }
 
-  // â”€â”€ State highlight â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function highlightState(id) {
-    clearHighlight();
+  function dimState(id) {
     const el = document.getElementById(id);
-    if (el) el.classList.add('state-highlight');
+    if (el) el.classList.add('state-used');
     const lbl = document.getElementById('lbl-' + id);
-    if (lbl) lbl.setAttribute('fill', '#1a1a1a');
-    currentHighlight = id;
+    if (lbl) lbl.setAttribute('fill', 'rgba(255,255,255,0.35)');
   }
 
-  function clearHighlight() {
-    if (!currentHighlight) return;
-    const el = document.getElementById(currentHighlight);
-    if (el) el.classList.remove('state-highlight');
-    const lbl = document.getElementById('lbl-' + currentHighlight);
-    if (lbl) lbl.setAttribute('fill', 'rgba(255,255,255,0.85)');
-    currentHighlight = null;
-  }
+  function clamp(v,lo,hi){return Math.max(lo,Math.min(hi,v));}
+  function applyTransform(){mapCont.style.transform=`scale(${zoom}) translate(${panX}px,${panY}px)`;}
+  function resetView(){zoom=1;panX=0;panY=0;applyTransform();}
 
-  // â”€â”€ Zoom / pan helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
-
-  function applyTransform() {
-    mapCont.style.transform = `scale(${zoom}) translate(${panX}px, ${panY}px)`;
-  }
-
-  function resetView() {
-    zoom = 1; panX = 0; panY = 0;
-    applyTransform();
-  }
-
-  resetZoom.addEventListener('click', e => { e.stopPropagation(); resetView(); });
-
-  mapWrap.addEventListener('wheel', e => {
+  resetZoom.addEventListener('click', e=>{e.stopPropagation();resetView();});
+  mapWrap.addEventListener('wheel', e=>{
     e.preventDefault();
-    const factor = e.deltaY > 0 ? 0.85 : 1.18;
-    const prevZoom = zoom;
-    zoom = clamp(zoom * factor, 1, 6);
-    if (zoom !== prevZoom) applyTransform();
-  }, { passive: false });
-
-  mapWrap.addEventListener('mousedown', e => {
-    if (e.button !== 0) return;
-    dragging = true;
-    dragLast = { x: e.clientX, y: e.clientY };
-    mapWrap.style.cursor = 'grabbing';
+    zoom=clamp(zoom*(e.deltaY>0?0.85:1.18),1,6); applyTransform();
+  },{passive:false});
+  mapWrap.addEventListener('mousedown',e=>{
+    if(e.button!==0)return; dragging=true; dragLast={x:e.clientX,y:e.clientY};
+    mapWrap.style.cursor='grabbing';
   });
-  window.addEventListener('mousemove', e => {
-    if (!dragging) return;
-    const dx = (e.clientX - dragLast.x) / zoom;
-    const dy = (e.clientY - dragLast.y) / zoom;
-    dragLast = { x: e.clientX, y: e.clientY };
-    const wrapW = mapWrap.offsetWidth;
-    const wrapH = mapWrap.offsetHeight;
-    const maxPan = ((zoom - 1) / zoom) * (wrapW / 2) + 40;
-    const maxPanY = ((zoom - 1) / zoom) * (wrapH / 2) + 40;
-    panX = clamp(panX + dx, -maxPan, maxPan);
-    panY = clamp(panY + dy, -maxPanY, maxPanY);
+  window.addEventListener('mousemove',e=>{
+    if(!dragging)return;
+    const dx=(e.clientX-dragLast.x)/zoom, dy=(e.clientY-dragLast.y)/zoom;
+    dragLast={x:e.clientX,y:e.clientY};
+    const mw=mapWrap.offsetWidth, mh=mapWrap.offsetHeight;
+    panX=clamp(panX+dx,-((zoom-1)/zoom)*(mw/2)-40,((zoom-1)/zoom)*(mw/2)+40);
+    panY=clamp(panY+dy,-((zoom-1)/zoom)*(mh/2)-40,((zoom-1)/zoom)*(mh/2)+40);
     applyTransform();
   });
-  window.addEventListener('mouseup', () => {
-    dragging = false;
-    mapWrap.style.cursor = 'crosshair';
-  });
+  window.addEventListener('mouseup',()=>{dragging=false;mapWrap.style.cursor='crosshair';});
 
-  mapWrap.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) {
+  mapWrap.addEventListener('touchstart',e=>{
+    if(e.touches.length===2){
       e.preventDefault();
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      pinchDist0 = Math.hypot(dx, dy);
-      pinchZoom0 = zoom;
-      pinchPan0 = { x: panX, y: panY };
-    } else if (e.touches.length === 1) {
-      dragLast = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-    }
-  }, { passive: false });
-
-  mapWrap.addEventListener('touchmove', e => {
+      pinchDist0=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      pinchZoom0=zoom;
+    }else if(e.touches.length===1){dragLast={x:e.touches[0].clientX,y:e.touches[0].clientY};}
+  },{passive:false});
+  mapWrap.addEventListener('touchmove',e=>{
     e.preventDefault();
-    if (e.touches.length === 2 && pinchDist0 !== null) {
-      const dx = e.touches[0].clientX - e.touches[1].clientX;
-      const dy = e.touches[0].clientY - e.touches[1].clientY;
-      const dist = Math.hypot(dx, dy);
-      zoom = clamp(pinchZoom0 * (dist / pinchDist0), 1, 6);
-      applyTransform();
-    } else if (e.touches.length === 1 && dragLast) {
-      const dx = (e.touches[0].clientX - dragLast.x) / zoom;
-      const dy = (e.touches[0].clientY - dragLast.y) / zoom;
-      dragLast = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-      const wrapW = mapWrap.offsetWidth;
-      const wrapH = mapWrap.offsetHeight;
-      const maxPan = ((zoom - 1) / zoom) * (wrapW / 2) + 40;
-      const maxPanY = ((zoom - 1) / zoom) * (wrapH / 2) + 40;
-      panX = clamp(panX + dx, -maxPan, maxPan);
-      panY = clamp(panY + dy, -maxPanY, maxPanY);
+    if(e.touches.length===2&&pinchDist0!==null){
+      const dist=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+      zoom=clamp(pinchZoom0*(dist/pinchDist0),1,6); applyTransform();
+    }else if(e.touches.length===1&&dragLast){
+      const dx=(e.touches[0].clientX-dragLast.x)/zoom,dy=(e.touches[0].clientY-dragLast.y)/zoom;
+      dragLast={x:e.touches[0].clientX,y:e.touches[0].clientY};
+      const mw=mapWrap.offsetWidth,mh=mapWrap.offsetHeight;
+      panX=clamp(panX+dx,-((zoom-1)/zoom)*(mw/2)-40,((zoom-1)/zoom)*(mw/2)+40);
+      panY=clamp(panY+dy,-((zoom-1)/zoom)*(mh/2)-40,((zoom-1)/zoom)*(mh/2)+40);
       applyTransform();
     }
-  }, { passive: false });
+  },{passive:false});
+  mapWrap.addEventListener('touchend',e=>{if(e.touches.length<2)pinchDist0=null;});
 
-  mapWrap.addEventListener('touchend', e => {
-    if (e.touches.length < 2) pinchDist0 = null;
+  // ── Any state click triggers quiz ─────────────────────────────────────────
+  function handleStateClick(path) {
+    if (!running || answered) return;
+    const entry = STATE_BY_NAME[path.dataset.name];
+    if (!entry) return;
+    if (usedStateIds.has(entry[0])) { showToast('Already played — pick another!', 900); return; }
+    startQuiz(entry);
+  }
+  mapWrap.addEventListener('click',e=>{
+    if(!running||answered||dragging)return;
+    const path=e.target.closest('path[data-name]');
+    if(path) handleStateClick(path);
   });
+  mapWrap.addEventListener('touchend',e=>{
+    if(!running||answered||pinchDist0!==null)return;
+    if(e.changedTouches.length!==1)return;
+    const t=e.changedTouches[0];
+    const el=document.elementFromPoint(t.clientX,t.clientY);
+    const path=el&&el.closest?el.closest('path[data-name]'):null;
+    if(path) handleStateClick(path);
+  },{passive:true});
 
-  // â”€â”€ Map click handler â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  mapWrap.addEventListener('click', e => {
-    if (!running || answered || dragging || !mapPhase) return;
-    const path = e.target.closest('path[data-name]');
-    if (!path) return;
-    const rect = mapWrap.getBoundingClientRect();
-    const vx = e.clientX - rect.left;
-    const vy = e.clientY - rect.top;
-    moveFoodTo(vx, vy);
-    handleMapClick(path.dataset.name, vx, vy);
-  });
-
-  mapWrap.addEventListener('touchend', e => {
-    if (!running || answered || pinchDist0 !== null || !mapPhase) return;
-    if (e.changedTouches.length !== 1) return;
-    const touch = e.changedTouches[0];
-    const el = document.elementFromPoint(touch.clientX, touch.clientY);
-    const path = el && el.closest ? el.closest('path[data-name]') : null;
-    if (!path) return;
-    const rect = mapWrap.getBoundingClientRect();
-    const vx = touch.clientX - rect.left;
-    const vy = touch.clientY - rect.top;
-    moveFoodTo(vx, vy);
-    handleMapClick(path.dataset.name, vx, vy);
-  }, { passive: true });
-
-  // â”€â”€ Food icon movement â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function moveFoodTo(vx, vy) {
-    sheepX = vx;
-    sheepY = vy;
-    foodIcon.style.left = vx + 'px';
-    foodIcon.style.top  = vy + 'px';
+  function startQuiz(entry) {
+    const [id,name,domain,tier,cx,cy]=entry;
+    currentState={id,name,domain,tier,cx,cy};
+    answered=false; firstAttempt=true;
+    usedStateIds.add(id);
+    roundValEl.textContent=(roundIndex+1)+' / '+TOTAL_ROUNDS;
+    updateRoundPips(); corrLabel.textContent='';
+    showQuizPopup(domain,name);
+    startTimer();
   }
 
-  function moveFoodToCentroid(cx, cy) {
-    const wrapW = mapWrap.offsetWidth;
-    const wrapH = mapWrap.offsetHeight;
-    const svgNatW = 959, svgNatH = 593;
-    const scaleRatio = Math.min(wrapW / svgNatW, wrapH / svgNatH);
-    const displayW = svgNatW * scaleRatio;
-    const displayH = svgNatH * scaleRatio;
-    const svgOriginX = (wrapW - displayW) / 2;
-    const svgOriginY = (wrapH - displayH) / 2;
-    const rawX = cx * scaleRatio + svgOriginX;
-    const rawY = cy * scaleRatio + svgOriginY;
-    const tcX = wrapW / 2;
-    const tcY = wrapH / 2;
-    const vx = (rawX - tcX) * zoom + tcX + panX * zoom;
-    const vy = (rawY - tcY) * zoom + tcY + panY * zoom;
-    moveFoodTo(
-      clamp(vx, 20, wrapW - 20),
-      clamp(vy, 20, wrapH - 20)
-    );
+  function buildQuizOptions(correctDomain){
+    const d=ALL_DOMAINS.filter(x=>x!==correctDomain); shuffle(d);
+    const opts=[correctDomain,...d.slice(0,3)]; shuffle(opts); return opts;
   }
 
-  // â”€â”€ State flash â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function flashState(id, cls, duration) {
-    const el = document.getElementById(id);
-    if (!el) return;
-    el.classList.add(cls);
-    setTimeout(() => el.classList.remove(cls), duration);
-  }
-
-  // â”€â”€ Map phase answer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function handleMapClick(clickedName, vx, vy) {
-    if (!currentState) return;
-    if (clickedName === currentState.name) {
-      onStateCorrect(vx, vy);
-    } else {
-      onStateWrong(clickedName);
-    }
-  }
-
-  function onStateCorrect(vx, vy) {
-    mapPhase = false;
-    quizPhase = true;
-    flashState(currentState.id, 'flash-correct', 600);
-    sfx('state-found');
-    showQuizPopup(currentState.domain, currentState.name);
-  }
-
-  function onStateWrong(clickedName) {
-    firstAttempt = false;
-    const paths = mapCont.querySelectorAll('path[data-name]');
-    for (const p of paths) {
-      if (p.dataset.name === clickedName) {
-        p.classList.add('flash-wrong');
-        setTimeout(() => p.classList.remove('flash-wrong'), 600);
-        break;
-      }
-    }
-    sfx('wrong');
-    showToast('Not that state â€” keep looking!', 800);
-    corrLabel.textContent = `âŒ That's ${clickedName} â€” keep searching!`;
-  }
-
-  // â”€â”€ Quiz popup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function domainColor(domain) {
-    let h = 0;
-    for (const c of domain) h = (h * 31 + c.charCodeAt(0)) % 360;
-    return `hsl(${h}, 65%, 45%)`;
-  }
-
-  function buildQuizOptions(correctDomain) {
-    const distractors = ALL_DOMAINS.filter(d => d !== correctDomain);
-    shuffle(distractors);
-    const options = [correctDomain, ...distractors.slice(0, 3)];
-    shuffle(options);
-    return options;
-  }
-
-  function showQuizPopup(correctDomain, stateName) {
-    const options = buildQuizOptions(correctDomain);
-    quizQuestion.textContent = `What's ${stateName}'s favorite fast food?`;
-    quizGrid.innerHTML = '';
-    options.forEach(domain => {
-      const btn = document.createElement('button');
-      btn.className = 'logo-card';
-      btn.dataset.domain = domain;
-      const name = BRAND_NAMES[domain] || domain;
-      const initial = name[0].toUpperCase();
-      const color = domainColor(domain);
-      const logoUrl = `https://logo.clearbit.com/${domain}`;
-      btn.innerHTML = `
-        <div class="logo-img-wrap">
-          <img class="logo-img" src="${logoUrl}" alt="${name} logo"
-               onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-          <div class="logo-fallback" style="display:none;background:${color}">${initial}</div>
-        </div>
-        <div class="logo-name">${name}</div>
-      `;
-      btn.addEventListener('click', () => onLogoClick(domain, btn));
+  function showQuizPopup(correctDomain,stateName){
+    const opts=buildQuizOptions(correctDomain);
+    quizQuestion.textContent="What's "+stateName+"'s favorite fast food?";
+    quizGrid.innerHTML='';
+    opts.forEach(domain=>{
+      const btn=document.createElement('button');
+      btn.className='logo-card'; btn.dataset.domain=domain;
+      const name=BRAND_NAMES[domain]||domain;
+      const clearbit='https://logo.clearbit.com/'+domain;
+      const gfav='https://www.google.com/s2/favicons?domain='+domain+'&sz=128';
+      btn.innerHTML=
+        '<div class="logo-img-wrap">'+
+          '<img class="logo-img" src="'+clearbit+'" alt="'+name+'" '+
+               'onerror="this.src=\''+gfav+'\';this.onerror=null;">'+
+        '</div>'+
+        '<div class="logo-name">'+name+'</div>';
+      btn.addEventListener('click',()=>onLogoClick(domain,btn));
       quizGrid.appendChild(btn);
     });
     quizOverlay.classList.add('visible');
+    timerLbl.textContent=maxTime.toFixed(1)+'s';
+    timerBar.style.transform='scaleX(1)';
+    timerBar.classList.remove('urgent');
   }
 
-  function hideQuizPopup() {
-    quizOverlay.classList.remove('visible');
-    quizGrid.innerHTML = '';
+  function hideQuizPopup(){quizOverlay.classList.remove('visible');quizGrid.innerHTML='';}
+
+  function onLogoClick(domain,cardEl){
+    if(!running||answered)return;
+    if(domain===currentState.domain){onLogoCorrect(cardEl);}else{onLogoWrong(cardEl);}
   }
 
-  function onLogoClick(domain, cardEl) {
-    if (!running || answered || !quizPhase) return;
-    if (domain === currentState.domain) {
-      onLogoCorrect(cardEl);
-    } else {
-      onLogoWrong(cardEl);
-    }
-  }
-
-  function onLogoCorrect(cardEl) {
-    answered = true;
-    stopTimer();
-    const elapsed = maxTime - timeLeft;
-    let points = Math.round((timeLeft / maxTime) * MAX_SCORE_PER_ROUND);
-    if (sportMode && elapsed < 5) points += SPORT_SPEED_BONUS;
-    const gotBonus = firstAttempt && points > 0;
-    if (gotBonus) points += FIRST_ATTEMPT_BONUS;
-    points = Math.max(0, points);
-    score += points;
-    roundResults.push({ correct: true, points, firstAttempt });
-
+  function onLogoCorrect(cardEl){
+    answered=true; stopTimer();
+    const elapsed=maxTime-timeLeft;
+    let points=Math.round((timeLeft/maxTime)*MAX_SCORE_PER_ROUND);
+    if(sportMode&&elapsed<5)points+=SPORT_SPEED_BONUS;
+    const gotBonus=firstAttempt&&points>0;
+    if(gotBonus)points+=FIRST_ATTEMPT_BONUS;
+    points=Math.max(0,points);
+    score+=points; roundResults.push({correct:true,points,firstAttempt});
     cardEl.classList.add('flash-correct-card');
-    foodIcon.classList.remove('retreating');
-    foodIcon.classList.add('celebrating');
-    setTimeout(() => foodIcon.classList.remove('celebrating'), 700);
-    moveFoodToCentroid(currentState.cx, currentState.cy);
-    sfx('correct');
-
-    const rect = mapWrap.getBoundingClientRect();
-    const cx = mapWrap.offsetWidth / 2;
-    const cy = mapWrap.offsetHeight / 2;
-    floatScore('+' + points, cx, cy);
-
-    const bonusTag = gotBonus ? ` ðŸŽ¯ +${FIRST_ATTEMPT_BONUS} first try!` : '';
-    corrLabel.textContent = `âœ… ${currentState.name}!${points > 0 ? ' +' + points + ' pts' : ''}${bonusTag}`;
+    sfx('correct'); dimState(currentState.id);
+    floatScore('+'+points,mapWrap.offsetWidth/2,mapWrap.offsetHeight*0.4);
+    const bonusTag=gotBonus?' \U0001f3af +'+FIRST_ATTEMPT_BONUS+' first try!':'';
+    corrLabel.textContent='✅ '+currentState.name+'!'+(points>0?' +'+points+' pts':'')+bonusTag;
     updateScoreDisplay();
-
-    if (elapsed < 3) unlockAch('lightning');
-    if (currentState.id === 'TX') unlockAch('texas');
-    if (currentState.tier === 'hard' && points >= 800) unlockAch('scholar');
-    const streak = roundResults.slice(-5);
-    if (streak.length === 5 && streak.every(r => r.correct)) unlockAch('streaker');
-
-    setTimeout(() => {
-      hideQuizPopup();
-      advanceRound();
-    }, 800);
+    if(elapsed<3)unlockAch('lightning');
+    if(currentState.id==='TX')unlockAch('texas');
+    if(currentState.tier==='hard'&&points>=800)unlockAch('scholar');
+    const streak=roundResults.slice(-5);
+    if(streak.length===5&&streak.every(r=>r.correct))unlockAch('streaker');
+    setTimeout(()=>{
+      hideQuizPopup(); roundIndex++;
+      if(roundIndex>=TOTAL_ROUNDS){endGame();}
+      else{updateRoundPips();hudSub.textContent='Click another state!';}
+    },800);
   }
 
-  function onLogoWrong(cardEl) {
-    firstAttempt = false;
+  function onLogoWrong(cardEl){
+    firstAttempt=false;
     cardEl.classList.add('flash-wrong-card');
-    setTimeout(() => cardEl.classList.remove('flash-wrong-card'), 500);
-    sfx('wrong');
-    showToast('Not quite â€” try again!', 800);
+    setTimeout(()=>cardEl.classList.remove('flash-wrong-card'),500);
+    sfx('wrong'); showToast('Not quite — try again!',800);
   }
 
-  // â”€â”€ Timer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function startTimer() {
-    timerStartTs = performance.now();
-    timerRaf = requestAnimationFrame(tickTimer);
-  }
-
-  function tickTimer(ts) {
-    if (!running || answered) return;
-    const elapsed = (ts - timerStartTs) / 1000;
-    timeLeft = Math.max(0, maxTime - elapsed);
-    const frac = timeLeft / maxTime;
-    timerBar.style.transform = `scaleX(${frac})`;
-    timerLbl.textContent = timeLeft.toFixed(1) + 's';
-    if (timeLeft <= 5 && timeLeft > 0) {
+  function startTimer(){timerStartTs=performance.now();timerRaf=requestAnimationFrame(tickTimer);}
+  function tickTimer(ts){
+    if(!running||answered)return;
+    const elapsed=(ts-timerStartTs)/1000;
+    timeLeft=Math.max(0,maxTime-elapsed);
+    timerBar.style.transform='scaleX('+(timeLeft/maxTime)+')';
+    timerLbl.textContent=timeLeft.toFixed(1)+'s';
+    if(timeLeft<=5&&timeLeft>0){
       timerBar.classList.add('urgent');
-      if (!MUTED && Math.floor(timeLeft * 2) !== Math.floor((timeLeft + 0.05) * 2)) sfxTick();
-    } else {
-      timerBar.classList.remove('urgent');
-    }
-    if (timeLeft <= 0) {
-      timeOut();
-      return;
-    }
-    timerRaf = requestAnimationFrame(tickTimer);
+      if(!MUTED&&Math.floor(timeLeft*2)!==Math.floor((timeLeft+0.05)*2))sfxTick();
+    }else{timerBar.classList.remove('urgent');}
+    if(timeLeft<=0){timeOut();return;}
+    timerRaf=requestAnimationFrame(tickTimer);
   }
+  function stopTimer(){if(timerRaf){cancelAnimationFrame(timerRaf);timerRaf=null;}timerBar.classList.remove('urgent');}
 
-  function stopTimer() {
-    if (timerRaf) { cancelAnimationFrame(timerRaf); timerRaf = null; }
-    timerBar.classList.remove('urgent');
-  }
-
-  function timeOut() {
-    answered = true;
-    stopTimer();
-    hideQuizPopup();
-    roundResults.push({ correct: false, points: 0 });
-    flashState(currentState.id, 'reveal-state', 1800);
+  function timeOut(){
+    answered=true; stopTimer();
+    roundResults.push({correct:false,points:0});
+    dimState(currentState.id);
+    flashState(currentState.id,'reveal-state',1800);
     sfx('timeout');
-    const brandName = BRAND_NAMES[currentState.domain] || currentState.domain;
-    corrLabel.textContent = `â±ï¸ Time's up! ${currentState.name} â†’ ${brandName}`;
+    corrLabel.textContent='⏱️ Time\'s up! '+currentState.name+' → '+(BRAND_NAMES[currentState.domain]||currentState.domain);
     updateScoreDisplay();
-    setTimeout(() => advanceRound(), 1800);
+    setTimeout(()=>{
+      hideQuizPopup(); roundIndex++;
+      if(roundIndex>=TOTAL_ROUNDS){endGame();}
+      else{updateRoundPips();hudSub.textContent='Click another state!';}
+    },1800);
   }
 
-  // â”€â”€ Round management â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function buildRoundQueue() {
-    const easy   = STATE_EATS.filter(s => s[3] === 'easy').map(s => [...s]);
-    const medium = STATE_EATS.filter(s => s[3] === 'medium').map(s => [...s]);
-    const hard   = STATE_EATS.filter(s => s[3] === 'hard').map(s => [...s]);
+  function flashState(id,cls,dur){
+    const el=document.getElementById(id); if(!el)return;
+    el.classList.add(cls); setTimeout(()=>el.classList.remove(cls),dur);
+  }
 
-    shuffle(easy); shuffle(medium); shuffle(hard);
-
-    if (sportMode) {
-      const all = STATE_EATS.map(s => [...s]);
-      shuffle(all);
-      return all.slice(0, TOTAL_ROUNDS);
+  function updateRoundPips(){
+    let h='';
+    for(let i=0;i<TOTAL_ROUNDS;i++){
+      let c='';
+      if(i<roundIndex){c=roundResults[i]&&roundResults[i].correct?'done':'missed';}
+      else if(i===roundIndex&&running){c='current';}
+      h+='<div class="round-pip '+c+'"></div>';
     }
-    const queue = [];
-    queue.push(...easy.slice(0, 4));
-    queue.push(...medium.slice(0, 4));
-    queue.push(...hard.slice(0, 2));
-    shuffle(queue);
-    return queue;
+    roundPips.innerHTML=h;
   }
 
-  function shuffle(arr) {
-    for (let i = arr.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [arr[i], arr[j]] = [arr[j], arr[i]];
-    }
+  function updateScoreDisplay(){
+    scoreEl.textContent=score;
+    if(score>personalBest)bestEl.textContent=score;
   }
 
-  function beginRound() {
-    const [id, name, domain, tier, cx, cy] = roundQueue[roundIndex];
-    currentState = { id, name, domain, tier, cx, cy };
-    answered = false;
-    firstAttempt = true;
-    mapPhase = true;
-    quizPhase = false;
-    timeLeft = maxTime;
-    timerBar.style.transform = 'scaleX(1)';
-    timerLbl.textContent = maxTime.toFixed(1) + 's';
-    timerBar.classList.remove('urgent');
-    corrLabel.textContent = '';
-    roundValEl.textContent = `${roundIndex + 1} / ${TOTAL_ROUNDS}`;
-    updateRoundPips();
-    highlightState(id);
-    showSign(name, () => {
-      startTimer();
+  function floatScore(text,vx,vy){
+    const el=document.createElement('div');
+    el.className='map-score-pop'+(text==='+0'?' zero':'');
+    el.textContent=text; el.style.left=vx+'px'; el.style.top=vy+'px';
+    mapWrap.appendChild(el); setTimeout(()=>el.remove(),1200);
+  }
+
+  let toastTimer=null;
+  function showToast(msg,dur){
+    fbToast.textContent=msg; fbToast.classList.add('visible');
+    if(toastTimer)clearTimeout(toastTimer);
+    toastTimer=setTimeout(()=>fbToast.classList.remove('visible'),dur||1000);
+  }
+
+  function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}}
+
+  function startGame(sport){
+    sportMode=sport; maxTime=sport?SPORT_TIME:NORMAL_TIME;
+    score=0;roundIndex=0;roundResults=[];usedStateIds=new Set();running=true;
+    resetView();hideQuizPopup();
+    mapCont.querySelectorAll('.state-used').forEach(el=>el.classList.remove('state-used'));
+    STATE_EATS.forEach(([abbr])=>{
+      const lbl=document.getElementById('lbl-'+abbr);
+      if(lbl)lbl.setAttribute('fill','rgba(255,255,255,0.9)');
     });
-  }
-
-  function advanceRound() {
-    clearHighlight();
-    roundIndex++;
+    resultOv.classList.remove('visible'); modeOverlay.style.display='none';
+    hudSub.textContent=sport?'⚡ Click any state!':'Click any state to begin!';
+    scoreEl.textContent=0; bestEl.textContent=personalBest>0?personalBest:'—';
+    corrLabel.textContent=''; timerLbl.textContent='';
+    timerBar.style.transform='scaleX(0)';
+    if(GROUP_MODE)groupBadge.style.display='';
     updateRoundPips();
-    if (roundIndex >= TOTAL_ROUNDS) {
-      endGame();
-    } else {
-      beginRound();
-    }
   }
 
-  // â”€â”€ Sign animation â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function showSign(name, onReady) {
-    stateSign.style.display = '';
-    stateSign.textContent = `Find: ${name} ðŸ”`;
-    stateSign.classList.remove('sign-arrive', 'sign-leave');
-    void stateSign.offsetWidth;
-    stateSign.classList.add('sign-arrive');
-    sfx('sign');
-    setTimeout(() => { onReady && onReady(); }, 600);
-  }
-
-  // â”€â”€ Round pips â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function updateRoundPips() {
-    let html = '';
-    for (let i = 0; i < TOTAL_ROUNDS; i++) {
-      let cls = '';
-      if (i < roundIndex) {
-        cls = roundResults[i] && roundResults[i].correct ? 'done' : 'missed';
-      } else if (i === roundIndex && running) {
-        cls = 'current';
-      }
-      html += `<div class="round-pip ${cls}"></div>`;
-    }
-    roundPips.innerHTML = html;
-  }
-
-  // â”€â”€ Score display â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function updateScoreDisplay() {
-    scoreEl.textContent = score;
-    if (score > personalBest) bestEl.textContent = score;
-  }
-
-  // â”€â”€ Floating score popup â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function floatScore(text, vx, vy) {
-    const el = document.createElement('div');
-    el.className = 'map-score-pop' + (text === '+0' ? ' zero' : '');
-    el.textContent = text;
-    el.style.left = vx + 'px';
-    el.style.top  = vy + 'px';
-    mapWrap.appendChild(el);
-    setTimeout(() => el.remove(), 1200);
-  }
-
-  // â”€â”€ Feedback toast â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  let toastTimer = null;
-  function showToast(msg, dur) {
-    fbToast.textContent = msg;
-    fbToast.classList.add('visible');
-    if (toastTimer) clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => fbToast.classList.remove('visible'), dur || 1000);
-  }
-
-  // â”€â”€ Start / end game â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function startGame(sport) {
-    sportMode = sport;
-    maxTime = sport ? SPORT_TIME : NORMAL_TIME;
-    score = 0;
-    roundIndex = 0;
-    roundResults = [];
-    running = true;
-    mapPhase = true;
-    quizPhase = false;
-    resetView();
-    clearHighlight();
-    hideQuizPopup();
-
-    sheepX = mapWrap.offsetWidth / 2;
-    sheepY = mapWrap.offsetHeight / 2;
-    foodIcon.style.left = sheepX + 'px';
-    foodIcon.style.top  = sheepY + 'px';
-    foodIcon.style.transition = 'left 0.6s cubic-bezier(0.25,0.46,0.45,0.94), top 0.6s cubic-bezier(0.25,0.46,0.45,0.94)';
-
-    resultOv.classList.remove('visible');
-    modeOverlay.style.display = 'none';
-    hudSub.textContent = sport ? 'âš¡ Sport mode' : 'Find states & their fast food';
-    scoreEl.textContent = 0;
-    bestEl.textContent = personalBest > 0 ? personalBest : 'â€”';
-    corrLabel.textContent = '';
-
-    if (GROUP_MODE) groupBadge.style.display = '';
-
-    roundQueue = buildRoundQueue();
-    updateRoundPips();
-    beginRound();
-  }
-
-  function endGame() {
-    running = false;
-    stopTimer();
-    clearHighlight();
-    hideQuizPopup();
-    corrLabel.textContent = '';
-    stateSign.style.display = 'none';
-    timerLbl.textContent = '';
-
+  function endGame(){
+    running=false; stopTimer(); hideQuizPopup();
+    corrLabel.textContent=''; timerLbl.textContent='';
     stats.games++;
-    const correctCount = roundResults.filter(r => r.correct).length;
-    stats.correct = (stats.correct || 0) + correctCount;
-    if (score === 10000) { stats.perfect = (stats.perfect || 0) + 1; unlockAch('perfect'); }
-    if (stats.games >= 10) unlockAch('explorer');
-    const prevBest = stats.best || 0;
-    if (score > prevBest) stats.best = score;
-    personalBest = stats.best;
-    saveStats(STATS_KEY, stats);
+    const cc=roundResults.filter(r=>r.correct).length;
+    stats.correct=(stats.correct||0)+cc;
+    if(score===10000){stats.perfect=(stats.perfect||0)+1;unlockAch('perfect');}
+    if(stats.games>=10)unlockAch('explorer');
+    if(score>(stats.best||0))stats.best=score;
+    personalBest=stats.best; saveStats(STATS_KEY,stats);
+    const pct=score/(TOTAL_ROUNDS*MAX_SCORE_PER_ROUND);
+    let grade,gradeEmo;
+    if(pct>=0.95){grade='Fast Food Master!';gradeEmo='\U0001f3c6';}
+    else if(pct>=0.80){grade='Food Expert';gradeEmo='\U0001f31f';}
+    else if(pct>=0.60){grade='Solid Foodie';gradeEmo='\U0001f354';}
+    else if(pct>=0.40){grade='Still Learning';gradeEmo='\U0001f4da';}
+    else{grade='Keep Tasting!';gradeEmo='\U0001f35f';}
+    resultEmo.textContent=gradeEmo;
+    resultBig.textContent=score.toLocaleString();
+    resultLbl.textContent='out of 10,000';
+    resultCorr.textContent=cc+' / '+TOTAL_ROUNDS+' correct';
+    resultGrd.textContent=grade;
+    resultOv.classList.add('visible'); sfx('end'); updateRoundPips();
+    const lbRef=sportMode?sportLb:lb;
+    if(isNewBest(lbRef,score,LB_MAX)){
+      mpcScoreVal.textContent=score.toLocaleString(); mpcScoreSub.textContent=grade;
+      mpcScoreWrap.style.display='block'; mpcNameRow.style.display='flex';
+      mpcTitle.textContent='\U0001f3c6 New Best!';
+      mpcSub.textContent='Enter your name for the leaderboard:';
+      mpcNormal.style.display='none'; mpcSport.style.display='none';
+      modeOverlay.style.display='flex';
+    }else{refreshLeaderboard();}
+  }
 
-    const pct = score / (TOTAL_ROUNDS * MAX_SCORE_PER_ROUND);
-    let grade, gradeEmo;
-    if (pct >= 0.95) { grade = 'Fast Food Master!'; gradeEmo = 'ðŸ†'; }
-    else if (pct >= 0.80) { grade = 'Food Expert';      gradeEmo = 'ðŸŒŸ'; }
-    else if (pct >= 0.60) { grade = 'Solid Foodie';     gradeEmo = 'ðŸ”'; }
-    else if (pct >= 0.40) { grade = 'Still Learning';   gradeEmo = 'ðŸ“š'; }
-    else { grade = 'Keep Tasting!'; gradeEmo = 'ðŸŸ'; }
-
-    resultEmo.textContent = gradeEmo;
-    resultBig.textContent = score.toLocaleString();
-    resultLbl.textContent = 'out of 10,000';
-    resultCorr.textContent = `${correctCount} / ${TOTAL_ROUNDS} states identified`;
-    resultGrd.textContent = grade;
-    resultOv.classList.add('visible');
-    sfx('end');
-    updateRoundPips();
-
-    const lbRef = sportMode ? sportLb : lb;
-    if (isNewBest(lbRef, score, LB_MAX)) {
-      mpcScoreVal.textContent = score.toLocaleString();
-      mpcScoreSub.textContent = grade;
-      mpcScoreWrap.style.display = 'block';
-      mpcNameRow.style.display = 'flex';
-      mpcTitle.textContent = 'ðŸ† New Best!';
-      mpcSub.textContent = 'Enter your name for the leaderboard:';
-      mpcNormal.style.display = 'none';
-      mpcSport.style.display = 'none';
-      modeOverlay.style.display = 'flex';
-    } else {
-      refreshLeaderboard();
+  async function initLeaderboards(){
+    if(!token){
+      try{
+        const res=await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key='+window.__FB_KEY__,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({returnSecureToken:true})});
+        token=(await res.json()).idToken||null;
+      }catch{}
     }
+    lb=loadLocalLeaderboard(LB_KEY,LB_MAX);
+    sportLb=loadLocalLeaderboard(LB_SPORT,LB_MAX);
+    try{
+      lb=await fetchLeaderboard({dbUrl:DB,localKey:LB_KEY,max:LB_MAX})||lb;
+      sportLb=await fetchLeaderboard({dbUrl:DB+'/sport',localKey:LB_SPORT,max:LB_MAX})||sportLb;
+    }catch{}
+    bestEl.textContent=personalBest>0?personalBest:'—';
   }
 
-  // â”€â”€ Leaderboard helpers â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  async function initLeaderboards() {
-    if (!token) {
-      try {
-        const res = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${window.__FB_KEY__}`, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({returnSecureToken:true}) });
-        const data = await res.json();
-        token = data.idToken || null;
-      } catch {}
-    }
-    lb      = loadLocalLeaderboard(LB_KEY, LB_MAX);
-    sportLb = loadLocalLeaderboard(LB_SPORT, LB_MAX);
-    try {
-      lb      = await fetchLeaderboard({ dbUrl: DB,           localKey: LB_KEY,   max: LB_MAX }) || lb;
-      sportLb = await fetchLeaderboard({ dbUrl: `${DB}/sport`, localKey: LB_SPORT, max: LB_MAX }) || sportLb;
-    } catch {}
-    bestEl.textContent = personalBest > 0 ? personalBest : 'â€”';
+  function refreshLeaderboard(){
+    renderLeaderboard(document.getElementById('lb-list'),document.getElementById('lb-title'),
+      sportMode?sportLb:lb,sportMode?'Global · Sport':'Global · Normal');
   }
 
-  function refreshLeaderboard() {
-    const list = sportMode ? sportLb : lb;
-    const titleEl = document.getElementById('lb-title');
-    renderLeaderboard(document.getElementById('lb-list'), titleEl, list, sportMode ? 'Global Â· Sport' : 'Global Â· Normal');
-  }
+  mpcNormal.addEventListener('click',()=>startGame(false));
+  mpcSport.addEventListener('click', ()=>startGame(true));
 
-  // â”€â”€ Mode popup & save â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  mpcNormal.addEventListener('click', () => startGame(false));
-  mpcSport.addEventListener('click',  () => startGame(true));
-
-  mpcSave.addEventListener('click', async () => {
-    const raw = (mpcNameIn.value || '').trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
-    const name = raw.slice(0, 10) || 'ANON';
-    const entry = { name, score };
-    const lbRef  = sportMode ? sportLb : lb;
-    const lbKey  = sportMode ? LB_SPORT : LB_KEY;
-    const dbBase = sportMode ? `${DB}/sport` : DB;
-
-    lbRef.push(entry);
-    lbRef.sort((a,b) => b.score - a.score);
-    if (lbRef.length > LB_MAX) lbRef.length = LB_MAX;
-    saveLocalLeaderboard(lbKey, lbRef);
-    try { await pushLeaderboard({ dbUrl: dbBase, localKey: lbKey, max: LB_MAX, lb: lbRef, token }); } catch {}
-
-    modeOverlay.style.display = 'none';
-    mpcNormal.style.display = '';
-    mpcSport.style.display = '';
-    mpcNameRow.style.display = 'none';
-    mpcScoreWrap.style.display = 'none';
-    mpcTitle.textContent = 'ðŸ” State Eats Quest';
-    mpcSub.textContent = 'Find the state & pick its fast food!';
+  mpcSave.addEventListener('click',async()=>{
+    const raw=(mpcNameIn.value||'').trim().toUpperCase().replace(/[^A-Z0-9 ]/g,'');
+    const name=raw.slice(0,10)||'ANON';
+    const entry={name,score};
+    const lbRef=sportMode?sportLb:lb, lbKey=sportMode?LB_SPORT:LB_KEY, dbBase=sportMode?DB+'/sport':DB;
+    lbRef.push(entry); lbRef.sort((a,b)=>b.score-a.score);
+    if(lbRef.length>LB_MAX)lbRef.length=LB_MAX;
+    saveLocalLeaderboard(lbKey,lbRef);
+    try{await pushLeaderboard({dbUrl:dbBase,localKey:lbKey,max:LB_MAX,lb:lbRef,token});}catch{}
+    modeOverlay.style.display='none'; mpcNormal.style.display=''; mpcSport.style.display='';
+    mpcNameRow.style.display='none'; mpcScoreWrap.style.display='none';
+    mpcTitle.textContent='\U0001f354 State Eats Quest';
+    mpcSub.textContent='Click any state & pick its fast food!';
     refreshLeaderboard();
   });
 
-  document.getElementById('play-again-btn').addEventListener('click', () => {
+  document.getElementById('play-again-btn').addEventListener('click',()=>{
     resultOv.classList.remove('visible');
-    mpcTitle.textContent = 'ðŸ” State Eats Quest';
-    mpcSub.textContent = 'Play again?';
-    mpcScoreWrap.style.display = 'none';
-    mpcNameRow.style.display = 'none';
-    mpcNormal.style.display = '';
-    mpcSport.style.display = '';
-    modeOverlay.style.display = 'flex';
+    mpcTitle.textContent='\U0001f354 State Eats Quest'; mpcSub.textContent='Play again?';
+    mpcScoreWrap.style.display='none'; mpcNameRow.style.display='none';
+    mpcNormal.style.display=''; mpcSport.style.display='';
+    modeOverlay.style.display='flex';
   });
-
-  document.getElementById('view-lb-btn').addEventListener('click', () => {
+  document.getElementById('view-lb-btn').addEventListener('click',()=>{
     refreshLeaderboard();
     document.getElementById('info-overlay').classList.add('visible');
     document.getElementById('info-drawer').classList.add('open');
   });
-
-  // â”€â”€ Stats / leaderboard drawer â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  statsBtn.addEventListener('click', () => {
-    refreshLeaderboard();
-    updateStatsPanel();
-    renderAchievements();
+  statsBtn.addEventListener('click',()=>{
+    refreshLeaderboard();updateStatsPanel();renderAchievements();
     document.getElementById('info-overlay').classList.add('visible');
     document.getElementById('info-drawer').classList.add('open');
   });
-  document.getElementById('info-close').addEventListener('click', closeDrawer);
-  document.getElementById('info-overlay').addEventListener('click', closeDrawer);
-  function closeDrawer() {
+  document.getElementById('info-close').addEventListener('click',closeDrawer);
+  document.getElementById('info-overlay').addEventListener('click',closeDrawer);
+  function closeDrawer(){
     document.getElementById('info-overlay').classList.remove('visible');
     document.getElementById('info-drawer').classList.remove('open');
   }
-
-  function updateStatsPanel() {
-    document.getElementById('stat-games').textContent   = stats.games || 0;
-    document.getElementById('stat-best').textContent    = stats.best || 0;
-    document.getElementById('stat-correct').textContent = stats.correct || 0;
-    document.getElementById('stat-perfect').textContent = stats.perfect || 0;
+  function updateStatsPanel(){
+    document.getElementById('stat-games').textContent  =stats.games||0;
+    document.getElementById('stat-best').textContent   =stats.best||0;
+    document.getElementById('stat-correct').textContent=stats.correct||0;
+    document.getElementById('stat-perfect').textContent=stats.perfect||0;
+  }
+  function renderAchievements(){
+    document.getElementById('ach-list').innerHTML=ACHIEVEMENTS.map(a=>
+      '<div class="ach-item '+(unlockedAch.has(a.id)?'unlocked':'locked')+'">'
+      +'<span class="ach-icon">'+a.icon+'</span>'
+      +'<div><strong>'+a.label+'</strong><br><small>'+a.desc+'</small></div></div>'
+    ).join('');
   }
 
-  function renderAchievements() {
-    const list = document.getElementById('ach-list');
-    list.innerHTML = ACHIEVEMENTS.map(a => `
-      <div class="ach-item ${unlockedAch.has(a.id) ? 'unlocked' : 'locked'}">
-        <span class="ach-icon">${a.icon}</span>
-        <div><strong>${a.label}</strong><br><small>${a.desc}</small></div>
-      </div>
-    `).join('');
-  }
-
-  // â”€â”€ Mute â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  document.addEventListener('keydown', e => {
-    if (e.key === 'm' || e.key === 'M') {
-      MUTED = !MUTED;
-      localStorage.setItem(MUTE_KEY, MUTED ? '1' : '0');
-    }
+  document.addEventListener('keydown',e=>{
+    if(e.key==='m'||e.key==='M'){MUTED=!MUTED;localStorage.setItem(MUTE_KEY,MUTED?'1':'0');}
   });
 
-  // â”€â”€ Audio â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  function sfx(type) {
-    if (MUTED) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    const now = ctx.currentTime;
-    if (type === 'sign') {
-      tone(ctx, 523, 'triangle', 0.12, now,        0.18);
-      tone(ctx, 659, 'triangle', 0.12, now + 0.12, 0.18);
-      tone(ctx, 784, 'triangle', 0.15, now + 0.24, 0.25);
-    } else if (type === 'state-found') {
-      tone(ctx, 659, 'triangle', 0.14, now,        0.15);
-      tone(ctx, 784, 'triangle', 0.18, now + 0.1,  0.2);
-    } else if (type === 'correct') {
-      tone(ctx, 523,  'triangle', 0.14, now,        0.15);
-      tone(ctx, 659,  'triangle', 0.14, now + 0.12, 0.15);
-      tone(ctx, 784,  'triangle', 0.14, now + 0.24, 0.15);
-      tone(ctx, 1047, 'triangle', 0.18, now + 0.36, 0.3);
-    } else if (type === 'wrong') {
-      tone(ctx, 330, 'sawtooth', 0.12, now,       0.1);
-      tone(ctx, 220, 'sawtooth', 0.10, now + 0.1, 0.15);
-    } else if (type === 'timeout') {
-      tone(ctx, 330, 'sawtooth', 0.12, now,        0.12);
-      tone(ctx, 247, 'sawtooth', 0.12, now + 0.12, 0.12);
-      tone(ctx, 196, 'sawtooth', 0.12, now + 0.24, 0.2);
-    } else if (type === 'end') {
-      [523, 659, 784, 1047].forEach((f, i) => {
-        tone(ctx, f, 'triangle', 0.14, now + i * 0.1, 0.3);
-      });
-    }
+  function sfx(type){
+    if(MUTED)return; const ctx=getAudioContext();if(!ctx)return;
+    const now=ctx.currentTime;
+    if(type==='correct'){
+      tone(ctx,523,'triangle',0.14,now,0.15);tone(ctx,659,'triangle',0.14,now+0.12,0.15);
+      tone(ctx,784,'triangle',0.14,now+0.24,0.15);tone(ctx,1047,'triangle',0.18,now+0.36,0.3);
+    }else if(type==='wrong'){
+      tone(ctx,330,'sawtooth',0.12,now,0.1);tone(ctx,220,'sawtooth',0.10,now+0.1,0.15);
+    }else if(type==='timeout'){
+      tone(ctx,330,'sawtooth',0.12,now,0.12);tone(ctx,247,'sawtooth',0.12,now+0.12,0.12);
+      tone(ctx,196,'sawtooth',0.12,now+0.24,0.2);
+    }else if(type==='end'){[523,659,784,1047].forEach((f,i)=>tone(ctx,f,'triangle',0.14,now+i*0.1,0.3));}
   }
+  function sfxTick(){if(MUTED)return;const ctx=getAudioContext();if(!ctx)return;tone(ctx,440,'sine',0.07,ctx.currentTime,0.06);}
 
-  function sfxTick() {
-    if (MUTED) return;
-    const ctx = getAudioContext();
-    if (!ctx) return;
-    tone(ctx, 440, 'sine', 0.07, ctx.currentTime, 0.06);
-  }
-
-  // â”€â”€ Friends group â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  document.getElementById('create-group-btn').addEventListener('click', async () => {
-    const id = generateGroupId();
-    const url = getGroupUrl(id);
-    const wrap = document.getElementById('group-link-wrap');
-    document.getElementById('group-link-display').textContent = url;
-    wrap.style.display = '';
-    document.getElementById('create-group-btn').style.display = 'none';
-    try { await createGroupInFirebase(DB, id, token); } catch {}
+  document.getElementById('create-group-btn').addEventListener('click',async()=>{
+    const id=generateGroupId(),url=getGroupUrl(id);
+    document.getElementById('group-link-display').textContent=url;
+    document.getElementById('group-link-wrap').style.display='';
+    document.getElementById('create-group-btn').style.display='none';
+    try{await createGroupInFirebase(DB,id,token);}catch{}
   });
-
-  document.querySelectorAll('.share-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const net = btn.dataset.net;
-      const url = document.getElementById('group-link-display').textContent;
-      if (net === 'copy') {
-        navigator.clipboard.writeText(url).then(() => showFriendsCopyToast());
-      } else if (net === 'twitter') {
-        window.open(`https://twitter.com/intent/tweet?text=Play+State+Eats+Quest+with+me!&url=${encodeURIComponent(url)}`);
-      }
+  document.querySelectorAll('.share-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const url=document.getElementById('group-link-display').textContent;
+      if(btn.dataset.net==='copy')navigator.clipboard.writeText(url).then(()=>showFriendsCopyToast());
+      else if(btn.dataset.net==='twitter')window.open('https://twitter.com/intent/tweet?text=Play+State+Eats+Quest+with+me!&url='+encodeURIComponent(url));
     });
   });
 
-  // â”€â”€ Boot â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  (async () => {
-    await initLeaderboards();
-    refreshLeaderboard();
-    updateStatsPanel();
-    renderAchievements();
-    mpcTitle.textContent = 'ðŸ” State Eats Quest';
-    mpcSub.textContent = 'Find the state & pick its fast food!';
-    mpcNormal.style.display = '';
-    mpcSport.style.display = '';
-    mpcNameRow.style.display = 'none';
-    mpcScoreWrap.style.display = 'none';
-    modeOverlay.style.display = 'flex';
+  (async()=>{
+    await initLeaderboards(); refreshLeaderboard(); updateStatsPanel(); renderAchievements();
+    mpcTitle.textContent='\U0001f354 State Eats Quest';
+    mpcSub.textContent='Click any state & pick its fast food!';
+    mpcNormal.style.display=''; mpcSport.style.display='';
+    mpcNameRow.style.display='none'; mpcScoreWrap.style.display='none';
+    modeOverlay.style.display='flex';
   })();
 
 })();
 </script>
 </BaseLayout>
-

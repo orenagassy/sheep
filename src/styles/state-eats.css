@@ -52,15 +52,9 @@
   fill: #ffa726 !important;
   transition: fill 0s;
 }
-.state-path.state-highlight {
-  fill: #f5a623 !important;
-  stroke: #8b4513 !important;
-  stroke-width: 1.5;
-  animation: highlight-pulse 1.2s ease-in-out infinite alternate;
-}
-@keyframes highlight-pulse {
-  from { fill: #f5a623; }
-  to   { fill: #ffcc44; }
+.state-path.state-used {
+  fill: #b8a060 !important;
+  opacity: 0.55;
 }
 
 /* ── Food icon on map ────────────────────────────────────────────────────── */
