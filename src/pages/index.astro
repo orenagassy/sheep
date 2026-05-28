@@ -125,6 +125,28 @@ const schema = JSON.stringify({
               "suggestedMinAge": 7
             }
           }
+        },
+        {
+          "@type": "ListItem",
+          "position": 5,
+          "item": {
+            "@type": "VideoGame",
+            "@id": "https://sheeps.online/state-eats/#game",
+            "name": "State Eats Quest",
+            "url": "https://sheeps.online/state-eats/",
+            "description": "A fast food geography quiz! Click the highlighted US state on the map, then pick the state's iconic fast food chain from four logo choices.",
+            "genre": ["Casual", "Educational", "Trivia", "Geography"],
+            "playMode": "SinglePlayer",
+            "applicationCategory": "Game",
+            "operatingSystem": "Any",
+            "gamePlatform": "Web Browser",
+            "isAccessibleForFree": true,
+            "image": "https://sheeps.online/og-image.svg",
+            "audience": {
+              "@type": "PeopleAudience",
+              "suggestedMinAge": 8
+            }
+          }
         }
       ]
     },
@@ -396,6 +418,17 @@ const schema = JSON.stringify({
           <span class="tag">Geography</span>
           <span class="tag">Educational</span>
           <span class="tag">Kids</span>
+          <span class="tag">Free</span>
+        </div>
+      </a>
+      <a class="game-card" href="/state-eats/" aria-label="Play State Eats Quest">
+        <div class="game-card-icon">🗺️<span class="icon-badge">🍔</span></div>
+        <div class="game-card-title">State Eats Quest</div>
+        <p class="game-card-desc">Click the highlighted state on the map, then pick its favorite fast food from four logos. Do you know your regional chains?</p>
+        <div class="game-card-meta">
+          <span class="tag">Trivia</span>
+          <span class="tag">Geography</span>
+          <span class="tag">Food</span>
           <span class="tag">Free</span>
         </div>
       </a>
