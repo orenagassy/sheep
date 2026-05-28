@@ -205,7 +205,8 @@ const schema = JSON.stringify({
   const TOTAL_ROUNDS  = 10;
   const NORMAL_TIME   = 20;   // seconds per round (normal)
   const SPORT_TIME    = 15;   // seconds per round (sport)
-  const SPORT_SPEED_BONUS = 200; // bonus if answered in first 5s (sport)
+  const SPORT_SPEED_BONUS   = 200; // bonus if answered in first 5s (sport)
+  const FIRST_ATTEMPT_BONUS = 150; // bonus for finding the state on first click
   const MAX_SCORE_PER_ROUND = 1000;
 
   // ── Game framework utilities ──────────────────────────────────────────────
@@ -465,6 +466,7 @@ const schema = JSON.stringify({
   let timerRaf = null;
   let timerStartTs = null;
   let answered = false;       // has the current round been answered?
+  let firstAttempt = true;    // no wrong click yet this round
   let running  = false;
   let roundResults = [];      // { correct: bool, points: int }
 
@@ -538,6 +540,29 @@ const schema = JSON.stringify({
 
   // ── Init map ───────────────────────────────────────────────────────────────
   mapCont.innerHTML = MAP_SVG;
+
+  // Inject state abbreviation labels at each centroid
+  (function addLabels() {
+    const svgEl = mapCont.querySelector('svg');
+    if (!svgEl) return;
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'state-labels');
+    g.setAttribute('pointer-events', 'none');
+    for (const [id, , , cx, cy] of STATES) {
+      const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      t.setAttribute('x', cx);
+      t.setAttribute('y', cy + 3);
+      t.setAttribute('text-anchor', 'middle');
+      t.setAttribute('font-size', '10');
+      t.setAttribute('font-family', 'sans-serif');
+      t.setAttribute('font-weight', '700');
+      t.setAttribute('fill', '#5a4e38');
+      t.setAttribute('opacity', '0.7');
+      t.textContent = id;
+      g.appendChild(t);
+    }
+    svgEl.appendChild(g);
+  })();
 
   // Center sheep
   const mRect = mapWrap.getBoundingClientRect();
@@ -747,9 +772,11 @@ const schema = JSON.stringify({
     const elapsed = maxTime - timeLeft;
     let points = Math.round((timeLeft / maxTime) * MAX_SCORE_PER_ROUND);
     if (sportMode && elapsed < 5) points += SPORT_SPEED_BONUS;
+    const gotBonus = firstAttempt && points > 0;
+    if (gotBonus) points += FIRST_ATTEMPT_BONUS;
     points = Math.max(0, points);
     score += points;
-    roundResults.push({ correct: true, points });
+    roundResults.push({ correct: true, points, firstAttempt });
 
     flashState(currentState.id, 'flash-correct', 1200);
     sheep.classList.remove('retreating');
@@ -758,7 +785,8 @@ const schema = JSON.stringify({
     moveSheepToCentroid(currentState.cx, currentState.cy);
     sfx('correct');
     floatScore('+' + points, vx, vy);
-    corrLabel.textContent = `✅ ${currentState.name}! ${points > 0 ? '+' + points + ' pts' : 'Time up!'}`;
+    const bonusTag = gotBonus ? ` 🎯 +${FIRST_ATTEMPT_BONUS} first try!` : '';
+    corrLabel.textContent = `✅ ${currentState.name}!${points > 0 ? ' +' + points + ' pts' : ' Time up!'}${bonusTag}`;
     updateScoreDisplay();
 
     // Achievements
@@ -772,6 +800,7 @@ const schema = JSON.stringify({
   }
 
   function wrongAnswer(clickedName) {
+    firstAttempt = false;
     flashState(clickedName.replace(/ /g,'_') || '', 'flash-wrong', 600);
     // Find path by data-name
     const paths = mapCont.querySelectorAll('path[data-name]');
@@ -863,6 +892,7 @@ const schema = JSON.stringify({
     const [id, name, emoji, cx, cy, tier] = roundQueue[roundIndex];
     currentState = { id, name, emoji, cx, cy, tier };
     answered = false;
+    firstAttempt = true;
     timeLeft = maxTime;
     timerBar.style.transform = 'scaleX(1)';
     timerLbl.textContent = maxTime.toFixed(1) + 's';
