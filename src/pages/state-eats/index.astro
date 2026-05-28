@@ -683,7 +683,7 @@ const schema = JSON.stringify({
     const streak=roundResults.slice(-5);
     if(streak.length===5&&streak.every(r=>r.correct))unlockAch('streaker');
     setTimeout(()=>{
-      hideQuizPopup(); roundIndex++;
+      hideQuizPopup(); answered=false; roundIndex++;
       if(roundIndex>=TOTAL_ROUNDS){endGame();}
       else{updateRoundPips();hudSub.textContent='Click another state!';}
     },800);
@@ -703,8 +703,7 @@ const schema = JSON.stringify({
     corrLabel.textContent = '❌ Wrong! '+currentState.name+' → '+brandName;
     updateScoreDisplay();
     setTimeout(()=>{
-      hideQuizPopup();
-      roundIndex++;
+      hideQuizPopup(); answered=false; roundIndex++;
       if(roundIndex>=TOTAL_ROUNDS){endGame();}
       else{updateRoundPips();hudSub.textContent='Click another state!';}
     },1200);
@@ -735,7 +734,7 @@ const schema = JSON.stringify({
     corrLabel.textContent='⏱️ Time\'s up! '+currentState.name+' → '+(BRAND_NAMES[currentState.domain]||currentState.domain);
     updateScoreDisplay();
     setTimeout(()=>{
-      hideQuizPopup(); roundIndex++;
+      hideQuizPopup(); answered=false; roundIndex++;
       if(roundIndex>=TOTAL_ROUNDS){endGame();}
       else{updateRoundPips();hudSub.textContent='Click another state!';}
     },1800);
