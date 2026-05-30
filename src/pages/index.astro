@@ -43,11 +43,11 @@ const schema = JSON.stringify({
           "position": 1,
           "item": {
             "@type": "VideoGame",
-            "@id": "https://sheeps.online/sheep-gates/#game",
-            "name": "Sheep Gates",
-            "url": "https://sheeps.online/sheep-gates/",
-            "description": "Pick the open gate, dodge the wolves, and survive as long as you can. A fast-paced casual browser game perfect for kids and adults.",
-            "genre": ["Casual", "Action", "Arcade", "Kids"],
+            "@id": "https://sheeps.online/state-eats/#game",
+            "name": "Fast Food Sheep",
+            "url": "https://sheeps.online/state-eats/",
+            "description": "A fast food geography quiz! Click the highlighted US state on the map, then pick the state's iconic fast food chain from four logo choices.",
+            "genre": ["Casual", "Educational", "Trivia", "Geography"],
             "playMode": "SinglePlayer",
             "applicationCategory": "Game",
             "operatingSystem": "Any",
@@ -56,7 +56,7 @@ const schema = JSON.stringify({
             "image": "https://sheeps.online/og-image.svg",
             "audience": {
               "@type": "PeopleAudience",
-              "suggestedMinAge": 5
+              "suggestedMinAge": 8
             }
           }
         },
@@ -65,11 +65,11 @@ const schema = JSON.stringify({
           "position": 2,
           "item": {
             "@type": "VideoGame",
-            "@id": "https://sheeps.online/fat-sheep/#game",
-            "name": "Fat Grazing Sheep",
-            "url": "https://sheeps.online/fat-sheep/",
-            "description": "Guide your sheep around a pasture, eat food, grow enormous, and dodge the sheepdogs. A casual browser game with 6 fat stages and power-ups.",
-            "genre": ["Casual", "Kids"],
+            "@id": "https://sheeps.online/state-quest/#game",
+            "name": "Sheep State Quest",
+            "url": "https://sheeps.online/state-quest/",
+            "description": "Guide your sheep to the correct US state on a blank map! A wooden sign names the target state, the clock starts ticking — zoom in and click before time runs out.",
+            "genre": ["Casual", "Educational", "Geography", "Kids"],
             "playMode": "SinglePlayer",
             "applicationCategory": "Game",
             "operatingSystem": "Any",
@@ -78,7 +78,7 @@ const schema = JSON.stringify({
             "image": "https://sheeps.online/og-image.svg",
             "audience": {
               "@type": "PeopleAudience",
-              "suggestedMinAge": 5
+              "suggestedMinAge": 7
             }
           }
         },
@@ -109,11 +109,11 @@ const schema = JSON.stringify({
           "position": 4,
           "item": {
             "@type": "VideoGame",
-            "@id": "https://sheeps.online/state-quest/#game",
-            "name": "Sheep State Quest",
-            "url": "https://sheeps.online/state-quest/",
-            "description": "Guide your sheep to the correct US state on a blank map! A wooden sign names the target state, the clock starts ticking — zoom in and click before time runs out.",
-            "genre": ["Casual", "Educational", "Geography", "Kids"],
+            "@id": "https://sheeps.online/fat-sheep/#game",
+            "name": "Fat Grazing Sheep",
+            "url": "https://sheeps.online/fat-sheep/",
+            "description": "Guide your sheep around a pasture, eat food, grow enormous, and dodge the sheepdogs. A casual browser game with 6 fat stages and power-ups.",
+            "genre": ["Casual", "Kids"],
             "playMode": "SinglePlayer",
             "applicationCategory": "Game",
             "operatingSystem": "Any",
@@ -122,7 +122,7 @@ const schema = JSON.stringify({
             "image": "https://sheeps.online/og-image.svg",
             "audience": {
               "@type": "PeopleAudience",
-              "suggestedMinAge": 7
+              "suggestedMinAge": 5
             }
           }
         },
@@ -131,11 +131,11 @@ const schema = JSON.stringify({
           "position": 5,
           "item": {
             "@type": "VideoGame",
-            "@id": "https://sheeps.online/state-eats/#game",
-            "name": "State Eats Quest",
-            "url": "https://sheeps.online/state-eats/",
-            "description": "A fast food geography quiz! Click the highlighted US state on the map, then pick the state's iconic fast food chain from four logo choices.",
-            "genre": ["Casual", "Educational", "Trivia", "Geography"],
+            "@id": "https://sheeps.online/sheep-gates/#game",
+            "name": "Sheep Gates",
+            "url": "https://sheeps.online/sheep-gates/",
+            "description": "Pick the open gate, dodge the wolves, and survive as long as you can. A fast-paced casual browser game perfect for kids and adults.",
+            "genre": ["Casual", "Action", "Arcade", "Kids"],
             "playMode": "SinglePlayer",
             "applicationCategory": "Game",
             "operatingSystem": "Any",
@@ -144,7 +144,7 @@ const schema = JSON.stringify({
             "image": "https://sheeps.online/og-image.svg",
             "audience": {
               "@type": "PeopleAudience",
-              "suggestedMinAge": 8
+              "suggestedMinAge": 5
             }
           }
         }
@@ -377,24 +377,24 @@ const schema = JSON.stringify({
     <p class="subtitle">No download, no account. Pick a game and play.</p>
 
     <div class="games-grid">
-      <a class="game-card" href="/sheep-gates/" aria-label="Play Sheep Gates">
-        <div class="game-card-icon">🐑<span class="icon-badge">🐺</span></div>
-        <div class="game-card-title">Sheep Gates</div>
-        <p class="game-card-desc">Seven gates, one wolf. Pick the right one and keep going.</p>
+      <a class="game-card" href="/state-eats/" aria-label="Play Fast Food Sheep">
+        <div class="game-card-icon">🗺️<span class="icon-badge">🍔</span></div>
+        <div class="game-card-title">Fast Food Sheep</div>
+        <p class="game-card-desc">Click the highlighted state on the map, then pick its favorite fast food from four logos. Do you know your regional chains?</p>
         <div class="game-card-meta">
-          <span class="tag">Casual</span>
-          <span class="tag">Arcade</span>
-          <span class="tag">Kids</span>
+          <span class="tag">Trivia</span>
+          <span class="tag">Geography</span>
+          <span class="tag">Food</span>
           <span class="tag">Free</span>
         </div>
       </a>
-      <a class="game-card" href="/fat-sheep/" aria-label="Play Fat Grazing Sheep">
-        <div class="game-card-icon">🐑<span class="icon-badge">🌿</span></div>
-        <div class="game-card-title">Fat Grazing Sheep</div>
-        <p class="game-card-desc">Guide your sheep, eat everything, grow enormous, and dodge the sheepdogs. How fat can you get?</p>
+      <a class="game-card" href="/state-quest/" aria-label="Play Sheep State Quest">
+        <div class="game-card-icon">🐑<span class="icon-badge">🗺️</span></div>
+        <div class="game-card-title">Sheep State Quest</div>
+        <p class="game-card-desc">Guide your sheep to the right US state on a blank map! Zoom in, pan around, and click before the timer runs out.</p>
         <div class="game-card-meta">
-          <span class="tag">Casual</span>
-          <span class="tag">Movement</span>
+          <span class="tag">Geography</span>
+          <span class="tag">Educational</span>
           <span class="tag">Kids</span>
           <span class="tag">Free</span>
         </div>
@@ -410,25 +410,25 @@ const schema = JSON.stringify({
           <span class="tag">Free</span>
         </div>
       </a>
-      <a class="game-card" href="/state-quest/" aria-label="Play Sheep State Quest">
-        <div class="game-card-icon">🐑<span class="icon-badge">🗺️</span></div>
-        <div class="game-card-title">Sheep State Quest</div>
-        <p class="game-card-desc">Guide your sheep to the right US state on a blank map! Zoom in, pan around, and click before the timer runs out.</p>
+      <a class="game-card" href="/fat-sheep/" aria-label="Play Fat Grazing Sheep">
+        <div class="game-card-icon">🐑<span class="icon-badge">🌿</span></div>
+        <div class="game-card-title">Fat Grazing Sheep</div>
+        <p class="game-card-desc">Guide your sheep, eat everything, grow enormous, and dodge the sheepdogs. How fat can you get?</p>
         <div class="game-card-meta">
-          <span class="tag">Geography</span>
-          <span class="tag">Educational</span>
+          <span class="tag">Casual</span>
+          <span class="tag">Movement</span>
           <span class="tag">Kids</span>
           <span class="tag">Free</span>
         </div>
       </a>
-      <a class="game-card" href="/state-eats/" aria-label="Play State Eats Quest">
-        <div class="game-card-icon">🗺️<span class="icon-badge">🍔</span></div>
-        <div class="game-card-title">State Eats Quest</div>
-        <p class="game-card-desc">Click the highlighted state on the map, then pick its favorite fast food from four logos. Do you know your regional chains?</p>
+      <a class="game-card" href="/sheep-gates/" aria-label="Play Sheep Gates">
+        <div class="game-card-icon">🐑<span class="icon-badge">🐺</span></div>
+        <div class="game-card-title">Sheep Gates</div>
+        <p class="game-card-desc">Seven gates, one wolf. Pick the right one and keep going.</p>
         <div class="game-card-meta">
-          <span class="tag">Trivia</span>
-          <span class="tag">Geography</span>
-          <span class="tag">Food</span>
+          <span class="tag">Casual</span>
+          <span class="tag">Arcade</span>
+          <span class="tag">Kids</span>
           <span class="tag">Free</span>
         </div>
       </a>

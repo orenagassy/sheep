@@ -10,7 +10,7 @@ const schema = JSON.stringify({
     {
       "@type": "VideoGame",
       "@id": "https://sheeps.online/state-eats/#game",
-      "name": "State Eats Quest",
+      "name": "Fast Food Sheep",
       "url": "https://sheeps.online/state-eats/",
       "description": "Click any US state on the map to reveal a fast food quiz. Pick the chain most popular in that state from four real logo choices.",
       "genre": ["Casual", "Educational", "Trivia", "Geography"],
@@ -33,14 +33,14 @@ const schema = JSON.stringify({
       "@type": "BreadcrumbList",
       "itemListElement": [
         { "@type": "ListItem", "position": 1, "name": "Free Games", "item": "https://sheeps.online/" },
-        { "@type": "ListItem", "position": 2, "name": "State Eats Quest", "item": "https://sheeps.online/state-eats/" }
+        { "@type": "ListItem", "position": 2, "name": "Fast Food Sheep", "item": "https://sheeps.online/state-eats/" }
       ]
     }
   ]
 });
 ---
 <BaseLayout
-  title="State Eats Quest — USA Fast Food Trivia Game | Sheeps.online"
+  title="Fast Food Sheep — USA Fast Food Trivia Game | Sheeps.online"
   description="Click any US state on the map and pick its favorite fast food from four logo choices. Can you name all 50? Free browser trivia game."
 >
   <Fragment slot="head">
@@ -50,7 +50,7 @@ const schema = JSON.stringify({
   </Fragment>
 
 <div class="app">
-  <h1>🍔 State Eats Quest</h1>
+  <h1>🍔 Fast Food Sheep</h1>
   <p class="tagline">Click any state — then pick its favorite fast food! 🗺️</p>
 
   <div class="ad-wrap ad-wrap--top"></div>
@@ -61,7 +61,7 @@ const schema = JSON.stringify({
       <div class="topbar-left">
         <span id="group-badge" style="display:none">👥 Group Mode</span>
         <div>
-          <div class="hud-title">🍔 State Eats</div>
+          <div class="hud-title">🍔 Fast Food Sheep</div>
           <div class="hud-subtitle" id="hud-subtitle">Click a state to begin</div>
         </div>
       </div>
@@ -116,7 +116,7 @@ const schema = JSON.stringify({
 <div id="mode-overlay">
   <div id="mode-popup">
     <div class="mode-popup-inner">
-      <div class="mode-popup-title" id="mode-popup-title">🍔 State Eats Quest</div>
+      <div class="mode-popup-title" id="mode-popup-title">🍔 Fast Food Sheep</div>
       <div class="mode-popup-sub" id="mode-popup-sub">Click any state &amp; pick its fast food!</div>
       <div class="mode-popup-score" id="mode-popup-score" style="display:none">
         <div id="mode-popup-score-val"></div>
@@ -460,6 +460,7 @@ const schema = JSON.stringify({
   let timeLeft = NORMAL_TIME, maxTime = NORMAL_TIME;
   let timerRaf = null, timerStartTs = null;
   let answered = false, firstAttempt = true, running = false;
+  let blockQuizClicks = false;
   let roundResults = [];
   let zoom = 1, panX = 0, panY = 0;
   let dragging = false, dragLast = null;
@@ -470,11 +471,11 @@ const schema = JSON.stringify({
 
   const ACHIEVEMENTS = [
     { id:'lightning', icon:'⚡', label:'Lightning Round', desc:'Answer in under 3 seconds' },
-    { id:'perfect',   icon:'\U0001f4af', label:'Perfect Score',   desc:'Score 10,000 in one game' },
-    { id:'explorer',  icon:'\U0001f5fa️', label:'Food Explorer', desc:'Play 10 games' },
-    { id:'texas',     icon:'\U0001f920', label:"Don't Mess",    desc:'Answer Texas correctly' },
-    { id:'streaker',  icon:'\U0001f525', label:'Unstoppable',   desc:'Get 5 correct in a row' },
-    { id:'scholar',   icon:'\U0001f393', label:'Food Scholar',  desc:'Score 800+ on a hard state' },
+    { id:'perfect',   icon:'💯', label:'Perfect Score',   desc:'Score 10,000 in one game' },
+    { id:'explorer',  icon:'🗺️', label:'Food Explorer', desc:'Play 10 games' },
+    { id:'texas',     icon:'🤠', label:"Don't Mess",    desc:'Answer Texas correctly' },
+    { id:'streaker',  icon:'🔥', label:'Unstoppable',   desc:'Get 5 correct in a row' },
+    { id:'scholar',   icon:'🎓', label:'Food Scholar',  desc:'Score 800+ on a hard state' },
   ];
   let unlockedAch = new Set(JSON.parse(localStorage.getItem('stateeats:ach') || '[]'));
   function unlockAch(id) {
@@ -538,9 +539,12 @@ const schema = JSON.stringify({
     });
   }
 
-  function dimState(id) {
+  function dimState(id, correct) {
     const el = document.getElementById(id);
-    if (el) el.classList.add('state-used');
+    if (el) {
+      el.classList.remove('state-correct', 'state-wrong');
+      el.classList.add(correct ? 'state-correct' : 'state-wrong');
+    }
     const lbl = document.getElementById('lbl-' + id);
     if (lbl) lbl.setAttribute('fill', 'rgba(255,255,255,0.35)');
   }
@@ -611,8 +615,8 @@ const schema = JSON.stringify({
     const t=e.changedTouches[0];
     const el=document.elementFromPoint(t.clientX,t.clientY);
     const path=el&&el.closest?el.closest('path[data-name]'):null;
-    if(path) handleStateClick(path);
-  },{passive:true});
+    if(path){e.preventDefault();handleStateClick(path);}
+  });
 
   function startQuiz(entry) {
     const [id,name,domain,tier,cx,cy]=entry;
@@ -638,8 +642,8 @@ const schema = JSON.stringify({
       const btn=document.createElement('button');
       btn.className='logo-card'; btn.dataset.domain=domain;
       const name=BRAND_NAMES[domain]||domain;
-      const clearbit='https://logo.clearbit.com/'+domain;
-      const gfav='https://www.google.com/s2/favicons?domain='+domain+'&sz=128';
+      const clearbit='https://logo.clearbit.com/'+domain+'?size=200';
+      const gfav='https://www.google.com/s2/favicons?domain='+domain+'&sz=256';
       btn.innerHTML=
         '<div class="logo-img-wrap">'+
           '<img class="logo-img" src="'+clearbit+'" alt="'+name+'" '+
@@ -649,7 +653,9 @@ const schema = JSON.stringify({
       btn.addEventListener('click',()=>onLogoClick(domain,btn));
       quizGrid.appendChild(btn);
     });
+    blockQuizClicks=true;
     quizOverlay.classList.add('visible');
+    requestAnimationFrame(()=>{ blockQuizClicks=false; });
     timerLbl.textContent=maxTime.toFixed(1)+'s';
     timerBar.style.transform='scaleX(1)';
     timerBar.classList.remove('urgent');
@@ -658,7 +664,7 @@ const schema = JSON.stringify({
   function hideQuizPopup(){quizOverlay.classList.remove('visible');quizGrid.innerHTML='';}
 
   function onLogoClick(domain,cardEl){
-    if(!running||answered)return;
+    if(!running||answered||blockQuizClicks)return;
     if(domain===currentState.domain){onLogoCorrect(cardEl);}else{onLogoWrong(cardEl);}
   }
 
@@ -672,10 +678,9 @@ const schema = JSON.stringify({
     points=Math.max(0,points);
     score+=points; roundResults.push({correct:true,points,firstAttempt});
     cardEl.classList.add('flash-correct-card');
-    sfx('correct'); dimState(currentState.id);
+    sfx('correct'); dimState(currentState.id, true);
     floatScore('+'+points,mapWrap.offsetWidth/2,mapWrap.offsetHeight*0.4);
-    const bonusTag=gotBonus?' \U0001f3af +'+FIRST_ATTEMPT_BONUS+' first try!':'';
-    corrLabel.textContent='✅ '+currentState.name+'!'+(points>0?' +'+points+' pts':'')+bonusTag;
+    corrLabel.textContent='✅ '+currentState.name+'!'+(points>0?' +'+points+' pts':'');
     updateScoreDisplay();
     if(elapsed<3)unlockAch('lightning');
     if(currentState.id==='TX')unlockAch('texas');
@@ -695,7 +700,7 @@ const schema = JSON.stringify({
     roundResults.push({correct:false,points:0});
     cardEl.classList.add('flash-wrong-card');
     sfx('wrong');
-    dimState(currentState.id);
+    dimState(currentState.id, false);
     // Show correct answer briefly before advancing
     const correctCard = quizGrid.querySelector('[data-domain="'+currentState.domain+'"]');
     if(correctCard) correctCard.classList.add('flash-correct-card');
@@ -728,7 +733,7 @@ const schema = JSON.stringify({
   function timeOut(){
     answered=true; stopTimer();
     roundResults.push({correct:false,points:0});
-    dimState(currentState.id);
+    dimState(currentState.id, false);
     flashState(currentState.id,'reveal-state',1800);
     sfx('timeout');
     corrLabel.textContent='⏱️ Time\'s up! '+currentState.name+' → '+(BRAND_NAMES[currentState.domain]||currentState.domain);
@@ -781,7 +786,7 @@ const schema = JSON.stringify({
     sportMode=sport; maxTime=sport?SPORT_TIME:NORMAL_TIME;
     score=0;roundIndex=0;roundResults=[];usedStateIds=new Set();running=true;
     resetView();hideQuizPopup();
-    mapCont.querySelectorAll('.state-used').forEach(el=>el.classList.remove('state-used'));
+    mapCont.querySelectorAll('.state-correct, .state-wrong').forEach(el=>el.classList.remove('state-correct','state-wrong'));
     STATE_EATS.forEach(([abbr])=>{
       const lbl=document.getElementById('lbl-'+abbr);
       if(lbl)lbl.setAttribute('fill','rgba(255,255,255,0.9)');
@@ -807,11 +812,11 @@ const schema = JSON.stringify({
     personalBest=stats.best; saveStats(STATS_KEY,stats);
     const pct=score/(TOTAL_ROUNDS*MAX_SCORE_PER_ROUND);
     let grade,gradeEmo;
-    if(pct>=0.95){grade='Fast Food Master!';gradeEmo='\U0001f3c6';}
-    else if(pct>=0.80){grade='Food Expert';gradeEmo='\U0001f31f';}
-    else if(pct>=0.60){grade='Solid Foodie';gradeEmo='\U0001f354';}
-    else if(pct>=0.40){grade='Still Learning';gradeEmo='\U0001f4da';}
-    else{grade='Keep Tasting!';gradeEmo='\U0001f35f';}
+    if(pct>=0.95){grade='Fast Food Master!';gradeEmo='🏆';}
+    else if(pct>=0.80){grade='Food Expert';gradeEmo='🌟';}
+    else if(pct>=0.60){grade='Solid Foodie';gradeEmo='🍔';}
+    else if(pct>=0.40){grade='Still Learning';gradeEmo='📚';}
+    else{grade='Keep Tasting!';gradeEmo='🍟';}
     resultEmo.textContent=gradeEmo;
     resultBig.textContent=score.toLocaleString();
     resultLbl.textContent='out of 10,000';
@@ -822,7 +827,7 @@ const schema = JSON.stringify({
     if(isNewBest(lbRef,score,LB_MAX)){
       mpcScoreVal.textContent=score.toLocaleString(); mpcScoreSub.textContent=grade;
       mpcScoreWrap.style.display='block'; mpcNameRow.style.display='flex';
-      mpcTitle.textContent='\U0001f3c6 New Best!';
+      mpcTitle.textContent='🏆 New Best!';
       mpcSub.textContent='Enter your name for the leaderboard:';
       mpcNormal.style.display='none'; mpcSport.style.display='none';
       modeOverlay.style.display='flex';
@@ -864,14 +869,14 @@ const schema = JSON.stringify({
     try{await pushLeaderboard({dbUrl:dbBase,localKey:lbKey,max:LB_MAX,lb:lbRef,token});}catch{}
     modeOverlay.style.display='none'; mpcNormal.style.display=''; mpcSport.style.display='';
     mpcNameRow.style.display='none'; mpcScoreWrap.style.display='none';
-    mpcTitle.textContent='\U0001f354 State Eats Quest';
+    mpcTitle.textContent='🍔 Fast Food Sheep';
     mpcSub.textContent='Click any state & pick its fast food!';
     refreshLeaderboard();
   });
 
   document.getElementById('play-again-btn').addEventListener('click',()=>{
     resultOv.classList.remove('visible');
-    mpcTitle.textContent='\U0001f354 State Eats Quest'; mpcSub.textContent='Play again?';
+    mpcTitle.textContent='🍔 Fast Food Sheep'; mpcSub.textContent='Play again?';
     mpcScoreWrap.style.display='none'; mpcNameRow.style.display='none';
     mpcNormal.style.display=''; mpcSport.style.display='';
     modeOverlay.style.display='flex';
@@ -942,7 +947,7 @@ const schema = JSON.stringify({
 
   (async()=>{
     await initLeaderboards(); refreshLeaderboard(); updateStatsPanel(); renderAchievements();
-    mpcTitle.textContent='\U0001f354 State Eats Quest';
+    mpcTitle.textContent='🍔 Fast Food Sheep';
     mpcSub.textContent='Click any state & pick its fast food!';
     mpcNormal.style.display=''; mpcSport.style.display='';
     mpcNameRow.style.display='none'; mpcScoreWrap.style.display='none';

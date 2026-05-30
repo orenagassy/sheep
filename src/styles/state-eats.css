@@ -52,9 +52,13 @@
   fill: #ffa726 !important;
   transition: fill 0s;
 }
-.state-path.state-used {
-  fill: #b8a060 !important;
-  opacity: 0.55;
+.state-path.state-correct {
+  fill: #43a047 !important;
+  opacity: 0.75;
+}
+.state-path.state-wrong {
+  fill: #e53935 !important;
+  opacity: 0.75;
 }
 
 /* ── Food icon on map ────────────────────────────────────────────────────── */
@@ -324,21 +328,23 @@
 }
 
 .logo-img-wrap {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
+  background: #f8f8f8;
+  border-radius: 8px;
+  overflow: hidden;
 }
 .logo-img {
-  max-width: 56px;
-  max-height: 56px;
+  max-width: 72px;
+  max-height: 72px;
   object-fit: contain;
-  border-radius: 4px;
 }
 .logo-fallback {
-  width: 56px;
-  height: 56px;
+  width: 72px;
+  height: 72px;
   border-radius: 50%;
   color: #fff;
   font-size: 24px;
@@ -490,7 +496,7 @@
   #map-sheep { font-size: 22px; }
   #quiz-popup { padding: 14px 12px 10px; }
   #quiz-question { font-size: 14px; }
-  .logo-img-wrap { width: 46px; height: 46px; }
-  .logo-img { max-width: 46px; max-height: 46px; }
-  .logo-fallback { width: 46px; height: 46px; font-size: 20px; }
+  .logo-img-wrap { width: 56px; height: 56px; }
+  .logo-img { max-width: 56px; max-height: 56px; }
+  .logo-fallback { width: 56px; height: 56px; font-size: 20px; }
 }
