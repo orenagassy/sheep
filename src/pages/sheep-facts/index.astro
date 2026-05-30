@@ -1,0 +1,264 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { sheepFacts } from '../../data/sheepFacts.js';
+
+const title = '250 Funny Sheep Facts for Kids & Adults | Sheeps.online';
+const description = 'Discover 250 hilarious sheep facts for kids and grown-ups! From rectangular pupils to a $490,000 ram, these baa-rilliant facts will blow your woolly mind. Updated with the best sheep trivia on the web.';
+
+const schema = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Article",
+      "@id": "https://sheeps.online/sheep-facts/#article",
+      "headline": "250 Funny Sheep Facts for Kids & Adults",
+      "description": description,
+      "url": "https://sheeps.online/sheep-facts/",
+      "inLanguage": "en",
+      "publisher": {
+        "@type": "Organization",
+        "@id": "https://sheeps.online/#organization",
+        "name": "Sheeps.online",
+        "url": "https://sheeps.online/"
+      }
+    },
+    {
+      "@type": "BreadcrumbList",
+      "@id": "https://sheeps.online/sheep-facts/#breadcrumb",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "https://sheeps.online/" },
+        { "@type": "ListItem", "position": 2, "name": "250 Sheep Facts", "item": "https://sheeps.online/sheep-facts/" }
+      ]
+    }
+  ]
+});
+---
+
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>" />
+    <script type="application/ld+json" set:html={schema} />
+  </Fragment>
+
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f5f1e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      color: #2c2c2a;
+    }
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px 80px;
+    }
+
+    /* ---- Hero ---- */
+    .hero {
+      text-align: center;
+      padding: 52px 0 44px;
+    }
+    .sheep-parade {
+      display: block;
+      font-size: 42px;
+      letter-spacing: 8px;
+      margin-bottom: 20px;
+      animation: graze 3s ease-in-out infinite;
+    }
+    @keyframes graze {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-7px); }
+    }
+    h1 {
+      font-size: 42px;
+      font-weight: 800;
+      margin: 0 0 10px;
+      line-height: 1.1;
+      color: #2c2c2a;
+    }
+    .hero-sub {
+      font-size: 19px;
+      color: #4a9e6b;
+      font-weight: 600;
+      margin: 0 0 20px;
+    }
+    .hero-intro {
+      max-width: 660px;
+      margin: 0 auto 32px;
+      font-size: 15px;
+      color: #6b6961;
+      line-height: 1.7;
+    }
+    .stat-pills {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .pill {
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.09);
+      border-radius: 40px;
+      padding: 7px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #2c2c2a;
+      white-space: nowrap;
+    }
+
+    /* ---- Section header ---- */
+    .facts-header {
+      text-align: center;
+      padding: 32px 0 28px;
+    }
+    .section-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4a9e6b;
+      margin: 0 0 8px;
+      display: block;
+    }
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      margin: 0;
+      color: #2c2c2a;
+    }
+
+    /* ---- Facts grid ---- */
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 12px;
+      margin-bottom: 56px;
+    }
+    .fact-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 18px 20px;
+      border: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      gap: 13px;
+      align-items: flex-start;
+      transition: box-shadow 0.15s, transform 0.15s;
+    }
+    .fact-card:hover {
+      box-shadow: 0 4px 18px rgba(0,0,0,0.09);
+      transform: translateY(-2px);
+    }
+    .fact-num {
+      flex-shrink: 0;
+      width: 30px;
+      height: 30px;
+      background: #4a9e6b;
+      color: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .fact-text {
+      font-size: 14px;
+      color: #2c2c2a;
+      line-height: 1.65;
+      margin: 0;
+    }
+
+    /* ---- Dividers ---- */
+    .facts-divider {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 20px 0 12px;
+      font-size: 26px;
+      letter-spacing: 8px;
+      color: #c4bfb3;
+      user-select: none;
+    }
+
+    /* ---- Footer nav ---- */
+    .page-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+    }
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #4a9e6b;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 15px;
+      transition: opacity 0.15s;
+    }
+    .back-link:hover { opacity: 0.72; }
+    .footer-credit {
+      font-size: 13px;
+      color: #94918a;
+    }
+
+    @media (max-width: 640px) {
+      h1 { font-size: 30px; }
+      .hero-sub { font-size: 16px; }
+      .sheep-parade { font-size: 30px; letter-spacing: 4px; }
+      .facts-grid { grid-template-columns: 1fr; gap: 10px; }
+      main { padding: 0 16px 56px; }
+    }
+  </style>
+
+  <main>
+    <!-- Hero -->
+    <div class="hero">
+      <span class="sheep-parade" aria-hidden="true">🐑 🐑 🐑 🐑 🐑</span>
+      <h1>250 Funny Sheep Facts</h1>
+      <p class="hero-sub">Baa-rilliant trivia for kids &amp; adults</p>
+      <p class="hero-intro">
+        Think sheep are just boring fluffy lawn mowers? Think again. These 250 hilarious and amazing sheep facts cover everything from their rectangular pupils and four-chambered stomachs to the $490,000 ram and the sheep that rode in the world's first hot air balloon. Prepare to be very, very surprised.
+      </p>
+      <div class="stat-pills">
+        <span class="pill">🐑 250 Facts</span>
+        <span class="pill">🌍 ~1 Billion Sheep on Earth</span>
+        <span class="pill">📅 Friends Since 11,000 BC</span>
+        <span class="pill">🧠 Smarter Than You Think</span>
+      </div>
+    </div>
+
+    <!-- Facts section header -->
+    <div class="facts-header">
+      <span class="section-label">The Full List</span>
+      <h2>All 250 Sheep Facts</h2>
+    </div>
+
+    <!-- Facts grid -->
+    <div class="facts-grid">
+      {sheepFacts.map((fact, i) => (
+        <>
+          {(i === 50 || i === 100 || i === 150 || i === 200) && (
+            <div class="facts-divider" aria-hidden="true">🐑 &nbsp; 🐑 &nbsp; 🐑</div>
+          )}
+          <div class="fact-card">
+            <div class="fact-num">{i + 1}</div>
+            <p class="fact-text">{fact}</p>
+          </div>
+        </>
+      ))}
+    </div>
+
+    <!-- Footer nav -->
+    <div class="page-footer">
+      <a href="/" class="back-link">← Back to games</a>
+      <span class="footer-credit">250 baa-rilliant sheep facts · Sheeps.online</span>
+    </div>
+  </main>
+</BaseLayout>

@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { sheepFacts } from '../data/sheepFacts.js';
 
 const title = 'Free Online Sheep Games for Kids & Adults | Casual Browser Games | Sheeps.online';
 const description = 'Play free online games at Sheeps.online! Fun casual games for kids and adults. No download, no signup. Pick a game and play instantly in your browser.';
@@ -365,10 +366,48 @@ const schema = JSON.stringify({
       color: #4a9e6b;
       margin: 0 0 12px;
     }
+    .fact-widget {
+      background: #fff;
+      border-radius: 12px;
+      padding: 22px 24px;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-left: 4px solid #4a9e6b;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .fact-widget-icon { font-size: 36px; flex-shrink: 0; line-height: 1; margin-top: 2px; }
+    .fact-widget-body { flex: 1; min-width: 0; }
+    .fact-widget-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4a9e6b;
+      margin: 0 0 8px;
+    }
+    .fact-widget-text {
+      font-size: 15px;
+      color: #2c2c2a;
+      line-height: 1.65;
+      margin: 0 0 12px;
+    }
+    .fact-widget-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: #4a9e6b;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .fact-widget-link:hover { text-decoration: underline; }
     @media (max-width: 480px) {
       main { padding: 32px 16px 48px; }
       h1 { font-size: 26px; }
       .about { padding: 20px 18px; }
+      .fact-widget { flex-direction: column; gap: 10px; }
     }
   </style>
   <main>
@@ -447,6 +486,15 @@ const schema = JSON.stringify({
       </div>
     </section>
 
+    <div class="fact-widget" aria-label="Random sheep fact">
+      <div class="fact-widget-icon" aria-hidden="true">🐑</div>
+      <div class="fact-widget-body">
+        <p class="fact-widget-label">Did You Know?</p>
+        <p id="random-sheep-fact" class="fact-widget-text">Loading a sheep fact…</p>
+        <a href="/sheep-facts/" class="fact-widget-link">Discover all 250 sheep facts →</a>
+      </div>
+    </div>
+
     <section class="faq" aria-label="Frequently asked questions">
       <p class="section-label" style="margin-top:32px">FAQ</p>
       <h2>Common Questions</h2>
@@ -468,4 +516,8 @@ const schema = JSON.stringify({
       </details>
     </section>
   </main>
+  <script define:vars={{ sheepFacts }}>
+    const el = document.getElementById('random-sheep-fact');
+    if (el) el.textContent = sheepFacts[Math.floor(Math.random() * sheepFacts.length)];
+  </script>
 </BaseLayout>
