@@ -3,7 +3,20 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { sheepFacts } from '../../data/sheepFacts.js';
 
 const title = '250 Funny Sheep Facts for Kids & Adults | Sheeps.online';
-const description = 'Discover 250 hilarious sheep facts for kids and grown-ups! From rectangular pupils to a $490,000 ram, these baa-rilliant facts will blow your woolly mind. Updated with the best sheep trivia on the web.';
+const description = 'Discover 250 hilarious sheep facts for kids and grown-ups! From rectangular pupils to a $490,000 ram, these baa-rilliant facts will blow your woolly mind.';
+
+const categories = [
+  { id: 'basics',       label: 'The Basics',                    emoji: '🐑', start: 0,   end: 25  },
+  { id: 'bodies',       label: 'Bodies, Breeds & Lifespans',    emoji: '🦷', start: 25,  end: 50  },
+  { id: 'wool',         label: 'Wool & Products',               emoji: '🧶', start: 50,  end: 75  },
+  { id: 'intelligence', label: 'Intelligence & Farm Life',      emoji: '🧠', start: 75,  end: 100 },
+  { id: 'senses',       label: 'Senses & Social Life',          emoji: '👂', start: 100, end: 125 },
+  { id: 'quirks',       label: 'Quirks & Surprises',            emoji: '🤔', start: 125, end: 150 },
+  { id: 'work',         label: 'Sheep at Work',                 emoji: '🌱', start: 150, end: 175 },
+  { id: 'history',      label: 'History & Culture',             emoji: '📜', start: 175, end: 200 },
+  { id: 'records',      label: 'Records & Big Numbers',         emoji: '🏆', start: 200, end: 225 },
+  { id: 'world',        label: 'Sheep Around the World',        emoji: '🌍', start: 225, end: 250 },
+];
 
 const schema = JSON.stringify({
   "@context": "https://schema.org",
@@ -15,6 +28,13 @@ const schema = JSON.stringify({
       "description": description,
       "url": "https://sheeps.online/sheep-facts/",
       "inLanguage": "en",
+      "datePublished": "2026-05-30",
+      "dateModified": "2026-05-30",
+      "author": {
+        "@type": "Organization",
+        "name": "Sheeps.online Editorial Team",
+        "url": "https://sheeps.online/about/"
+      },
       "publisher": {
         "@type": "Organization",
         "@id": "https://sheeps.online/#organization",
@@ -58,7 +78,7 @@ const schema = JSON.stringify({
     /* ---- Hero ---- */
     .hero {
       text-align: center;
-      padding: 52px 0 44px;
+      padding: 52px 0 32px;
     }
     .sheep-parade {
       display: block;
@@ -82,11 +102,16 @@ const schema = JSON.stringify({
       font-size: 19px;
       color: #4a9e6b;
       font-weight: 600;
+      margin: 0 0 8px;
+    }
+    .byline {
+      font-size: 13px;
+      color: #6b6961;
       margin: 0 0 20px;
     }
     .hero-intro {
       max-width: 660px;
-      margin: 0 auto 32px;
+      margin: 0 auto 28px;
       font-size: 15px;
       color: #6b6961;
       line-height: 1.7;
@@ -108,25 +133,57 @@ const schema = JSON.stringify({
       white-space: nowrap;
     }
 
-    /* ---- Section header ---- */
-    .facts-header {
-      text-align: center;
-      padding: 32px 0 28px;
+    /* ---- Anchor nav ---- */
+    .anchor-nav {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid rgba(0,0,0,0.08);
+      padding: 20px 24px;
+      margin: 32px 0 48px;
     }
-    .section-label {
+    .anchor-nav-label {
       font-size: 11px;
       font-weight: 700;
       letter-spacing: 0.08em;
       text-transform: uppercase;
       color: #4a9e6b;
-      margin: 0 0 8px;
+      margin: 0 0 12px;
       display: block;
     }
-    h2 {
+    .anchor-nav-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .anchor-nav-links a {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2c2c2a;
+      text-decoration: none;
+      background: #f5f1e8;
+      border-radius: 20px;
+      padding: 5px 14px;
+      transition: background 0.15s, color 0.15s;
+    }
+    .anchor-nav-links a:hover { background: #4a9e6b; color: #fff; }
+
+    /* ---- Category sections ---- */
+    .category-section {
+      margin-bottom: 56px;
+    }
+    .category-heading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       font-size: 22px;
       font-weight: 700;
-      margin: 0;
+      margin: 0 0 20px;
       color: #2c2c2a;
+      scroll-margin-top: 24px;
+    }
+    .category-emoji {
+      font-size: 26px;
+      flex-shrink: 0;
     }
 
     /* ---- Facts grid ---- */
@@ -134,7 +191,6 @@ const schema = JSON.stringify({
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
       gap: 12px;
-      margin-bottom: 56px;
     }
     .fact-card {
       background: #fff;
@@ -171,16 +227,43 @@ const schema = JSON.stringify({
       margin: 0;
     }
 
-    /* ---- Dividers ---- */
-    .facts-divider {
-      grid-column: 1 / -1;
-      text-align: center;
-      padding: 20px 0 12px;
-      font-size: 26px;
-      letter-spacing: 8px;
-      color: #c4bfb3;
-      user-select: none;
+    /* ---- Game cross-links ---- */
+    .game-links-section {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px 28px;
+      border: 1px solid rgba(0,0,0,0.08);
+      margin-bottom: 32px;
     }
+    .game-links-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #4a9e6b;
+      margin: 0 0 14px;
+      display: block;
+    }
+    .game-links-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 10px;
+    }
+    .game-link-card {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #f5f1e8;
+      border-radius: 10px;
+      padding: 12px 16px;
+      text-decoration: none;
+      color: #2c2c2a;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.12s;
+    }
+    .game-link-card:hover { background: #efeadd; transform: translateY(-1px); }
+    .game-link-icon { font-size: 22px; flex-shrink: 0; }
 
     /* ---- Games banner ---- */
     .games-banner {
@@ -235,7 +318,7 @@ const schema = JSON.stringify({
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 16px;
-      padding-top: 8px;
+      padding-top: 20px;
       border-top: 1px solid rgba(0,0,0,0.08);
     }
     .back-link {
@@ -249,17 +332,22 @@ const schema = JSON.stringify({
       transition: opacity 0.15s;
     }
     .back-link:hover { opacity: 0.72; }
-    .footer-credit {
+    .footer-links {
+      display: flex;
+      gap: 16px;
       font-size: 13px;
-      color: #94918a;
     }
+    .footer-links a { color: #6b6961; text-decoration: none; }
+    .footer-links a:hover { color: #4a9e6b; }
 
     @media (max-width: 640px) {
       h1 { font-size: 30px; }
       .hero-sub { font-size: 16px; }
       .sheep-parade { font-size: 30px; letter-spacing: 4px; }
       .facts-grid { grid-template-columns: 1fr; gap: 10px; }
+      .category-heading { font-size: 18px; }
       main { padding: 0 16px 56px; }
+      .games-banner { flex-direction: column; gap: 12px; }
     }
   </style>
 
@@ -269,36 +357,67 @@ const schema = JSON.stringify({
       <span class="sheep-parade" aria-hidden="true">🐑 🐑 🐑 🐑 🐑</span>
       <h1>250 Funny Sheep Facts</h1>
       <p class="hero-sub">Baa-rilliant trivia for kids &amp; adults</p>
+      <p class="byline">By Sheeps.online Editorial Team · Published May 2026</p>
       <p class="hero-intro">
-        Think sheep are just boring fluffy lawn mowers? Think again. These 250 hilarious and amazing sheep facts cover everything from their rectangular pupils and four-chambered stomachs to the $490,000 ram and the sheep that rode in the world's first hot air balloon. Prepare to be very, very surprised.
+        Think sheep are just boring fluffy lawn mowers? These 250 facts cover everything from rectangular pupils and four-chambered stomachs to the $490,000 ram, the sheep that rode in the world's first hot air balloon, and the Chinese flock that walked in circles for two weeks. Prepare to be surprised.
       </p>
       <div class="stat-pills">
         <span class="pill">🐑 250 Facts</span>
         <span class="pill">🌍 ~1 Billion Sheep on Earth</span>
         <span class="pill">📅 Friends Since 11,000 BC</span>
-        <span class="pill">🧠 Smarter Than You Think</span>
+        <span class="pill">🧠 10 Categories</span>
       </div>
     </div>
 
-    <!-- Facts section header -->
-    <div class="facts-header">
-      <span class="section-label">The Full List</span>
-      <h2>All 250 Sheep Facts</h2>
-    </div>
+    <!-- Anchor navigation -->
+    <nav class="anchor-nav" aria-label="Jump to category">
+      <span class="anchor-nav-label">Jump to category</span>
+      <div class="anchor-nav-links">
+        {categories.map(cat => (
+          <a href={`#${cat.id}`}>{cat.emoji} {cat.label}</a>
+        ))}
+      </div>
+    </nav>
 
-    <!-- Facts grid -->
-    <div class="facts-grid">
-      {sheepFacts.map((fact, i) => (
-        <>
-          {(i === 50 || i === 100 || i === 150 || i === 200) && (
-            <div class="facts-divider" aria-hidden="true">🐑 &nbsp; 🐑 &nbsp; 🐑</div>
-          )}
-          <div class="fact-card">
-            <div class="fact-num">{i + 1}</div>
-            <p class="fact-text">{fact}</p>
-          </div>
-        </>
-      ))}
+    <!-- Facts by category -->
+    {categories.map(cat => (
+      <section class="category-section" id={cat.id} aria-label={cat.label}>
+        <h2 class="category-heading">
+          <span class="category-emoji" aria-hidden="true">{cat.emoji}</span>
+          {cat.label}
+        </h2>
+        <div class="facts-grid">
+          {sheepFacts.slice(cat.start, cat.end).map((fact, i) => (
+            <div class="fact-card">
+              <div class="fact-num">{cat.start + i + 1}</div>
+              <p class="fact-text">{fact}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- Cross-links to games -->
+    <div class="game-links-section">
+      <span class="game-links-label">Now go test your knowledge</span>
+      <div class="game-links-grid">
+        <a href="/state-quest/" class="game-link-card">
+          <span class="game-link-icon">🐑🗺️</span>
+          Sheep State Quest
+        </a>
+        <a href="/state-eats/" class="game-link-card">
+          <span class="game-link-icon">🗺️🍔</span>
+          State Eats Quest
+        </a>
+        <a href="/sheep-gates/" class="game-link-card">
+          <span class="game-link-icon">🐑🐺</span>
+          Sheep Gates
+        </a>
+        <a href="/fat-sheep/" class="game-link-card">
+          <span class="game-link-icon">🐑🌿</span>
+          Fat Grazing Sheep
+        </a>
+      </div>
     </div>
 
     <!-- Games link -->
@@ -307,7 +426,7 @@ const schema = JSON.stringify({
       <div class="games-banner-body">
         <span class="games-banner-label">Now go play!</span>
         <p class="games-banner-title">Free Sheep Games at Sheeps.online</p>
-        <p class="games-banner-desc">Sheep Gates, Fat Grazing Sheep, Plop Drop, State Quest, Fast Food Sheep. All free, no install.</p>
+        <p class="games-banner-desc">Sheep Gates, Fat Grazing Sheep, Plop Drop, State Quest, State Eats Quest. All free, no install.</p>
       </div>
       <span class="games-banner-arrow" aria-hidden="true">→</span>
     </a>
@@ -315,7 +434,10 @@ const schema = JSON.stringify({
     <!-- Footer nav -->
     <div class="page-footer">
       <a href="/" class="back-link">← Back to games</a>
-      <span class="footer-credit">250 baa-rilliant sheep facts · Sheeps.online</span>
+      <div class="footer-links">
+        <a href="/about/">About</a>
+        <a href="/privacy/">Privacy</a>
+      </div>
     </div>
   </main>
 </BaseLayout>

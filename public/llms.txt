@@ -1,0 +1,18 @@
+# sheeps.online
+> Free casual browser games with a sheep theme. No download, no account required. Play instantly in any browser.
+
+## Games
+
+- [Sheep Gates](https://sheeps.online/sheep-gates/): Fast reflex game — pick the open gate before the wolf appears. Escalating difficulty with seven gates. Global leaderboard.
+- [Fat Grazing Sheep](https://sheeps.online/fat-sheep/): Movement game — guide your sheep around a pasture, eat everything, grow to enormous size, and dodge the sheepdogs. Six fat stages and power-ups.
+- [Plop Drop](https://sheeps.online/plop-drop/): Reflex game — drone sheep fly overhead dropping plops. Move your toilet seat to catch them before they hit the ground. Combos and power-ups.
+- [Sheep State Quest](https://sheeps.online/state-quest/): Geography quiz — a wooden sign names a US state, the clock starts ticking, click the correct state on a blank map before time runs out.
+- [State Eats Quest](https://sheeps.online/state-eats/): Food geography trivia — click the highlighted US state on the map, then identify its iconic regional fast food chain from four real logo choices.
+
+## Facts
+
+- [250 Funny Sheep Facts](https://sheeps.online/sheep-facts/): A researched collection of 250 surprising, funny, and genuinely interesting facts about sheep. Covers anatomy, behavior, intelligence, famous sheep, world records, wool and products, sheep in history, breeds from around the world, and global statistics. Written for kids and adults.
+
+## About
+
+Sheeps.online publishes free browser games and editorial content built around a sheep theme. All content is in English and aimed at kids and adults. No user accounts are required. No personal data is collected to play.

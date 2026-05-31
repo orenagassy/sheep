@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const title = 'About Sheeps.online | Free Browser Games & Sheep Facts';
+const description = 'About Sheeps.online — who we are, what the site is, and how the games and sheep facts were made.';
+---
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>" />
+  </Fragment>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f5f1e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      color: #2c2c2a;
+    }
+    main { max-width: 740px; margin: 0 auto; padding: 48px 24px 80px; }
+    .back { font-size: 14px; color: #4a9e6b; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 32px; }
+    .back:hover { text-decoration: underline; }
+    h1 { font-size: 32px; font-weight: 800; margin: 0 0 32px; }
+    h2 { font-size: 18px; font-weight: 700; margin: 0 0 10px; color: #2c2c2a; }
+    p { font-size: 15px; line-height: 1.7; color: #3a3a38; margin: 0 0 14px; }
+    a { color: #4a9e6b; }
+    .section { background: #fff; border-radius: 12px; padding: 24px 28px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 20px; }
+    .game-list { list-style: none; padding: 0; margin: 0; }
+    .game-list li { padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,0.06); font-size: 15px; color: #3a3a38; line-height: 1.5; }
+    .game-list li:last-child { border-bottom: none; }
+    .game-list a { font-weight: 600; color: #2c2c2a; text-decoration: none; }
+    .game-list a:hover { color: #4a9e6b; }
+    @media (max-width: 480px) { main { padding: 32px 16px 56px; } h1 { font-size: 26px; } }
+  </style>
+  <main>
+    <a href="/" class="back">← Back to Sheeps.online</a>
+    <h1>About Sheeps.online</h1>
+
+    <div class="section">
+      <h2>What this site is</h2>
+      <p>Sheeps.online is a small collection of free browser games built around a running sheep theme, plus a collection of 250 researched sheep facts. Everything runs directly in your browser. No app, no account, no waiting.</p>
+      <p>The games cover different styles — reflex, movement, geography trivia, and food trivia — so there's usually something that fits the mood. New games are added when they're ready.</p>
+    </div>
+
+    <div class="section">
+      <h2>The games</h2>
+      <ul class="game-list">
+        <li><a href="/sheep-gates/">Sheep Gates</a> — Pick the open gate before the wolf appears. Seven gates, one wolf, escalating speed.</li>
+        <li><a href="/fat-sheep/">Fat Grazing Sheep</a> — Guide your sheep around a pasture, eat everything in sight, grow to absurd size, and dodge the sheepdogs.</li>
+        <li><a href="/plop-drop/">Plop Drop</a> — Drone sheep fly overhead dropping plops. Move your toilet seat to catch them before they hit the ground.</li>
+        <li><a href="/state-quest/">Sheep State Quest</a> — A wooden sign names a US state, the clock starts, click the right state on a blank map.</li>
+        <li><a href="/state-eats/">State Eats Quest</a> — Click the highlighted US state, then identify its iconic regional fast food chain from four real logos.</li>
+      </ul>
+    </div>
+
+    <div class="section">
+      <h2>The sheep facts</h2>
+      <p>The <a href="/sheep-facts/">250 Funny Sheep Facts</a> page was put together by the Sheeps.online editorial team. The facts cover anatomy, behavior, intelligence, famous sheep, world records, wool and its uses, sheep in history, breeds from around the world, and global population statistics.</p>
+      <p>All facts were researched from published sources including scientific studies, historical records, and verified news reports. The goal was to make the list genuinely informative and genuinely funny — not padded with vague trivia.</p>
+    </div>
+
+    <div class="section">
+      <h2>Who made it</h2>
+      <p>Sheeps.online is an independent project. The games and content are made by a small team that wanted to put genuinely playable browser games on the internet without requiring accounts, downloads, or payment.</p>
+      <p>If you have a question, found a bug, or want to get in touch, you can reach us at <strong>hello@sheeps.online</strong>.</p>
+    </div>
+
+    <div class="section">
+      <h2>Legal</h2>
+      <p><a href="/privacy/">Privacy Policy</a> — covers Google Analytics, AdSense, and leaderboard data.</p>
+    </div>
+  </main>
+</BaseLayout>

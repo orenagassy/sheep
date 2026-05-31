@@ -1,0 +1,971 @@
+<!DOCTYPE html><html lang="en"> <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Fat Grazing Sheep — Free Online Casual Game | Sheeps.online</title><meta name="description" content="Guide your sheep around a pasture, eat everything, grow enormous, and dodge the sheepdogs! Free casual browser game, no download, no sign-up. How fat can you get?"><link rel="canonical" href="https://sheeps.online/fat-sheep/"><!-- Open Graph --><meta property="og:type" content="website"><meta property="og:url" content="https://sheeps.online/fat-sheep/"><meta property="og:title" content="Fat Grazing Sheep — Free Online Casual Game | Sheeps.online"><meta property="og:description" content="Guide your sheep around a pasture, eat everything, grow enormous, and dodge the sheepdogs! Free casual browser game, no download, no sign-up. How fat can you get?"><meta property="og:image" content="https://sheeps.online/og-image.svg"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta property="og:site_name" content="Sheeps.online"><!-- Twitter Card --><meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Fat Grazing Sheep — Free Online Casual Game | Sheeps.online"><meta name="twitter:description" content="Guide your sheep around a pasture, eat everything, grow enormous, and dodge the sheepdogs! Free casual browser game, no download, no sign-up. How fat can you get?"><meta name="twitter:image" content="https://sheeps.online/og-image.svg"><!-- Favicon --><link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎮</text></svg>"><!-- AdSense verification + ads --><meta name="google-adsense-account" content="ca-pub-5105009779643901"><script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5105009779643901" crossorigin="anonymous"></script><!-- Google Analytics --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JVNNP0C4D3"></script><script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-JVNNP0C4D3');
+  </script> <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>"> <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"VideoGame","@id":"https://sheeps.online/fat-sheep/#game","name":"Fat Grazing Sheep","url":"https://sheeps.online/fat-sheep/","description":"Guide your sheep around a pasture, eat food, grow enormous, and dodge the sheepdogs. A casual browser game with 6 fat stages, power-ups, and a global leaderboard.","genre":["Casual","Arcade","Kids"],"playMode":"SinglePlayer","applicationCategory":"Game","operatingSystem":"Any","gamePlatform":"Web Browser","isAccessibleForFree":true,"inLanguage":"en","image":"https://sheeps.online/og-image.svg","publisher":{"@type":"Organization","@id":"https://sheeps.online/#organization","name":"Sheeps.online","url":"https://sheeps.online/"},"audience":{"@type":"PeopleAudience","suggestedMinAge":5}},{"@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Free Games","item":"https://sheeps.online/"},{"@type":"ListItem","position":2,"name":"Fat Grazing Sheep","item":"https://sheeps.online/fat-sheep/"}]}]}</script> <script src="/scripts/game-framework.js"></script> <link rel="stylesheet" href="/_astro/index.CPeYWyxo.css">
+<style>#grazing-field{background:#7dc940;border-radius:8px;height:360px;position:relative;overflow:hidden;cursor:crosshair;user-select:none}#sheep-entity{position:absolute;top:0;left:0;line-height:1;cursor:default;user-select:none;will-change:transform;pointer-events:none;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 3px 6px rgba(0,0,0,.25));transition:font-size .4s cubic-bezier(.34,1.56,.64,1),width .4s cubic-bezier(.34,1.56,.64,1),height .4s cubic-bezier(.34,1.56,.64,1)}#level-up-banner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(.5);opacity:0;background:#0f6e56f2;color:#fff;padding:10px 22px;border-radius:8px;font-size:16px;font-weight:600;z-index:5;pointer-events:none;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .4s;text-align:center;white-space:nowrap}.food-item{position:absolute;font-size:26px;line-height:1;pointer-events:none;user-select:none;transform:translate(-50%,-50%);animation:food-pop .3s cubic-bezier(.34,1.56,.64,1) both;filter:drop-shadow(0 1px 3px rgba(0,0,0,.15));z-index:2}@keyframes food-pop{0%{transform:translate(-50%,-50%) scale(0);opacity:0}to{transform:translate(-50%,-50%) scale(1);opacity:1}}.dog-entity{position:absolute;font-size:30px;line-height:1;pointer-events:none;user-select:none;will-change:transform;filter:drop-shadow(0 2px 4px rgba(0,0,0,.25));z-index:3;top:0;left:0}.dog-collie{filter:drop-shadow(0 2px 6px rgba(180,0,0,.4)) drop-shadow(0 0 3px rgba(255,80,0,.3))}#power-hud{text-align:center;font-size:13px;font-weight:600;color:var(--success);min-height:22px;margin:6px 0 2px;letter-spacing:.3px}.floating-score.big-eat{font-size:22px;color:#0f6e56;text-shadow:0 0 10px rgba(15,110,86,.5),0 1px 3px rgba(0,0,0,.2);animation:fast-float .9s cubic-bezier(.22,1,.36,1) forwards}.floating-score.power-up{font-size:28px;animation:fast-float 1.1s cubic-bezier(.22,1,.36,1) forwards}.dog-entity.scared{animation:dog-scared .5s ease-out infinite}@keyframes dog-scared{0%,to{filter:drop-shadow(0 2px 4px rgba(0,0,0,.25))}50%{filter:drop-shadow(0 0 12px rgba(255,220,0,.9)) drop-shadow(0 2px 4px rgba(0,0,0,.2))}}#sheep-entity.speedy{filter:drop-shadow(0 3px 6px rgba(0,0,0,.25)) drop-shadow(0 0 10px rgba(255,150,0,.6))}#grazing-field.shaking{animation:screen-shake .5s ease-out}#grazing-field.shaking-small{animation:screen-shake-small .3s ease-out}#move-target{position:absolute;width:14px;height:14px;border:2.5px solid rgba(255,255,255,.75);border-radius:50%;transform:translate(-50%,-50%);pointer-events:none;z-index:4;transition:opacity .5s ease-out}#move-target.active{opacity:1}#move-target.fading{opacity:0}.grass-deco{position:absolute;pointer-events:none;user-select:none;font-size:14px;opacity:.4;z-index:0}.energy-bar-wrap{margin:4px 0 6px}.energy-bar-text{display:flex;justify-content:space-between;font-size:12px;color:var(--text-secondary);margin-bottom:3px}.energy-bar-track{background:#0000001f;border-radius:4px;height:7px;overflow:hidden}.energy-bar-fill{height:100%;border-radius:4px;background:#4caf50;transition:width .1s linear,background .3s;will-change:width}@keyframes hurt-flash{0%{filter:drop-shadow(0 3px 6px rgba(0,0,0,.25)) brightness(1) saturate(1)}35%{filter:drop-shadow(0 3px 6px rgba(255,0,0,.6)) brightness(1.7) saturate(4) hue-rotate(330deg)}to{filter:drop-shadow(0 3px 6px rgba(0,0,0,.25)) brightness(1) saturate(1)}}#sheep-entity.hurt{animation:hurt-flash .2s ease-out infinite}.dog-small{opacity:.85;filter:drop-shadow(0 1px 3px rgba(0,0,0,.2))}.dog-guard{filter:drop-shadow(0 2px 8px rgba(100,0,150,.5)) drop-shadow(0 0 4px rgba(180,0,255,.25))}
+</style></head> <body>   <div class="app"> <h1>🐑 Fat Grazing Sheep</h1> <p class="tagline">Get as fat as possible. The sheepdogs object strongly.</p> <div class="ad-wrap ad-wrap--top"> <!-- Ad unit loads here after AdSense approval --> </div> <div id="game-container"> <div class="topbar"> <div class="topbar-left"> <span id="group-badge">👥 Group Mode</span> <div> <div class="hud-title" id="stage-label">🐑 Skinny</div> <div class="hud-subtitle" id="stage-sub">Keep eating!</div> </div> </div> <div class="stat-group"> <div class="stat"> <div class="stat-label">Score</div> <div class="stat-value" id="score-display">0</div> </div> <div class="stat"> <div class="stat-label">Your best</div> <div class="stat-value" id="best-display">—</div> </div> </div> </div> <div class="level-bar-wrap"> <div class="level-bar-text"> <span id="fat-label">Skinny</span> <span id="fat-next">Next: Chubby (10 pts)</span> </div> <div class="level-bar-track"> <div class="level-bar-fill" id="fat-bar"></div> </div> <div id="streak-row"></div> </div> <div class="energy-bar-wrap"> <div class="energy-bar-text"> <span>❤️ Fight energy</span> <span id="energy-value"></span> </div> <div class="energy-bar-track"> <div class="energy-bar-fill" id="energy-bar"></div> </div> </div> <div id="grazing-field"> <canvas id="grass-canvas" style="position:absolute;top:0;left:0;pointer-events:none;z-index:0;border-radius:8px;"></canvas> <div id="sheep-entity" style="display:none">🐑</div> <div id="move-target" style="display:none"></div> <div id="level-up-banner"></div> <div id="sport-timer"><div id="sport-timer-bar"></div></div> </div> <div id="power-hud"></div> <details> <summary>How to play &amp; what even is this</summary> <p>You are a sheep. A very hungry, very ambitious sheep. Your mission: eat everything in the pasture and get absolutely massive. Click anywhere to waddle toward it. Use WASD or arrow keys if you're feeling fancy. Eat grass, flowers, clovers, and apples to gain fat points. The fatter you get, the slower you move. Deeply unfair, very on-brand for a blob sheep.</p> <p>🌿 Grass gives 10 pts. 🌸 Flowers give 25 pts. 🍀 Clovers give 60 pts <em>and</em> repel dogs for 5 seconds (dogs hate clovers, they're very judgmental). 🍎 Apples give 90 pts <em>and</em> give you a speed boost for 4 seconds. 🔔 Whistles scare all dogs away for 8 whole seconds of blissful grazing freedom.</p> <p>The sheepdogs 🐕 want to herd you back to zero. A basic Herder just chases you. A Border Collie 🐕‍🦺 is smarter: it circles, it feints, then it dashes. Once it catches you, game over. You were so close to becoming a blob.</p> <p><strong>Fat stages:</strong> Skinny → Chubby → Round → Chonky → Mega → Blob. Each stage is slower but more majestic. Reaching Blob is the true victory condition, even if the leaderboard disagrees.<br> <strong>Sport mode ⚡:</strong> 90 seconds. Everything spawns faster. Your dignity exits the chat.</p> <p>Free browser game. No download, no sign-up. Works on any device. Your friends are either impressed or very concerned about your sheep priorities.</p> </details> </div> </div> <div id="info-overlay"></div> <div id="info-drawer"> <div id="info-drawer-header"> <span>Leaderboard &amp; Stats</span> <button id="info-close">✕</button> </div> <div style="display:flex;gap:8px;margin-bottom:16px"> <div style="flex:1;display:flex;justify-content:space-between;align-items:center;background:var(--bg-soft);border-radius:8px;padding:8px 12px"> <span style="font-size:13px;font-weight:500">🔇 Mute</span> <button id="mute-toggle" style="font-size:12px;font-weight:600;min-width:44px"></button> </div> </div> <div id="leaderboard"> <div class="leaderboard-title"> <span id="leaderboard-title">Top 5 of all time</span> <span class="sync-indicator" id="sync-indicator"></span> </div> <div id="leaderboard-list"></div> </div> <div id="stats-panel"> <div class="stats-title">Your all-time stats</div> <div class="stats-grid"> <div> <div class="stat-item-label">Games played</div> <div class="stat-item-value" id="stat-games">0</div> </div> <div> <div class="stat-item-label">Best score</div> <div class="stat-item-value" id="stat-best">—</div> </div> <div> <div class="stat-item-label">Best stage</div> <div class="stat-item-value" id="stat-stage">Skinny</div> </div> <div> <div class="stat-item-label">Food eaten</div> <div class="stat-item-value" id="stat-food">0</div> </div> <div> <div class="stat-item-label">Blobs reached</div> <div class="stat-item-value" id="stat-blobs">0</div> </div> </div> </div> <div class="ad-wrap ad-wrap--drawer"> <!-- Ad unit loads here after AdSense approval --> </div> <div id="drawer-credits">🐑🌿🐕</div> </div> <div id="mode-overlay"> <div id="mode-popup"> <div id="mode-popup-result" style="display:none"> <div id="mode-popup-score-val"></div> <div id="mode-popup-score-sub"></div> </div> <div id="hiscore-entry" style="display: none;"> <div class="entry-title">🏅 New world best!</div> <div class="entry-subtitle">Enter your name (up to 10 characters)</div> <div class="entry-row"> <input id="hiscore-name" type="text" maxlength="10" autocomplete="off" style="width: 160px; text-align: center; text-transform: uppercase; font-size: 16px; letter-spacing: 2px; font-weight: 500;"> <button id="hiscore-save" style="font-weight: 500;">Save</button> </div> </div> <div class="action-bar" id="action-bar"></div> <div id="mode-popup-topbar"> <div id="mode-popup-title">🐑 Fat Grazing Sheep</div> <button id="popup-stats-btn" title="Leaderboard & stats">☰</button> </div> <div id="mode-popup-sub">Choose your mode</div> <div id="mode-btn-wrap"> <button id="mpc-normal" class="mode-btn"> <span class="mode-btn-icon">🐑</span>Normal
+</button> <button id="mpc-sport" class="mode-btn"> <span class="mode-btn-icon">⚡</span>Sport
+</button> </div> <button id="mpc-friends" class="mpc-friends-btn"> <span class="mpc-icon">👥</span> <span> <span class="mpc-name">Play with Friends</span> <span class="mpc-desc">Share a link · Group Top 5</span> </span> </button> <button id="mpc-leave-group" class="mpc-leave-group-btn" style="display:none">
+✕ Stop Group Mode
+</button> <a href="/" class="more-games-link">🎮 More free games →</a> </div> </div> <div id="friends-overlay"> <div id="friends-popup"> <div id="friends-popup-title">👥 Play with Friends</div> <p id="friends-popup-desc">Share this link. Everyone on it fights for your group's Top 5.</p> <div id="friends-link-box"> <input id="friends-link-input" type="text" readonly> </div> <div id="friends-share-row"> <button id="friends-share-twitter" class="friends-share-btn share-twitter" title="Share on X / Twitter"> <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.738l7.737-8.835L1.254 2.25H8.08l4.253 5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path></svg> </button> <button id="friends-share-ig" class="friends-share-btn share-ig" title="Share on Instagram"> <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"></path></svg> </button> <button id="friends-share-tiktok" class="friends-share-btn share-tiktok" title="Share on TikTok"> <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.67a8.27 8.27 0 004.84 1.56V6.78a4.85 4.85 0 01-1.07-.09z"></path></svg> </button> <button id="friends-share-copy" class="friends-share-btn share-copy" title="Copy link"> <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"></rect><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path></svg> </button> </div> <button id="friends-play-btn">▶ Play in Group Mode</button> <button id="friends-close-btn">✕ Close</button> </div> </div> <button id="stats-btn" title="Leaderboard & stats">☰</button> <script>(function(){const firebaseApiKey = "AIzaSyDopQnGZgxpRlY-t3yzlM-ks5eX5x3XoQ8";
+ window.__FB_KEY__ = firebaseApiKey; })();</script> <script>
+(function () {
+  // ── Config ─────────────────────────────────────────────────────────────────
+  const DB = 'https://sheep-game-4852f-default-rtdb.firebaseio.com/fat-sheep';
+  const LB_KEY     = 'fatgraze:leaderboard';
+  const LB_SPORT   = 'fatgraze:sport-leaderboard';
+  const STATS_KEY  = 'fatgraze:stats';
+  const GROUP_SKEY = 'fatgraze:group';
+  const MUTE_KEY   = 'fatgraze:mute';
+  const LB_MAX = 5;
+  // ── Mutable game params — overrideable from Firebase /fat-sheep/config ───────
+  let SPORT_SECONDS      = 90;
+  let GRASS_CELL         = 35;
+  let GRASS_EAT_RATE     = 0.35;
+  let GRASS_RECOVER_RATE = 0.04;
+  let ENERGY_REGEN       = 20; // max energy/sec at full grass quality
+
+  const _urlGroupId = new URLSearchParams(location.search).get('g') ?? null;
+  if (_urlGroupId) sessionStorage.setItem('fatgraze:active-group', _urlGroupId);
+  else sessionStorage.removeItem('fatgraze:active-group');
+  const GROUP_ID   = _urlGroupId ?? null;
+  const GROUP_MODE = !!GROUP_ID;
+
+  const {
+    signInAnonymously, authUrl,
+    fetchLeaderboard, pushLeaderboard,
+    fetchGroupLeaderboard, pushGroupLeaderboard,
+    renderLeaderboard, isNewBest,
+    openFriendsDialog, showFriendsCopyToast,
+    loadStats, saveStats, showAchievementToast,
+    getAudioContext, tone, setSyncStatus
+  } = window.GameFramework;
+
+  // ── Fat stages ─────────────────────────────────────────────────────────────
+  // fatDecay = fat pts/sec lost while at this stage (must keep eating to maintain).
+  let STAGES = [
+    { name: 'Skinny', pts: 0,    size: 38,  speed: 165, maxEnergy: 30,  fatDecay: 0  },
+    { name: 'Chubby', pts: 160,  size: 48,  speed: 150, maxEnergy: 55,  fatDecay: 2  },
+    { name: 'Round',  pts: 500,  size: 60,  speed: 132, maxEnergy: 90,  fatDecay: 5  },
+    { name: 'Chonky', pts: 1160, size: 74,  speed: 112, maxEnergy: 135, fatDecay: 10 },
+    { name: 'Mega',   pts: 2400, size: 90,  speed: 88,  maxEnergy: 190, fatDecay: 18 },
+    { name: 'Blob',   pts: 5000, size: 110, speed: 70,  maxEnergy: 260, fatDecay: 28 },
+  ];
+
+  // ── Food types (weighted random) ───────────────────────────────────────────
+  let FOODS = [
+    { type: 'grass',   emoji: '🌿', pts: 10, effect: null,    dur: 0,    w: 5   },
+    { type: 'flower',  emoji: '🌸', pts: 25, effect: null,    dur: 0,    w: 3   },
+    { type: 'clover',  emoji: '🍀', pts: 60, effect: 'repel', dur: 5000, w: 1.5 },
+    { type: 'apple',   emoji: '🍎', pts: 90, effect: 'speed', dur: 4000, w: 1   },
+    { type: 'whistle', emoji: '🔔', pts: 0,  effect: 'scare', dur: 8000, w: 0.5 },
+  ];
+  let FOOD_TOTAL_W = FOODS.reduce((s, f) => s + f.w, 0);
+
+  // ── Dog breeds — aiStyle: 'erratic' | 'intercept' | 'collie' | 'guard' ─────
+  let DOG_TYPES = [
+    { emoji: '🐶', cssClass: 'dog-small',  fontSize: 22, hitR: 9,  speed: 90,  drain: 10, aiStyle: 'erratic',   minSpawns: 0, weight: 3   },
+    { emoji: '🐕', cssClass: '',            fontSize: 30, hitR: 12, speed: 115, drain: 22, aiStyle: 'intercept', minSpawns: 0, weight: 3   },
+    { emoji: '🐕‍🦺', cssClass: 'dog-collie', fontSize: 36, hitR: 14, speed: 145, drain: 38, aiStyle: 'collie',    minSpawns: 4, weight: 1.5 },
+    { emoji: '🦮', cssClass: 'dog-guard',  fontSize: 42, hitR: 17, speed: 125, drain: 60, aiStyle: 'guard',     minSpawns: 9, weight: 0.7 },
+  ];
+
+  // ── Spawn tuning params ────────────────────────────────────────────────────
+  let PARAMS = {
+    maxFoodNormal:   8,
+    maxFoodSport:    10,
+    foodIntervalMin: 0.7,
+    foodIntervalBase: 2.2,
+    foodScoreDiv:    600,
+    maxDogsCap:      4,
+    dogScoreDiv:     80,
+    dogIntervalMin:  6,
+    dogIntervalBase: 14,
+  };
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let token = null, lb = [], sportLb = [];
+  let sportMode = false, muted = false;
+  let running = false, dead = false;
+  let animId = null, lastTs = 0;
+  let fieldW = 0, fieldH = 0;
+
+  // Sheep
+  let sx = 0, sy = 0;          // center position
+  let tx = 0, ty = 0;          // move target
+  let fatPts = 0, score = 0, stageIdx = 0;
+  let energy = 0, maxEnergy = 0;
+
+  // Entities
+  let foods = [], dogs = [];
+  let nextId = 0;
+  let spawnFoodT = 0, spawnDogT = 0;
+  let dogsSpawned = 0;
+
+  // Power-ups (expiry ms)
+  let repelExp = 0, speedExp = 0, scareExp = 0;
+
+  // Sport
+  let sportEnd = 0;
+
+  // Grass grid
+  let grassGrid = [], grassCols = 0, grassRows = 0;
+
+  // Banner dismiss timer — kept to allow clearTimeout before rescheduling
+  let bannerTimer = null;
+
+  // Keys
+  const keys = {};
+
+  // Stats + personal best
+  let stats = loadStats(STATS_KEY, { games: 0, best: 0, bestStage: 0, food: 0, blobs: 0 });
+  let personalBest = stats.best || 0;
+
+  // ── DOM refs ───────────────────────────────────────────────────────────────
+  const fieldEl     = document.getElementById('grazing-field');
+  const sheepEl     = document.getElementById('sheep-entity');
+  const scoreDsp    = document.getElementById('score-display');
+  const bestDsp     = document.getElementById('best-display');
+  const stageLbl    = document.getElementById('stage-label');
+  const stageSub    = document.getElementById('stage-sub');
+  const fatBar      = document.getElementById('fat-bar');
+  const fatLbl      = document.getElementById('fat-label');
+  const fatNext     = document.getElementById('fat-next');
+  const streakRow   = document.getElementById('streak-row');
+  const syncEl      = document.getElementById('sync-indicator');
+  const lbListEl    = document.getElementById('leaderboard-list');
+  const lbTitleEl   = document.getElementById('leaderboard-title');
+  const powerHud    = document.getElementById('power-hud');
+  const actionBar   = document.getElementById('action-bar');
+  const hiscoreEl   = document.getElementById('hiscore-entry');
+  const modOvEl     = document.getElementById('mode-overlay');
+  const modTitleEl  = document.getElementById('mode-popup-title');
+  const modSubEl    = document.getElementById('mode-popup-sub');
+  const resultEl    = document.getElementById('mode-popup-result');
+  const resultScore = document.getElementById('mode-popup-score-val');
+  const resultSub   = document.getElementById('mode-popup-score-sub');
+  const lvlBanner   = document.getElementById('level-up-banner');
+  const sportTimEl  = document.getElementById('sport-timer');
+  const sportBar    = document.getElementById('sport-timer-bar');
+  const grassCanvas = document.getElementById('grass-canvas');
+  const grassCtx    = grassCanvas.getContext('2d');
+  const energyBar   = document.getElementById('energy-bar');
+  const energyValue = document.getElementById('energy-value');
+  const sportBadge  = document.getElementById('sport-badge');
+  const muteBadge   = document.getElementById('mute-badge');
+  const groupBadge  = document.getElementById('group-badge');
+
+  // ── Audio ──────────────────────────────────────────────────────────────────
+  function sfx(type) {
+    if (muted) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const t = ctx.currentTime;
+    if (type === 'eat_small') {
+      tone(ctx, 440, 'sine', 0.12, t, 0.07);
+      tone(ctx, 660, 'sine', 0.08, t + 0.04, 0.07);
+    } else if (type === 'eat_med') {
+      tone(ctx, 523, 'sine', 0.15, t, 0.09);
+      tone(ctx, 784, 'sine', 0.10, t + 0.06, 0.09);
+    } else if (type === 'eat_big') {
+      [523, 659, 784].forEach((f, i) => tone(ctx, f, 'sine', 0.18, t + i * 0.07, 0.12));
+    } else if (type === 'powerup') {
+      [784, 1046, 1318].forEach((f, i) => tone(ctx, f, 'sine', 0.2, t + i * 0.06, 0.13));
+    } else if (type === 'fat_up') {
+      [330, 415, 523, 659].forEach((f, i) => tone(ctx, f, 'sine', 0.18, t + i * 0.09, 0.15));
+    } else if (type === 'game_over') {
+      [330, 311, 294, 277].forEach((f, i) => tone(ctx, f, 'sawtooth', 0.14, t + i * 0.13, 0.2));
+    } else if (type === 'whistle') {
+      tone(ctx, 1200, 'sine', 0.22, t, 0.04);
+      tone(ctx, 900,  'sine', 0.18, t + 0.05, 0.1);
+      tone(ctx, 1400, 'sine', 0.18, t + 0.13, 0.07);
+    }
+  }
+
+  // ── Sheep visuals ──────────────────────────────────────────────────────────
+  function applySheepVisual() {
+    const s = STAGES[stageIdx];
+    sheepEl.style.fontSize  = s.size + 'px';
+    sheepEl.style.width     = s.size + 'px';
+    sheepEl.style.height    = s.size + 'px';
+  }
+  function moveSheepDom() {
+    const half = STAGES[stageIdx].size / 2;
+    sheepEl.style.transform = `translate(${sx - half}px,${sy - half}px)`;
+  }
+
+  // ── Spawn helpers ──────────────────────────────────────────────────────────
+  function randFood() {
+    let r = Math.random() * FOOD_TOTAL_W;
+    for (const f of FOODS) { r -= f.w; if (r <= 0) return f; }
+    return FOODS[0];
+  }
+  function randInField(margin) {
+    return {
+      x: margin + Math.random() * (fieldW - margin * 2),
+      y: margin + Math.random() * (fieldH - margin * 2),
+    };
+  }
+  function spawnFood() {
+    const def = randFood();
+    const pos = randInField(30);
+    const el = document.createElement('div');
+    el.className = 'food-item';
+    el.textContent = def.emoji;
+    el.style.left = pos.x + 'px';
+    el.style.top  = pos.y + 'px';
+    fieldEl.appendChild(el);
+    foods.push({ id: nextId++, ...def, x: pos.x, y: pos.y, el });
+  }
+  function spawnDog() {
+    const available = DOG_TYPES.filter(t => dogsSpawned >= t.minSpawns);
+    const totalW = available.reduce((s, t) => s + t.weight, 0);
+    let r = Math.random() * totalW, type = available[0];
+    for (const t of available) { r -= t.weight; if (r <= 0) { type = t; break; } }
+
+    // Spawn from the field corner farthest from the sheep; shuffle first to break ties randomly.
+    const spawnCorners = [
+      { fx: 0,      fy: 0,      sx: -40,         sy: -40          },
+      { fx: fieldW, fy: 0,      sx: fieldW + 40,  sy: -40          },
+      { fx: 0,      fy: fieldH, sx: -40,          sy: fieldH + 40  },
+      { fx: fieldW, fy: fieldH, sx: fieldW + 40,  sy: fieldH + 40  },
+    ].sort(() => Math.random() - 0.5);
+    let best = spawnCorners[0], bestDist = -1;
+    for (const c of spawnCorners) {
+      const d = (c.fx - sx) * (c.fx - sx) + (c.fy - sy) * (c.fy - sy);
+      if (d > bestDist) { bestDist = d; best = c; }
+    }
+    let x = best.sx, y = best.sy;
+
+    const el = document.createElement('div');
+    el.className = 'dog-entity' + (type.cssClass ? ' ' + type.cssClass : '');
+    el.textContent = type.emoji;
+    el.style.fontSize = type.fontSize + 'px';
+    fieldEl.appendChild(el);
+
+    let aiState;
+    if      (type.aiStyle === 'erratic')   aiState = { phase: 'chase', timer: 0 };
+    else if (type.aiStyle === 'intercept') aiState = { timer: 0, prevSx: sx, prevSy: sy };
+    else if (type.aiStyle === 'collie')    aiState = { timer: 0, circling: false, angle: Math.atan2(sy - y, sx - x) };
+    else                                   aiState = { phase: 'stalk', timer: 0, chargeVx: 0, chargeVy: 0 };
+
+    dogs.push({
+      id: nextId++, x, y, el,
+      speed: type.speed,
+      drain: type.drain,
+      hitR:  type.hitR,
+      displayOff: type.fontSize / 2,
+      aiStyle: type.aiStyle,
+      aiState,
+    });
+    dogsSpawned++;
+  }
+
+  // ── Game loop ──────────────────────────────────────────────────────────────
+  function loop(ts) {
+    if (!running) return;
+    const dt = Math.min((ts - lastTs) / 1000, 0.12);
+    lastTs = ts;
+
+    stepSheep(dt);
+    stepGrass(dt);
+    stepFatDecay(dt);
+    stepSpawn(dt);
+    stepDogs(dt);
+    checkHits(dt);
+    drawGrass();
+    updateHUD();
+    if (sportMode) checkSport();
+
+    animId = requestAnimationFrame(loop);
+  }
+
+  function stepSheep(dt) {
+    const s = STAGES[stageIdx];
+    let spd = s.speed;
+    if (Date.now() < speedExp) spd *= 1.6;
+
+    // WASD / arrow keys override click target
+    let mx = 0, my = 0;
+    if (keys.ArrowLeft  || keys.a || keys.A) mx = -1;
+    if (keys.ArrowRight || keys.d || keys.D) mx = 1;
+    if (keys.ArrowUp    || keys.w || keys.W) my = -1;
+    if (keys.ArrowDown  || keys.s || keys.S) my = 1;
+
+    if (mx !== 0 || my !== 0) {
+      const len = Math.sqrt(mx * mx + my * my);
+      sx += (mx / len) * spd * dt;
+      sy += (my / len) * spd * dt;
+      tx = sx; ty = sy;
+    } else {
+      const dx = tx - sx, dy = ty - sy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist > 3) { sx += (dx / dist) * spd * dt; sy += (dy / dist) * spd * dt; }
+    }
+
+    // Clamp
+    const r = s.size / 2;
+    sx = Math.max(r, Math.min(fieldW - r, sx));
+    sy = Math.max(r, Math.min(fieldH - r, sy));
+
+    // Speed visual
+    if (Date.now() < speedExp) sheepEl.classList.add('speedy');
+    else sheepEl.classList.remove('speedy');
+
+    moveSheepDom();
+  }
+
+  function stepGrass(dt) {
+    const eatR  = STAGES[stageIdx].size / 2 * 1.1;
+    const eatR2 = eatR * eatR;
+    for (let r = 0; r < grassRows; r++) {
+      for (let c = 0; c < grassCols; c++) {
+        const cx = (c + 0.5) * GRASS_CELL;
+        const cy = (r + 0.5) * GRASS_CELL;
+        const dx = cx - sx, dy = cy - sy;
+        if (dx * dx + dy * dy < eatR2) {
+          grassGrid[r][c] = Math.max(0, grassGrid[r][c] - GRASS_EAT_RATE * dt);
+        } else {
+          grassGrid[r][c] = Math.min(1, grassGrid[r][c] + GRASS_RECOVER_RATE * dt);
+        }
+      }
+    }
+  }
+
+  function getGrassQualityAtSheep() {
+    const eatR  = STAGES[stageIdx].size / 2 * 1.1;
+    const eatR2 = eatR * eatR;
+    let totalQ = 0, count = 0;
+    for (let r = 0; r < grassRows; r++) {
+      for (let c = 0; c < grassCols; c++) {
+        const cx = (c + 0.5) * GRASS_CELL;
+        const cy = (r + 0.5) * GRASS_CELL;
+        const dx = cx - sx, dy = cy - sy;
+        if (dx * dx + dy * dy < eatR2) { totalQ += grassGrid[r][c]; count++; }
+      }
+    }
+    return count > 0 ? totalQ / count : 0;
+  }
+
+  function stepFatDecay(dt) {
+    const decay = STAGES[stageIdx].fatDecay;
+    if (!decay) return;
+    fatPts = Math.max(0, fatPts - decay * dt);
+    let newIdx = 0;
+    for (let i = STAGES.length - 1; i >= 0; i--) {
+      if (fatPts >= STAGES[i].pts) { newIdx = i; break; }
+    }
+    if (newIdx < stageIdx) {
+      stageIdx = newIdx;
+      maxEnergy = STAGES[stageIdx].maxEnergy;
+      energy = Math.min(energy, maxEnergy);
+      applySheepVisual();
+      lvlBanner.textContent = '🌿 Eat more grass!';
+      lvlBanner.style.opacity = '1';
+      lvlBanner.style.transform = 'translate(-50%,-50%) scale(1)';
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => {
+        lvlBanner.style.opacity = '0';
+        lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
+      }, 1500);
+    }
+  }
+
+  function grassColor(q) {
+    // brown (#c2862e) → yellow-green (#c8c040) → lush green (#7dc940)
+    let r, g, b;
+    if (q < 0.5) {
+      const t = q * 2;
+      r = Math.round(194 + (200 - 194) * t);
+      g = Math.round(134 + (192 - 134) * t);
+      b = Math.round(46  + (64  - 46)  * t);
+    } else {
+      const t = (q - 0.5) * 2;
+      r = Math.round(200 + (125 - 200) * t);
+      g = Math.round(192 + (201 - 192) * t);
+      b = 64;
+    }
+    return `rgb(${r},${g},${b})`;
+  }
+
+  function drawGrass() {
+    grassCtx.fillStyle = '#7dc940';
+    grassCtx.fillRect(0, 0, grassCanvas.width, grassCanvas.height);
+    const radius = GRASS_CELL * 0.52;
+    for (let r = 0; r < grassRows; r++) {
+      for (let c = 0; c < grassCols; c++) {
+        const q = grassGrid[r][c];
+        if (q >= 0.99) continue;
+        const cx = (c + 0.5) * GRASS_CELL;
+        const cy = (r + 0.5) * GRASS_CELL;
+        grassCtx.fillStyle = grassColor(q);
+        grassCtx.beginPath();
+        grassCtx.arc(cx, cy, radius, 0, Math.PI * 2);
+        grassCtx.fill();
+      }
+    }
+  }
+
+  function stepSpawn(dt) {
+    spawnFoodT += dt;
+    spawnDogT  += dt;
+
+    const maxFood = sportMode ? PARAMS.maxFoodSport : PARAMS.maxFoodNormal;
+    const foodInterval = Math.max(PARAMS.foodIntervalMin, PARAMS.foodIntervalBase - score / PARAMS.foodScoreDiv);
+    if (spawnFoodT >= foodInterval && foods.length < maxFood) {
+      spawnFoodT = 0; spawnFood();
+    }
+
+    const maxDogs = Math.min(PARAMS.maxDogsCap, 1 + Math.floor(score / PARAMS.dogScoreDiv));
+    const dogInterval = Math.max(PARAMS.dogIntervalMin, PARAMS.dogIntervalBase - score / PARAMS.dogScoreDiv);
+    if (spawnDogT >= dogInterval && dogs.length < maxDogs) {
+      spawnDogT = 0; spawnDog();
+    }
+  }
+
+  function stepDogs(dt) {
+    const now = Date.now();
+    const scared   = now < scareExp;
+    const repelled = now < repelExp;
+
+    dogs.forEach(dog => {
+      if (scared) {
+        const dx = dog.x - sx, dy = dog.y - sy;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        dog.x += (dx / d) * 95 * dt;
+        dog.y += (dy / d) * 95 * dt;
+        dog.el.classList.add('scared');
+        dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+        // Keep prevSx current so intercept velocity is fresh when scare expires
+        if (dog.aiStyle === 'intercept') { dog.aiState.prevSx = sx; dog.aiState.prevSy = sy; }
+        return;
+      }
+      dog.el.classList.remove('scared');
+
+      if (repelled) {
+        const dx = sx - dog.x, dy = sy - dog.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        if (d < 90) { dog.x -= (dx / d) * 38 * dt; dog.y -= (dy / d) * 38 * dt; }
+        dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+        if (dog.aiStyle === 'intercept') { dog.aiState.prevSx = sx; dog.aiState.prevSy = sy; }
+        return;
+      }
+
+      const ai = dog.aiState;
+      ai.timer += dt;
+
+      if (dog.aiStyle === 'erratic') {
+        // Pup: dash toward sheep 1.2s, then veer at a random angle 0.7s, repeat.
+        if (ai.phase === 'chase') {
+          const dx = sx - dog.x, dy = sy - dog.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          dog.x += (dx / d) * dog.speed * dt;
+          dog.y += (dy / d) * dog.speed * dt;
+          if (ai.timer > 1.2) {
+            ai.phase = 'veer';
+            ai.timer = 0;
+            ai.veerAngle = Math.atan2(sy - dog.y, sx - dog.x) + (Math.random() - 0.5) * Math.PI * 1.4;
+          }
+        } else {
+          dog.x += Math.cos(ai.veerAngle) * dog.speed * dt;
+          dog.y += Math.sin(ai.veerAngle) * dog.speed * dt;
+          if (ai.timer > 0.7) { ai.phase = 'chase'; ai.timer = 0; }
+        }
+
+      } else if (dog.aiStyle === 'intercept') {
+        // Herder: estimates sheep velocity and aims for a point ahead of the sheep.
+        // Clamp to realistic sheep speed to prevent spikes on first frame after spawn/scare.
+        const MAX_SHEEP_SPD = 300;
+        const sheepVx = Math.max(-MAX_SHEEP_SPD, Math.min(MAX_SHEEP_SPD, (sx - ai.prevSx) / dt));
+        const sheepVy = Math.max(-MAX_SHEEP_SPD, Math.min(MAX_SHEEP_SPD, (sy - ai.prevSy) / dt));
+        ai.prevSx = sx; ai.prevSy = sy;
+        const predX = sx + sheepVx * 0.35;
+        const predY = sy + sheepVy * 0.35;
+        const dx = predX - dog.x, dy = predY - dog.y;
+        const d = Math.sqrt(dx * dx + dy * dy) || 1;
+        dog.x += (dx / d) * dog.speed * dt;
+        dog.y += (dy / d) * dog.speed * dt;
+
+      } else if (dog.aiStyle === 'collie') {
+        // Border Collie: chase 2.5s → orbit at 80px for 1.6s → repeat.
+        if (!ai.circling) {
+          const dx = sx - dog.x, dy = sy - dog.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          dog.x += (dx / d) * dog.speed * dt;
+          dog.y += (dy / d) * dog.speed * dt;
+          if (ai.timer > 2.5) { ai.circling = true; ai.timer = 0; }
+        } else {
+          ai.angle += 2.8 * dt;
+          const gx = sx + Math.cos(ai.angle) * 80;
+          const gy = sy + Math.sin(ai.angle) * 80;
+          const ddx = gx - dog.x, ddy = gy - dog.y;
+          const d2 = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+          dog.x += (ddx / d2) * 130 * dt;
+          dog.y += (ddy / d2) * 130 * dt;
+          if (ai.timer > 1.6) { ai.circling = false; ai.timer = 0; }
+        }
+
+      } else if (dog.aiStyle === 'guard') {
+        // Guard Dog: slow stalk 2s (telegraphs) → locked charge at 220% speed 1s → cooldown 0.6s.
+        if (ai.phase === 'stalk') {
+          const dx = sx - dog.x, dy = sy - dog.y;
+          const d = Math.sqrt(dx * dx + dy * dy) || 1;
+          dog.x += (dx / d) * dog.speed * 0.5 * dt;
+          dog.y += (dy / d) * dog.speed * 0.5 * dt;
+          if (ai.timer > 2.0) {
+            ai.phase = 'charge'; ai.timer = 0;
+            const ddx = sx - dog.x, ddy = sy - dog.y;
+            const dd = Math.sqrt(ddx * ddx + ddy * ddy) || 1;
+            ai.chargeVx = (ddx / dd) * dog.speed * 2.2;
+            ai.chargeVy = (ddy / dd) * dog.speed * 2.2;
+          }
+        } else if (ai.phase === 'charge') {
+          dog.x += ai.chargeVx * dt;
+          dog.y += ai.chargeVy * dt;
+          if (ai.timer > 1.0) { ai.phase = 'cooldown'; ai.timer = 0; }
+        } else {
+          if (ai.timer > 0.6) { ai.phase = 'stalk'; ai.timer = 0; }
+        }
+      }
+
+      dog.el.style.transform = `translate(${dog.x - dog.displayOff}px,${dog.y - dog.displayOff}px)`;
+    });
+  }
+
+  function checkHits(dt) {
+    if (dead) return;
+    const sr = STAGES[stageIdx].size / 2 * 0.85;
+
+    // Food
+    foods = foods.filter(food => {
+      const dx = sx - food.x, dy = sy - food.y;
+      if (Math.sqrt(dx * dx + dy * dy) < sr + 18) {
+        eatFood(food);
+        food.el.remove();
+        return false;
+      }
+      return true;
+    });
+
+    // Energy regen scales with grass quality — eaten-out patches restore little.
+    const grassQ = getGrassQualityAtSheep();
+
+    // Dog contact — drain fight energy instead of instant death
+    if (Date.now() >= scareExp) {
+      let totalDrain = 0;
+      dogs.forEach(dog => {
+        const dx = sx - dog.x, dy = sy - dog.y;
+        if (Math.sqrt(dx * dx + dy * dy) < sr + dog.hitR) totalDrain += dog.drain;
+      });
+      if (totalDrain > 0) {
+        energy = Math.max(0, energy - totalDrain * dt);
+        sheepEl.classList.add('hurt');
+        if (energy <= 0) { endGame(); return; }
+      } else {
+        sheepEl.classList.remove('hurt');
+        energy = Math.min(maxEnergy, energy + ENERGY_REGEN * Math.max(0.1, grassQ) * dt);
+      }
+    } else {
+      sheepEl.classList.remove('hurt');
+      energy = Math.min(maxEnergy, energy + ENERGY_REGEN * Math.max(0.1, grassQ) * dt);
+    }
+  }
+
+  function eatFood(food) {
+    stats.food = (stats.food || 0) + 1;
+    score  += food.pts;
+    fatPts += food.pts;
+
+    // Sound
+    if      (food.pts >= 90) sfx('eat_big');
+    else if (food.pts >= 25) sfx('eat_med');
+    else if (food.pts >  0)  sfx('eat_small');
+
+    // Effects
+    if (food.effect === 'repel') { repelExp = Date.now() + food.dur; sfx('eat_big'); }
+    if (food.effect === 'speed') { speedExp = Date.now() + food.dur; sfx('powerup'); }
+    if (food.effect === 'scare') { scareExp = Date.now() + food.dur; sfx('whistle'); }
+
+    // Fat stage progression
+    let newIdx = 0;
+    for (let i = STAGES.length - 1; i >= 0; i--) {
+      if (fatPts >= STAGES[i].pts) { newIdx = i; break; }
+    }
+    if (newIdx > stageIdx) {
+      stageIdx = newIdx;
+      const prevMax = maxEnergy;
+      maxEnergy = STAGES[stageIdx].maxEnergy;
+      energy = Math.min(maxEnergy, energy + (maxEnergy - prevMax) * 0.5);
+      applySheepVisual();
+      sfx('fat_up');
+      const stageName = STAGES[stageIdx].name;
+      lvlBanner.textContent = '🐑 ' + stageName + '!';
+      lvlBanner.style.opacity = '1';
+      lvlBanner.style.transform = 'translate(-50%,-50%) scale(1)';
+      clearTimeout(bannerTimer);
+      bannerTimer = setTimeout(() => {
+        lvlBanner.style.opacity = '0';
+        lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
+      }, 1500);
+      if (stageIdx === STAGES.length - 1) {
+        stats.blobs = (stats.blobs || 0) + 1;
+        showAchievementToast({ icon: '🐑', label: 'Maximum Chonk', desc: 'You reached Blob stage!' });
+      }
+    }
+
+    // Floating score
+    if (food.pts > 0) {
+      const el = document.createElement('div');
+      const cls = food.pts >= 60 ? 'big-eat' : '';
+      el.className = 'floating-score' + (cls ? ' ' + cls : '');
+      el.textContent = '+' + food.pts;
+      el.style.left = food.x + 'px';
+      el.style.top  = food.y + 'px';
+      fieldEl.appendChild(el);
+      setTimeout(() => el.remove(), 950);
+    }
+
+    // Field shake on power-up
+    if (food.effect) {
+      fieldEl.classList.add('shaking-small');
+      fieldEl.addEventListener('animationend', () => fieldEl.classList.remove('shaking-small'), { once: true });
+    }
+  }
+
+  function updateHUD() {
+    const s     = STAGES[stageIdx];
+    const next  = STAGES[stageIdx + 1];
+    const pct   = next
+      ? Math.min(100, ((fatPts - s.pts) / (next.pts - s.pts)) * 100)
+      : 100;
+
+    scoreDsp.textContent = score;
+    stageLbl.textContent = '🐑 ' + s.name;
+    fatLbl.textContent   = s.name;
+    fatBar.style.width   = pct + '%';
+    fatNext.textContent  = next
+      ? 'Next: ' + next.name + ' (' + (next.pts - fatPts) + ' pts away)'
+      : 'Maximum size!';
+
+    // Energy bar
+    const ePct = maxEnergy > 0 ? Math.max(0, (energy / maxEnergy) * 100) : 100;
+    energyBar.style.width = ePct + '%';
+    energyBar.style.background = ePct > 60 ? '#4caf50' : ePct > 30 ? '#ff9800' : '#f44336';
+    energyValue.textContent = Math.ceil(energy) + ' / ' + maxEnergy;
+
+    // Power HUD
+    const now = Date.now();
+    const parts = [];
+    if (now < speedExp) parts.push('🍎 Speed boost');
+    if (now < repelExp) parts.push('🍀 Dogs repelled');
+    if (now < scareExp) parts.push('🔔 Dogs fleeing!');
+    powerHud.textContent = parts.join('  ');
+  }
+
+  function checkSport() {
+    const left = (sportEnd - Date.now()) / 1000;
+    if (left <= 0) { sportBar.style.transform = 'scaleX(0)'; endGame(); return; }
+    sportBar.style.transform = 'scaleX(' + (left / SPORT_SECONDS) + ')';
+  }
+
+  // ── End game ───────────────────────────────────────────────────────────────
+  function endGame() {
+    if (dead) return;
+    dead = true; running = false;
+    cancelAnimationFrame(animId);
+    sheepEl.classList.remove('hurt');
+    sfx('game_over');
+
+    fieldEl.classList.add('shaking');
+    fieldEl.addEventListener('animationend', () => fieldEl.classList.remove('shaking'), { once: true });
+
+    if (score > (stats.best || 0)) stats.best = score;
+    if (stageIdx > (stats.bestStage || 0)) stats.bestStage = stageIdx;
+    saveStats(STATS_KEY, stats);
+    personalBest = stats.best;
+    bestDsp.textContent = personalBest || '—';
+
+    resultEl.style.display   = '';
+    resultScore.textContent  = score;
+    resultSub.textContent    = STAGES[stageIdx].name + ' sheep · ' + (sportMode ? 'Sport' : 'Normal') + ' mode';
+    modTitleEl.textContent   = score === 0 ? 'Caught immediately!' : 'Game Over!';
+
+    const currentLb = sportMode ? sportLb : lb;
+    if (isNewBest(currentLb, score, LB_MAX) && score > 0) hiscoreEl.style.display = '';
+
+    actionBar.innerHTML = '';
+    modSubEl.textContent = 'Choose your mode';
+
+    modOvEl.style.display = 'flex';
+    if (score > 0) pushScore(score);
+    updateStatsPanel();
+  }
+
+  async function pushScore(s) {
+    const lbKey = sportMode ? LB_SPORT : LB_KEY;
+    const lbUrl = sportMode ? DB + '/sport' : DB;
+    if (GROUP_MODE) {
+      const result = await pushGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode, max: LB_MAX, lb: addTempScore(s), token, syncEl });
+      if (sportMode) sportLb = result; else lb = result;
+    } else {
+      const merged = await pushLeaderboard({ dbUrl: lbUrl, localKey: lbKey, max: LB_MAX, lb: addTempScore(s), token, syncEl });
+      if (sportMode) sportLb = merged; else lb = merged;
+    }
+    refreshLb();
+  }
+
+  function addTempScore(s) {
+    const curr = sportMode ? [...sportLb] : [...lb];
+    curr.push({ name: '???', score: s, date: new Date().toISOString().slice(0, 10) });
+    curr.sort((a, b) => b.score - a.score);
+    return curr.slice(0, LB_MAX);
+  }
+
+  // ── Name entry ─────────────────────────────────────────────────────────────
+  const nameInput = document.getElementById('hiscore-name');
+  const nameSaveBtn = document.getElementById('hiscore-save');
+
+  function doSaveScore() {
+    const raw  = nameInput.value.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, '').slice(0, 10);
+    const name = raw || 'SHEEP';
+    const entry = { name, score, date: new Date().toISOString().slice(0, 10) };
+    const lbKey = sportMode ? LB_SPORT : LB_KEY;
+    const lbUrl = sportMode ? DB + '/sport' : DB;
+    const curr  = sportMode ? [...sportLb] : [...lb];
+    curr.push(entry); curr.sort((a, b) => b.score - a.score);
+    const trimmed = curr.slice(0, LB_MAX);
+    pushLeaderboard({ dbUrl: lbUrl, localKey: lbKey, max: LB_MAX, lb: trimmed, token, syncEl });
+    if (sportMode) sportLb = trimmed; else lb = trimmed;
+    hiscoreEl.style.display = 'none';
+    refreshLb();
+    if (name === 'SHEEP' || name === 'BLOB') showAchievementToast({ icon: '🐑', label: 'Bold Name Choice', desc: 'Very on-brand.' });
+  }
+  nameSaveBtn.onclick = doSaveScore;
+  nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') doSaveScore(); });
+
+  // ── Leaderboard ────────────────────────────────────────────────────────────
+  function refreshLb() {
+    const current = GROUP_MODE
+      ? (sportMode ? sportLb : lb)
+      : (sportMode ? sportLb : lb);
+    renderLeaderboard(lbListEl, lbTitleEl, current,
+      GROUP_MODE ? '👥 Group Top 5' : (sportMode ? '⚡ Sport Top 5' : '🌍 World Top 5'));
+  }
+
+  // ── Stats panel ────────────────────────────────────────────────────────────
+  function updateStatsPanel() {
+    document.getElementById('stat-games').textContent = stats.games || 0;
+    document.getElementById('stat-best').textContent  = stats.best  || '—';
+    document.getElementById('stat-stage').textContent = STAGES[stats.bestStage || 0].name;
+    document.getElementById('stat-food').textContent  = stats.food  || 0;
+    document.getElementById('stat-blobs').textContent = stats.blobs || 0;
+  }
+
+  // ── Start game ─────────────────────────────────────────────────────────────
+  function startGame(isSport) {
+    sportMode = isSport;
+    running = true; dead = false;
+    score = 0; fatPts = 0; stageIdx = 0;
+    energy = maxEnergy = STAGES[0].maxEnergy;
+    repelExp = 0; speedExp = 0; scareExp = 0;
+    spawnFoodT = 0; spawnDogT = 9;
+    dogsSpawned = 0;
+    Object.keys(keys).forEach(k => delete keys[k]);
+
+    foods.forEach(f => f.el.remove()); foods = [];
+    dogs.forEach(d => d.el.remove());  dogs  = [];
+
+    fieldW = fieldEl.offsetWidth;
+    fieldH = fieldEl.offsetHeight;
+    sx = fieldW / 2; sy = fieldH / 2;
+    tx = sx; ty = sy;
+
+    grassCols = Math.ceil(fieldW / GRASS_CELL);
+    grassRows = Math.ceil(fieldH / GRASS_CELL);
+    grassGrid = Array.from({ length: grassRows }, () => new Float32Array(grassCols).fill(1));
+    grassCanvas.width  = fieldW;
+    grassCanvas.height = fieldH;
+    grassCtx.fillStyle = '#7dc940';
+    grassCtx.fillRect(0, 0, fieldW, fieldH);
+
+    stageIdx = 0; applySheepVisual(); moveSheepDom();
+    sheepEl.style.display = '';
+    targetDot.style.display = 'none';
+    lvlBanner.style.opacity = '0';
+    lvlBanner.style.transform = 'translate(-50%,-50%) scale(0.5)';
+    hiscoreEl.style.display = 'none';
+    powerHud.textContent = '';
+    streakRow.textContent = '';
+    actionBar.innerHTML = '';
+
+    if (sportMode) {
+      sportEnd = Date.now() + SPORT_SECONDS * 1000;
+      sportTimEl.style.display = '';
+      sportBar.style.transform = 'scaleX(1)';
+      if (sportBadge) sportBadge.style.display = '';
+      document.body.classList.add('sport-mode');
+    } else {
+      sportTimEl.style.display = 'none';
+      if (sportBadge) sportBadge.style.display = 'none';
+      document.body.classList.remove('sport-mode');
+    }
+
+    modOvEl.style.display = 'none';
+
+    // Seed some food
+    for (let i = 0; i < 5; i++) spawnFood();
+
+    stats.games = (stats.games || 0) + 1;
+    saveStats(STATS_KEY, stats);
+    updateHUD();
+
+    lastTs = performance.now();
+    animId = requestAnimationFrame(loop);
+  }
+
+  // ── Mode popup ─────────────────────────────────────────────────────────────
+  function showPopup() {
+    modOvEl.style.display = 'flex';
+    if (GROUP_MODE && groupBadge) { groupBadge.style.display = ''; groupBadge.textContent = '👥 Group Mode'; }
+    document.getElementById('mpc-leave-group').style.display = GROUP_MODE ? '' : 'none';
+  }
+
+  document.getElementById('mpc-normal').onclick = () => startGame(false);
+  document.getElementById('mpc-sport').onclick  = () => startGame(true);
+  document.getElementById('popup-stats-btn').onclick = openDrawer;
+
+  document.getElementById('mpc-friends').onclick = () => {
+    openFriendsDialog({
+      dbUrl: DB, groupId: GROUP_ID, groupMode: GROUP_MODE,
+      token, storageKey: GROUP_SKEY, ttlMs: 864000000,
+      gameTitle: 'Fat Grazing Sheep',
+      shareText: 'How fat can your sheep get? 🐑 Play with me!',
+    });
+  };
+  document.getElementById('mpc-leave-group').onclick = () => {
+    localStorage.removeItem(GROUP_SKEY);
+    location.href = location.pathname;
+  };
+
+  // ── Info drawer ────────────────────────────────────────────────────────────
+  function openDrawer() {
+    document.getElementById('info-overlay').classList.add('open');
+    document.getElementById('info-drawer').classList.add('open');
+    refreshLb();
+    updateStatsPanel();
+  }
+  function closeDrawer() {
+    document.getElementById('info-overlay').classList.remove('open');
+    document.getElementById('info-drawer').classList.remove('open');
+  }
+  document.getElementById('stats-btn').onclick  = openDrawer;
+  document.getElementById('info-close').onclick = closeDrawer;
+  document.getElementById('info-overlay').onclick = e => { if (e.target === e.currentTarget) closeDrawer(); };
+
+  // Mute toggle
+  muted = localStorage.getItem(MUTE_KEY) === '1';
+  function updateMuteUI() {
+    document.getElementById('mute-toggle').textContent = muted ? 'On' : 'Off';
+    if (muteBadge) { muteBadge.style.display = muted ? '' : 'none'; }
+  }
+  document.getElementById('mute-toggle').onclick = () => {
+    muted = !muted;
+    localStorage.setItem(MUTE_KEY, muted ? '1' : '0');
+    updateMuteUI();
+  };
+  updateMuteUI();
+
+  // Friends overlay close
+  document.getElementById('friends-close-btn').onclick = () => {
+    document.getElementById('friends-overlay').style.display = 'none';
+  };
+
+  // ── Controls ───────────────────────────────────────────────────────────────
+  document.addEventListener('keydown', e => {
+    keys[e.key] = true;
+    // Prevent page scroll
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' '].includes(e.key)) e.preventDefault();
+  });
+  document.addEventListener('keyup', e => { delete keys[e.key]; });
+
+  const targetDot = document.getElementById('move-target');
+  let targetFadeTimer = null;
+
+  function setTarget(x, y) {
+    tx = x; ty = y;
+    targetDot.style.left = x + 'px';
+    targetDot.style.top  = y + 'px';
+    targetDot.style.display = '';
+    targetDot.className = 'active';
+    clearTimeout(targetFadeTimer);
+    targetFadeTimer = setTimeout(() => { targetDot.className = 'fading'; }, 800);
+  }
+
+  fieldEl.addEventListener('click', e => {
+    if (!running) return;
+    const rect = fieldEl.getBoundingClientRect();
+    setTarget(e.clientX - rect.left, e.clientY - rect.top);
+  });
+  fieldEl.addEventListener('touchstart', e => {
+    if (!running) return;
+    e.preventDefault();
+    const rect = fieldEl.getBoundingClientRect();
+    const t = e.touches[0];
+    setTarget(t.clientX - rect.left, t.clientY - rect.top);
+  }, { passive: false });
+  fieldEl.addEventListener('touchmove', e => {
+    if (!running) return;
+    e.preventDefault();
+    const rect = fieldEl.getBoundingClientRect();
+    const t = e.touches[0];
+    setTarget(t.clientX - rect.left, t.clientY - rect.top);
+  }, { passive: false });
+
+  // ── Remote config ──────────────────────────────────────────────────────────
+  async function fetchConfig() {
+    try {
+      const res = await fetch(DB + '/config.json');
+      if (!res.ok) return;
+      const cfg = await res.json();
+      if (!cfg) return;
+      if (Array.isArray(cfg.stages) && cfg.stages.length > 0 &&
+          cfg.stages.every(s => s.pts != null && s.size != null && s.speed != null && s.maxEnergy != null && s.fatDecay != null))
+        STAGES = cfg.stages;
+      if (Array.isArray(cfg.foods))     { FOODS = cfg.foods; FOOD_TOTAL_W = FOODS.reduce((s, f) => s + f.w, 0); }
+      if (Array.isArray(cfg.dogs))      DOG_TYPES = cfg.dogs;
+      if (cfg.grassCell != null)        GRASS_CELL = cfg.grassCell;
+      if (cfg.grassEatRate != null)     GRASS_EAT_RATE = cfg.grassEatRate;
+      if (cfg.grassRecoverRate != null) GRASS_RECOVER_RATE = cfg.grassRecoverRate;
+      if (cfg.energyRegen != null)      ENERGY_REGEN = cfg.energyRegen;
+      if (cfg.sportSeconds != null)     SPORT_SECONDS = cfg.sportSeconds;
+      if (cfg.params && typeof cfg.params === 'object') Object.assign(PARAMS, cfg.params);
+    } catch (_) { /* use defaults on any error */ }
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  async function init() {
+    bestDsp.textContent = personalBest || '—';
+    updateStatsPanel();
+
+    await fetchConfig();
+    token = await signInAnonymously(window.__FB_KEY__);
+
+    if (GROUP_MODE) {
+      lb = await fetchGroupLeaderboard({ dbUrl: DB, groupId: GROUP_ID, sportMode: false, max: LB_MAX, syncEl });
+    } else {
+      lb      = await fetchLeaderboard({ dbUrl: DB,           localKey: LB_KEY,   max: LB_MAX, syncEl });
+      sportLb = await fetchLeaderboard({ dbUrl: DB + '/sport', localKey: LB_SPORT, max: LB_MAX, syncEl: null });
+    }
+
+    modTitleEl.textContent = '🐑 Fat Grazing Sheep';
+    modSubEl.textContent   = 'Choose your mode';
+    resultEl.style.display = 'none';
+    showPopup();
+    refreshLb();
+  }
+
+  init();
+})();
+</script>  </body></html>

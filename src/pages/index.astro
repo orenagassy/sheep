@@ -13,15 +13,7 @@ const schema = JSON.stringify({
       "@id": "https://sheeps.online/#website",
       "url": "https://sheeps.online/",
       "name": "Sheeps.online",
-      "description": "Free online casual games for kids and adults. Play browser games instantly, no download required.",
-      "potentialAction": {
-        "@type": "SearchAction",
-        "target": {
-          "@type": "EntryPoint",
-          "urlTemplate": "https://sheeps.online/?q={search_term_string}"
-        },
-        "query-input": "required name=search_term_string"
-      }
+      "description": "Free online casual games for kids and adults. Play browser games instantly, no download required."
     },
     {
       "@type": "Organization",
@@ -403,6 +395,18 @@ const schema = JSON.stringify({
       gap: 4px;
     }
     .fact-widget-link:hover { text-decoration: underline; }
+    .site-footer {
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,0,0,0.08);
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: #94918a;
+    }
+    .site-footer a { color: #6b6961; text-decoration: none; }
+    .site-footer a:hover { color: #4a9e6b; }
     @media (max-width: 480px) {
       main { padding: 32px 16px 48px; }
       h1 { font-size: 26px; }
@@ -484,14 +488,16 @@ const schema = JSON.stringify({
 
     <section class="about" aria-label="About Sheeps.online">
       <h2>Free browser games, no waiting</h2>
-      <p>Sheeps.online is a handful of free browser games. No app, no account. Some take a few minutes, some longer. We keep adding more.</p>
+      <p>Sheeps.online is a collection of free browser games built around a sheep theme. No app, no account, nothing to install. Open the page and start playing.</p>
+      <p>The games cover different styles: Sheep Gates is a fast reflex game where you pick the right gate before a wolf appears. Fat Grazing Sheep is a movement game where you eat, grow, and dodge sheepdogs. Plop Drop is a catch game with drone sheep dropping things you would rather not think about. Sheep State Quest and State Eats Quest are geography and food trivia games built around a US map.</p>
+      <p>The site also has <a href="/sheep-facts/" style="color:#4a9e6b;font-weight:600;">250 Funny Sheep Facts</a> — a researched collection covering everything from rectangular pupils and world records to the first hot air balloon passenger (a sheep named Montauciel, since you asked).</p>
       <div class="features">
         <div class="feature"><span class="feature-icon">🆓</span><span>100% free to play</span></div>
         <div class="feature"><span class="feature-icon">⚡</span><span>Instant, no install</span></div>
         <div class="feature"><span class="feature-icon">📱</span><span>Works on any device</span></div>
         <div class="feature"><span class="feature-icon">👨‍👩‍👧</span><span>Safe for kids</span></div>
-        <div class="feature"><span class="feature-icon">🏆</span><span>Global leaderboards</span></div>
-        <div class="feature"><span class="feature-icon">👥</span><span>Play with friends</span></div>
+        <div class="feature"><span class="feature-icon">🏆</span><span>Leaderboards in select games</span></div>
+        <div class="feature"><span class="feature-icon">👥</span><span>Group play in select games</span></div>
       </div>
     </section>
 
@@ -515,6 +521,12 @@ const schema = JSON.stringify({
         <p>Any device with a browser works. Phone, tablet, laptop, that old desktop in the corner. Doesn't matter.</p>
       </details>
     </section>
+    <footer class="site-footer">
+      <span>© 2026 Sheeps.online</span>
+      <a href="/about/">About</a>
+      <a href="/privacy/">Privacy Policy</a>
+      <a href="/sheep-facts/">250 Sheep Facts</a>
+    </footer>
   </main>
   <script define:vars={{ sheepFacts }}>
     const el = document.getElementById('random-sheep-fact');

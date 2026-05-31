@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+const title = 'Privacy Policy | Sheeps.online';
+const description = 'Privacy policy for Sheeps.online — free browser games and sheep facts. Learn how we handle cookies, advertising, and analytics data.';
+---
+<BaseLayout {title} {description}>
+  <Fragment slot="head">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐑</text></svg>" />
+  </Fragment>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #f5f1e8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+      color: #2c2c2a;
+    }
+    main {
+      max-width: 740px;
+      margin: 0 auto;
+      padding: 48px 24px 80px;
+    }
+    .back { font-size: 14px; color: #4a9e6b; text-decoration: none; font-weight: 600; display: inline-block; margin-bottom: 32px; }
+    .back:hover { text-decoration: underline; }
+    h1 { font-size: 32px; font-weight: 800; margin: 0 0 6px; }
+    .updated { font-size: 13px; color: #6b6961; margin: 0 0 40px; }
+    h2 { font-size: 18px; font-weight: 700; margin: 36px 0 10px; color: #2c2c2a; }
+    p, li { font-size: 15px; line-height: 1.7; color: #3a3a38; margin: 0 0 14px; }
+    ul { padding-left: 20px; margin: 0 0 14px; }
+    a { color: #4a9e6b; }
+    .section { background: #fff; border-radius: 12px; padding: 24px 28px; border: 1px solid rgba(0,0,0,0.08); margin-bottom: 20px; }
+    @media (max-width: 480px) { main { padding: 32px 16px 56px; } h1 { font-size: 26px; } }
+  </style>
+  <main>
+    <a href="/" class="back">← Back to Sheeps.online</a>
+    <h1>Privacy Policy</h1>
+    <p class="updated">Last updated: May 30, 2026</p>
+
+    <div class="section">
+      <h2>Overview</h2>
+      <p>Sheeps.online provides free browser games and editorial content. We do not require registration or accounts. This policy explains what data is collected when you use the site, by whom, and how it is used.</p>
+    </div>
+
+    <div class="section">
+      <h2>Data we collect directly</h2>
+      <p>We do not collect names, email addresses, or any personally identifying information directly. No account is required to play any game or read any content on this site.</p>
+      <p>Some games include an optional leaderboard feature powered by Google Firebase. If you submit a score to the leaderboard, you choose a display name. That name and score are stored in Firebase Realtime Database. No email address or identity verification is required.</p>
+    </div>
+
+    <div class="section">
+      <h2>Google Analytics</h2>
+      <p>This site uses Google Analytics 4 (measurement ID: G-JVNNP0C4D3) to understand how visitors use the site. Google Analytics collects data including pages visited, time on site, device type, and approximate location (country/region level). This data is processed by Google and subject to <a href="https://policies.google.com/privacy" rel="noopener">Google's Privacy Policy</a>.</p>
+      <p>Google Analytics uses cookies to distinguish visitors. You can opt out of Google Analytics tracking using the <a href="https://tools.google.com/dlpage/gaoptout" rel="noopener">Google Analytics Opt-out Browser Add-on</a>.</p>
+    </div>
+
+    <div class="section">
+      <h2>Advertising (Google AdSense)</h2>
+      <p>This site uses Google AdSense (publisher ID: ca-pub-5105009779643901) to display advertisements. Google AdSense may use cookies and similar technologies to show ads based on your prior visits to this and other websites.</p>
+      <p>Google's advertising practices are governed by <a href="https://policies.google.com/technologies/ads" rel="noopener">Google's Advertising Policies</a>. You can opt out of personalized advertising at <a href="https://www.google.com/settings/ads" rel="noopener">Google Ad Settings</a> or through the <a href="https://optout.aboutads.info/" rel="noopener">Digital Advertising Alliance</a>.</p>
+    </div>
+
+    <div class="section">
+      <h2>Cookies</h2>
+      <p>We do not set first-party cookies ourselves. Cookies on this site are set by third-party services including Google Analytics and Google AdSense. These cookies are used for analytics and advertising purposes as described above.</p>
+      <p>You can control cookies through your browser settings. Disabling cookies may affect how some features of the site function.</p>
+    </div>
+
+    <div class="section">
+      <h2>Children's privacy</h2>
+      <p>Sheeps.online is designed to be family-friendly and suitable for children. We do not knowingly collect personal information from children under 13. If you believe a child has submitted personal information through this site, please contact us so we can remove it.</p>
+      <p>Advertising on this site is provided by Google AdSense. Google's policies restrict personalized advertising to users over the age of consent in their jurisdiction.</p>
+    </div>
+
+    <div class="section">
+      <h2>Third-party links</h2>
+      <p>This site does not contain links to third-party websites beyond the services described in this policy. If that changes, this policy will be updated.</p>
+    </div>
+
+    <div class="section">
+      <h2>Changes to this policy</h2>
+      <p>We may update this privacy policy from time to time. The "last updated" date at the top of this page reflects the most recent revision. Continued use of the site after changes are posted constitutes acceptance of the updated policy.</p>
+    </div>
+
+    <div class="section">
+      <h2>Contact</h2>
+      <p>Questions about this privacy policy can be directed to the site owner via <a href="/about/">the about page</a>.</p>
+    </div>
+  </main>
+</BaseLayout>
